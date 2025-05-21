@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventPass - Организатор и Пользователь</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6200EE;
+            --primary-dark: #3700B3;
+            --secondary: #03DAC6;
+            --background: #121212;
+            --surface: #1E1E1E;
+            --surface-light: #2A2A2A;
+            --error: #CF6679;
+            --success: #4CAF50;
+            --warning: #FFC107;
+            --on-primary: #FFFFFF;
+            --on-background: #E1E1E1;
+            --on-surface: #E1E1E1;
+            --on-error: #000000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--on-background);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            width: 100%;
+        }
+
+        header {
+            background-color: var(--surface);
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--secondary);
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: var(--on-primary);
+        }
+
+        .mode-switcher {
+            display: flex;
+            background-color: #2c2c2c;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .mode-btn {
+            padding: 8px 16px;
+            background: none;
+            border: none;
+            color: #999;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 14px;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--secondary);
+            color: var(--secondary);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(3, 218, 198, 0.1);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--on-primary);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: var(--on-primary);
+        }
+
+        .btn-success:hover {
+            background-color: #388E3C;
+        }
+
+        .btn-danger {
+            background-color: var(--error);
+            color: var(--on-primary);
+        }
+
+        .btn-danger:hover {
+            background-color: #b00020;
+        }
+
+        main {
+            flex: 1;
+            padding: 30px 0;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        /* Стили для организатора */
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .event-card {
+            background-color: var(--surface);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .event-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .event-image {
+            height: 160px;
+            background-color: #333;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .event-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .status-draft {
+            background-color: var(--warning);
+            color: black;
+        }
+
+        .status-ended {
+            background-color: #9E9E9E;
+            color: white;
+        }
+
+        .event-details {
+            padding: 20px;
+        }
+
+        .event-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .event-date {
+            display: flex;
+            align-items: center;
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .event-date i {
+            margin-right: 5px;
+        }
+
+        .event-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 15px;
+        }
+
+        .event-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .event-actions .btn {
+            flex: 1;
+            padding: 8px;
+            font-size: 13px;
+        }
+
+        .create-event-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            min-height: 200px;
+            background-color: var(--surface);
+            border: 2px dashed #444;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .create-event-btn:hover {
+            border-color: var(--secondary);
+            background-color: var(--surface-light);
+        }
+
+        .create-event-btn i {
+            font-size: 24px;
+            margin-right: 10px;
+            color: var(--secondary);
+        }
+
+        .create-event-btn span {
+            font-weight: 500;
+        }
+
+        /* Модальное окно создания мероприятия */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background-color: var(--surface);
+            margin: 50px auto;
+            max-width: 800px;
+            width: 90%;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: #999;
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: var(--on-surface);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--on-surface);
+            opacity: 0.8;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: #2c2c2c;
+            border: 1px solid #333;
+            border-radius: 5px;
+            color: var(--on-surface);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 2px rgba(3, 218, 198, 0.2);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .form-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 20px;
+            border-top: 1px solid #333;
+        }
+
+        .file-upload {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            border: 2px dashed #444;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload:hover {
+            border-color: var(--secondary);
+        }
+
+        .file-upload i {
+            font-size: 40px;
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+
+        .file-upload input {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* Статистика мероприятия */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: var(--surface);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--secondary);
+        }
+
+        .stat-label {
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Стили для пользователя */
+        .event-category {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+        }
+
+        .event-location {
+            display: flex;
+            align-items: center;
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .event-location i {
+            margin-right: 5px;
+        }
+
+        .event-price {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--secondary);
+        }
+
+        /* Модальное окно покупки билета */
+        .ticket-options {
+            margin-top: 20px;
+        }
+
+        .ticket-option {
+            background-color: #2c2c2c;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .ticket-option-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .ticket-option-name {
+            font-weight: 600;
+        }
+
+        .ticket-option-price {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .ticket-option-description {
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .ticket-quantity {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+        }
+
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            background-color: #333;
+            border: none;
+            color: var(--on-surface);
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quantity-input {
+            width: 50px;
+            text-align: center;
+            background-color: #2c2c2c;
+            border: 1px solid #333;
+            color: var(--on-surface);
+            padding: 5px;
+            margin: 0 5px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-top: 1px solid #333;
+        }
+
+        .total-price {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 992px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .events-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <a href="#" class="logo">Event<span>Pass</span></a>
+            <div class="mode-switcher">
+                <button class="mode-btn active" data-mode="organizer">Организатор</button>
+                <button class="mode-btn" data-mode="user">Пользователь</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <!-- Режим организатора -->
+            <div class="content-section active" id="organizer-content">
+                <div class="page-header">
+                    <h1 class="page-title">Мои мероприятия</h1>
+                    <button class="btn btn-primary" id="createEventBtn"><i class="fas fa-plus"></i> Создать мероприятие</button>
+                </div>
+
+                <div class="events-grid">
+                    <div class="event-card">
+                        <div class="event-image" style="background-image: url('https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80')">
+                            <span class="event-status status-active">Активно</span>
+                        </div>
+                        <div class="event-details">
+                            <h3 class="event-title">Концерт классической музыки</h3>
+                            <div class="event-date">
+                                <i class="far fa-calendar-alt"></i> 15 июня 2023, 19:00
+                            </div>
+                            <div class="event-stats">
+                                <span><i class="fas fa-users"></i> 124/200 билетов</span>
+                                <span><i class="fas fa-ruble-sign"></i> 256 000 ₽</span>
+                            </div>
+                            <div class="event-actions">
+                                <button class="btn btn-primary view-stats" data-event="1">Статистика</button>
+                                <button class="btn btn-outline">Редактировать</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="event-card">
+                        <div class="event-image" style="background-image: url('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80')">
+                            <span class="event-status status-active">Активно</span>
+                        </div>
+                        <div class="event-details">
+                            <h3 class="event-title">Фестиваль электронной музыки</h3>
+                            <div class="event-date">
+                                <i class="far fa-calendar-alt"></i> 22-24 июля 2023
+                            </div>
+                            <div class="event-stats">
+                                <span><i class="fas fa-users"></i> 542/1000 билетов</span>
+                                <span><i class="fas fa-ruble-sign"></i> 1 240 500 ₽</span>
+                            </div>
+                            <div class="event-actions">
+                                <button class="btn btn-primary view-stats" data-event="2">Статистика</button>
+                                <button class="btn btn-outline">Редактировать</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="event-card">
+                        <div class="event-image" style="background-image: url('https://images.unsplash.com/photo-1531058020387-3be344556be6?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80')">
+                            <span class="event-status status-ended">Завершено</span>
+                        </div>
+                        <div class="event-details">
+                            <h3 class="event-title">Выставка современного искусства</h3>
+                            <div class="event-date">
+                                <i class="far fa-calendar-alt"></i> 10-15 мая 2023
+                            </div>
+                            <div class="event-stats">
+                                <span><i class="fas fa-users"></i> 876/900 билетов</span>
+                                <span><i class="fas fa-ruble-sign"></i> 524 000 ₽</span>
+                            </div>
+                            <div class="event-actions">
+                                <button class="btn btn-primary view-stats" data-event="3">Статистика</button>
+                                <button class="btn btn-outline">Редактировать</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="event-card">
+                        <div class="event-image" style="background-image: url('https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80')">
+                            <span class="event-status status-draft">Черновик</span>
+                        </div>
+                        <div class="event-details">
+                            <h3 class="event-title">Бизнес-форум "Инновации 2023"</h3>
+                            <div class="event-date">
+                                <i class="far fa-calendar-alt"></i> 12 сентября 2023
+                            </div>
+                            <div class="event-stats">
+                                <span><i class="fas fa-users"></i> 0/500 билетов</span>
+                                <span><i class="fas fa-ruble-sign"></i> 0 ₽</span>
+                            </div>
+                            <div class="event-actions">
+                                <button class="btn btn-primary">Опубликовать</button>
+                                <button class="btn btn-danger">Удалить</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="create-event-btn" id="createEventCard">
+                        <i class="fas fa-plus"></i>
+                        <span>Создать новое мероприятие</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Режим пользователя -->
+            <div class="content-section" id="user-content">
+                <div class="page-header">
+                    <h1 class="page-title">Доступные мероприятия</h1>
+                    <div class="search">
+                        <input type="text" class="form-control" placeholder="Поиск мероприятий..." style="width: 250px;">
+                    </div>
+                </div>
+
+                <div class="events-grid">
+                    <div class="event-card">
+                        <div class="event-image" style="background-image: url('https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80')">
+                            <span class="event-category">Концерт</span>
+                        </div>
+                        <div class="event-details">
+                            <h3 class="event-title">Концерт классической музыки</h3>
+                            <div class="event-date">
+                                <i class="far fa-calendar-alt"></i> 15 июня 2023, 19:00
+                            </div>
+                            <div class="event-location">
+                                <i class="fas fa-map-marker-alt"></i> Большой зал филармонии
+                            </div>
+                            <div class="event-price">от 1 500 ₽</div>
+                            <div class="event-actions">
+                                <button class="btn btn-outline"><i class="far fa-heart"></i></button>
+                                <button class="btn btn-primary buy-ticket" data-event="1">Купить билет</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="event-card">
+                        <div class="event-image" style="background-image: url('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80')">
+                            <span class="event-category">Фестиваль</span>
+                        </div>
+                        <div class="event-details">
+                            <h3 class="event-title">Фестиваль электронной музыки</h3>
+                            <div class="event-date">
+                                <i class="far fa-calendar-alt"></i> 22-24 июля 2023
+                            </div>
+                            <div class="event-location">
+                                <i class="fas fa-map-marker-alt"></i> Парк Горького
+                            </div>
+                            <div class="event-price">от 3 000 ₽</div>
+                            <div class="event-actions">
+                                <button class="btn btn-outline"><i class="far fa-heart"></i></button>
+                                <button class="btn btn-primary buy-ticket" data-event="2">Купить билет</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="event-card">
+                        <div class="event-image" style="background-image: url('https://images.unsplash.com/photo-1531058020387-3be344556be6?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80')">
+                            <span class="event-category">Выставка</span>
+                        </div>
+                        <div class="event-details">
+                            <h3 class="event-title">Выставка современного искусства</h3>
+                            <div class="event-date">
+                                <i class="far fa-calendar-alt"></i> 10-15 мая 2023
+                            </div>
+                            <div class="event-location">
+                                <i class="fas fa-map-marker-alt"></i> Музей современного искусства
+                            </div>
+                            <div class="event-price">от 500 ₽</div>
+                            <div class="event-actions">
+                                <button class="btn btn-outline"><i class="far fa-heart"></i></button>
+                                <button class="btn btn-primary buy-ticket" data-event="3">Купить билет</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="event-card">
+                        <div class="event-image" style="background-image: url('https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80')">
+                            <span class="event-category">Конференция</span>
+                        </div>
+                        <div class="event-details">
+                            <h3 class="event-title">Бизнес-форум "Инновации 2023"</h3>
+                            <div class="event-date">
+                                <i class="far fa-calendar-alt"></i> 12 сентября 2023
+                            </div>
+                            <div class="event-location">
+                                <i class="fas fa-map-marker-alt"></i> Конгресс-центр
+                            </div>
+                            <div class="event-price">от 5 000 ₽</div>
+                            <div class="event-actions">
+                                <button class="btn btn-outline"><i class="far fa-heart"></i></button>
+                                <button class="btn btn-primary buy-ticket" data-event="4">Купить билет</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Модальное окно создания мероприятия (для организатора) -->
+    <div class="modal" id="eventModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Создать новое мероприятие</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="eventForm">
+                    <div class="form-group">
+                        <label for="event-title">Название мероприятия</label>
+                        <input type="text" id="event-title" class="form-control" placeholder="Введите название мероприятия" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="event-description">Описание мероприятия</label>
+                        <textarea id="event-description" class="form-control" rows="4" placeholder="Расскажите о вашем мероприятии" required></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="event-start-date">Дата начала</label>
+                            <input type="datetime-local" id="event-start-date" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="event-end-date">Дата окончания</label>
+                            <input type="datetime-local" id="event-end-date" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="event-location">Место проведения</label>
+                            <input type="text" id="event-location" class="form-control" placeholder="Укажите место проведения" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="event-category">Категория</label>
+                            <select id="event-category" class="form-control" required>
+                                <option value="">Выберите категорию</option>
+                                <option value="concert">Концерт</option>
+                                <option value="festival">Фестиваль</option>
+                                <option value="conference">Конференция</option>
+                                <option value="exhibition">Выставка</option>
+                                <option value="sport">Спорт</option>
+                                <option value="theater">Театр</option>
+                                <option value="other">Другое</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="event-price">Цена билета (₽)</label>
+                            <input type="number" id="event-price" class="form-control" placeholder="0" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="event-limit">Лимит билетов</label>
+                            <input type="number" id="event-limit" class="form-control" placeholder="Неограничено" min="0">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Изображение мероприятия</label>
+                        <div class="file-upload">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Перетащите изображение или кликните для загрузки</span>
+                            <input type="file" id="event-image" accept="image/*">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="form-footer">
+                <button type="button" class="btn btn-outline close-modal">Отмена</button>
+                <button type="submit" form="eventForm" class="btn btn-primary">Создать мероприятие</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно статистики мероприятия (для организатора) -->
+    <div class="modal" id="statsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Статистика мероприятия</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h4 id="stats-event-title">Концерт классической музыки</h4>
+                <div class="event-date" id="stats-event-date">
+                    <i class="far fa-calendar-alt"></i> 15 июня 2023, 19:00
+                </div>
+                <div class="event-location" id="stats-event-location">
+                    <i class="fas fa-map-marker-alt"></i> Большой зал филармонии
+                </div>
+
+                <div class="stats-grid" style="margin-top: 20px;">
+                    <div class="stat-card">
+                        <div class="stat-value">124</div>
+                        <div class="stat-label">Продано билетов</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">76</div>
+                        <div class="stat-label">Осталось билетов</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">256 000 ₽</div>
+                        <div class="stat-label">Общий доход</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">98</div>
+                        <div class="stat-label">Посетило человек</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">79%</div>
+                        <div class="stat-label">Процент посещаемости</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">2 065 ₽</div>
+                        <div class="stat-label">Средний чек</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <h5>Список билетов</h5>
+                    <div style="background-color: #2c2c2c; border-radius: 5px; padding: 15px; margin-top: 10px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: 500;">
+                            <span>ID билета</span>
+                            <span>Статус</span>
+                            <span>Дата покупки</span>
+                            <span>Цена</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #333;">
+                            <span>#TICKET-001</span>
+                            <span style="color: var(--success);">Использован</span>
+                            <span>10.06.2023</span>
+                            <span>2 500 ₽</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #333;">
+                            <span>#TICKET-002</span>
+                            <span style="color: var(--success);">Использован</span>
+                            <span>12.06.2023</span>
+                            <span>1 500 ₽</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #333;">
+                            <span>#TICKET-003</span>
+                            <span style="color: var(--warning);">Не использован</span>
+                            <span>14.06.2023</span>
+                            <span>5 000 ₽</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-footer">
+                <button type="button" class="btn btn-outline close-modal">Закрыть</button>
+                <button type="button" class="btn btn-primary">Экспорт данных</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно покупки билета (для пользователя) -->
+    <div class="modal" id="ticketModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Покупка билета</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="event-info">
+                    <h4 id="modal-event-title">Концерт классической музыки</h4>
+                    <div class="event-date" id="modal-event-date">
+                        <i class="far fa-calendar-alt"></i> 15 июня 2023, 19:00
+                    </div>
+                    <div class="event-location" id="modal-event-location">
+                        <i class="fas fa-map-marker-alt"></i> Большой зал филармонии
+                    </div>
+                </div>
+
+                <div class="ticket-options">
+                    <div class="ticket-option">
+                        <div class="ticket-option-header">
+                            <div class="ticket-option-name">VIP-билет</div>
+                            <div class="ticket-option-price">5 000 ₽</div>
+                        </div>
+                        <div class="ticket-option-description">
+                            Лучшие места в зале, отдельный вход, фуршет после концерта
+                        </div>
+                        <div class="ticket-quantity">
+                            <div class="quantity-control">
+                                <button class="quantity-btn minus">-</button>
+                                <input type="number" class="quantity-input" value="0" min="0" max="10">
+                                <button class="quantity-btn plus">+</button>
+                            </div>
+                            <span>Доступно: 5</span>
+                        </div>
+                    </div>
+
+                    <div class="ticket-option">
+                        <div class="ticket-option-header">
+                            <div class="ticket-option-name">Стандарт</div>
+                            <div class="ticket-option-price">2 500 ₽</div>
+                        </div>
+                        <div class="ticket-option-description">
+                            Стандартные места в зале
+                        </div>
+                        <div class="ticket-quantity">
+                            <div class="quantity-control">
+                                <button class="quantity-btn minus">-</button>
+                                <input type="number" class="quantity-input" value="0" min="0" max="10">
+                                <button class="quantity-btn plus">+</button>
+                            </div>
+                            <span>Доступно: 15</span>
+                        </div>
+                    </div>
+
+                    <div class="ticket-option">
+                        <div class="ticket-option-header">
+                            <div class="ticket-option-name">Эконом</div>
+                            <div class="ticket-option-price">1 500 ₽</div>
+                        </div>
+                        <div class="ticket-option-description">
+                            Места на балконе
+                        </div>
+                        <div class="ticket-quantity">
+                            <div class="quantity-control">
+                                <button class="quantity-btn minus">-</button>
+                                <input type="number" class="quantity-input" value="0" min="0" max="10">
+                                <button class="quantity-btn plus">+</button>
+                            </div>
+                            <span>Доступно: 10</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="total-price">Итого: 0 ₽</div>
+                <button class="btn btn-primary" id="confirmPurchase">Перейти к оплате</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Переключение между режимами организатора и пользователя
+        const modeBtns = document.querySelectorAll('.mode-btn');
+        const contentSections = document.querySelectorAll('.content-section');
+        
+        modeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                modeBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                contentSections.forEach(section => {
+                    section.classList.remove('active');
+                    if (section.id === `${btn.dataset.mode}-content`) {
+                        section.classList.add('active');
+                    }
+                });
+            });
+        });
+        
+        // Управление модальными окнами
+        const createEventBtn = document.getElementById('createEventBtn');
+        const createEventCard = document.getElementById('createEventCard');
+        const eventModal = document.getElementById('eventModal');
+        const statsModal = document.getElementById('statsModal');
+        const ticketModal = document.getElementById('ticketModal');
+        const closeModalBtns = document.querySelectorAll('.close-modal');
+        const viewStatsBtns = document.querySelectorAll('.view-stats');
+        const buyTicketBtns = document.querySelectorAll('.buy-ticket');
+        
+        function openModal(modal) {
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+            document.body.style.overflow = 'auto';
+        }
+        
+        createEventBtn.addEventListener('click', () => openModal(eventModal));
+        createEventCard.addEventListener('click', () => openModal(eventModal));
+        
+        viewStatsBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Здесь можно загрузить данные о мероприятии по btn.dataset.event
+                openModal(statsModal);
+            });
+        });
+        
+        buyTicketBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Здесь можно загрузить данные о мероприятии по btn.dataset.event
+                openModal(ticketModal);
+            });
+        });
+        
+        closeModalBtns.forEach(btn => {
+            btn.addEventListener('click', closeModal);
+        });
+        
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+        });
+        
+        // Управление количеством билетов
+        const minusBtns = document.querySelectorAll('.minus');
+        const plusBtns = document.querySelectorAll('.plus');
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+        const totalPriceElement = document.querySelector('.total-price');
+        
+        function updateTotalPrice() {
+            let total = 0;
+            document.querySelectorAll('.ticket-option').forEach(option => {
+                const price = parseInt(option.querySelector('.ticket-option-price').textContent.replace(/\D/g, ''));
+                const quantity = parseInt(option.querySelector('.quantity-input').value);
+                total += price * quantity;
+            });
+            totalPriceElement.textContent = `Итого: ${total.toLocaleString('ru-RU')} ₽`;
+        }
+        
+        minusBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const input = this.nextElementSibling;
+                if (parseInt(input.value) > 0) {
+                    input.value = parseInt(input.value) - 1;
+                    updateTotalPrice();
+                }
+            });
+        });
+        
+        plusBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const input = this.previousElementSibling;
+                const max = parseInt(input.max);
+                if (isNaN(max) || parseInt(input.value) < max) {
+                    input.value = parseInt(input.value) + 1;
+                    updateTotalPrice();
+                }
+            });
+        });
+        
+        quantityInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                const max = parseInt(this.max);
+                if (parseInt(this.value) > max) {
+                    this.value = max;
+                }
+                updateTotalPrice();
+            });
+        });
+        
+        // Обработка создания мероприятия
+        const eventForm = document.getElementById('eventForm');
+        
+        eventForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const eventData = {
+                title: document.getElementById('event-title').value,
+                description: document.getElementById('event-description').value,
+                startDate: document.getElementById('event-start-date').value,
+                endDate: document.getElementById('event-end-date').value,
+                location: document.getElementById('event-location').value,
+                category: document.getElementById('event-category').value,
+                price: document.getElementById('event-price').value,
+                limit: document.getElementById('event-limit').value || null,
+                image: document.getElementById('event-image').files[0] ? document.getElementById('event-image').files[0].name : null
+            };
+            
+            console.log('Создано мероприятие:', eventData);
+            alert('Мероприятие успешно создано! В реальном приложении здесь будет генерация билетов с QR-кодами.');
+            closeModal();
+            
+            // Здесь можно добавить логику для отображения нового мероприятия в списке
+        });
+        
+        // Обработка покупки билета
+        const confirmPurchaseBtn = document.getElementById('confirmPurchase');
+        
+        confirmPurchaseBtn.addEventListener('click', () => {
+            let totalTickets = 0;
+            quantityInputs.forEach(input => {
+                totalTickets += parseInt(input.value);
+            });
+            
+            if (totalTickets > 0) {
+                alert('Покупка подтверждена! В реальном приложении здесь будет переход к оплате.');
+                closeModal();
+                // Здесь можно добавить логику для отображения нового билета в списке
+            } else {
+                alert('Пожалуйста, выберите хотя бы один билет.');
+            }
+        });
+    </script>
+</body>
+</html>
