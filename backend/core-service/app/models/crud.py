@@ -1,11 +1,11 @@
 from sqlalchemy.orm import Session
-from app.models.models import Accounts, Events, TicketTypes, Tickets
+from .models import Accounts, Events, TicketTypes, Tickets
 
 from typing import TypedDict, Optional
 
 from sqlalchemy.exc import IntegrityError
 
-from app.security.hashing import hash_password
+from ..security.hashing import hash_password
 
 
 class form_user_registration(TypedDict, total=False):
@@ -13,7 +13,7 @@ class form_user_registration(TypedDict, total=False):
     user_id: Optional[int]
     error: Optional[str]
 
-def user_registration(db: Session, login: str, password: str) -> form_user_registration: #Dict[str, Union[bool, int, str]]:
+async def user_registration(db: Session, login: str, password: str) -> form_user_registration: #Dict[str, Union[bool, int, str]]:
     """
     Функция для регистрации аккаунта.
 

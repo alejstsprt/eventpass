@@ -5,11 +5,11 @@ from sqlalchemy.orm import Session
 from ...schemas.user import loginUser
 
 from ...models.session import get_db
-from ...models.crud import is_exists_login
+from ...models.crud import is_exists_login, user_registration
 
-from ...exceptions import s
+from ...exceptions import LoginAlreadyExistsException
 
-# from ...security.hashing import is_
+from ...security.hashing import hash_password
 
 
 router = APIRouter()
@@ -17,8 +17,13 @@ router = APIRouter()
 
 @router.post('/create_user', summary="Создание аккаунта", description="ИНФО: Ручка для создания аккаунта. Принимает в себя логин и пароль.")
 async def test(request: loginUser, db: Session = Depends(get_db)):
-    is_user = await is_exists_login(request.login)
-    if not is_user['result']:
-        raise
+    is_user = await is_exists_login(db, request.login)
+    if is_user['result']:
+        raise LoginAlreadyExistsException()
 
-    return {'yes': request.password}
+    hash_pass = hash_password(request.login)
+    result = await user_registration(db, request.login, hash_pass)
+    if result['result']:
+        return {'result': True}
+    else:
+        raise LoginAlreadyExistsException()
