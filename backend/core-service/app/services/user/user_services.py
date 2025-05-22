@@ -3,7 +3,7 @@ from typing import Union
 from sqlalchemy.orm import Session
 
 from ...schemas.user import CreateUser, LoginUser
-from ...models.crud import user_registration #, is_exists_login
+from ...models.crud import user_registration
 from ...models.models import Accounts, Events, TicketTypes, Tickets
 from ...core.exceptions import LoginAlreadyExistsException, RegistrationFailedException, ValidationError
 from ...security.hashing import hash_password, verify_password
@@ -19,24 +19,21 @@ class ManagementUsers:
         self.db = db
 
     async def create_user(self, user: CreateUser) -> dict:
-        """Метод для создания пользователя в базе данных
+        """
+        Метод для создания пользователя в базе данных
 
         Args:
-            - user (LoginUser). Имя, логин и пароль.
+            - user (LoginUser): Имя, логин и пароль.
 
         Returns:
             - `{'result': True}`
 
         Raises:
-            - `LoginAlreadyExistsException` (HTTPException). Пользователь уже существует.
-            - `RegistrationFailedException` (HTTPException). Ошибка регистрации.
+            - `LoginAlreadyExistsException` (HTTPException): Пользователь уже существует.
+            - `RegistrationFailedException` (HTTPException): Ошибка регистрации.
         """
         if not user.name or not user.login or not user.password:
             raise RegistrationFailedException()
-
-        # is_user = await is_exists_login(self.db, user.login)
-        # if is_user['result']:
-        #     raise LoginAlreadyExistsException()
 
         hash_pass = hash_password(user.password)
         result = await user_registration(self.db, user.name, user.login, hash_pass)
@@ -49,14 +46,15 @@ class ManagementUsers:
             raise RegistrationFailedException()
 
     async def login_user(self, user: LoginUser) -> dict:
-        """Метод для входа в аккаунт
+        """
+        Метод для входа в аккаунт
 
         Args:
-            - user (LoginUser). Логин и пароль.
+            - user (LoginUser): Логин и пароль.
 
         Returns:
-            - `{'result': True, 'id': ID, 'name': Name}` (dict). Успешный вход.
-            - `{'result': False, 'error': Error}` (dict). Логин/пароль неверный.
+            - `{'result': True, 'id': ID, 'name': Name}` (dict): Успешный вход.
+            - `{'result': False, 'error': Error}` (dict): Логин/пароль неверный.
         Raises:
             - `ValidationError` (HTTPException). Неверные данные
         """

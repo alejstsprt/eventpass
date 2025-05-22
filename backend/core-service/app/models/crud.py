@@ -6,12 +6,12 @@ from sqlalchemy.exc import IntegrityError
 from .models import Accounts, Events, TicketTypes, Tickets
 
 
-class form_user_registration(TypedDict, total=False):
+class UserRegistrationResult(TypedDict):
     result: True
     user_id: Optional[int]
     error: Optional[str]
 
-async def user_registration(db: Session, name: str, login: str, password: str) -> form_user_registration: #Dict[str, Union[bool, int, str]]:
+async def user_registration(db: Session, name: str, login: str, password: str) -> UserRegistrationResult:
     """
     Функция для регистрации аккаунта.
 
@@ -21,7 +21,7 @@ async def user_registration(db: Session, name: str, login: str, password: str) -
         password (str): Пароль пользователя (хеш).
 
     Returns:
-        form_user_registration:
+        UserRegistrationResult (TypedDict):
             - При успехе: `{"result": True, "user_id": int}`
             - При ошибке: `{"result": False, "error": "Причина ошибки"}`
     """
@@ -43,6 +43,7 @@ async def user_registration(db: Session, name: str, login: str, password: str) -
         return {'result': False, 'error': f'Аккаунт с таким логином/именем уже существует'}
     except Exception:
         return {'result': False, 'error': 'Ошибка сервера'}
+        # raise HTTPException(status_code=500)
 
 
 # async def is_exists_login(db: Session, login: str) -> bool:

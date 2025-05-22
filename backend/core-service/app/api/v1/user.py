@@ -78,6 +78,6 @@ async def create_user(user: CreateUser, service: ManagementUsers = Depends(get_u
         }
     }
 )
-@cache(expire=60)
+@cache(expire=80)
 async def login_user(user: LoginUser, service: ManagementUsers = Depends(get_user_service)):
     return await service.login_user(user)
