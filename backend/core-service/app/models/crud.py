@@ -4,7 +4,6 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
 from .models import Accounts, Events, TicketTypes, Tickets
-from ..security.hashing import hash_password
 
 
 class form_user_registration(TypedDict, total=False):
@@ -12,14 +11,14 @@ class form_user_registration(TypedDict, total=False):
     user_id: Optional[int]
     error: Optional[str]
 
-async def user_registration(db: Session, login: str, password: str) -> form_user_registration: #Dict[str, Union[bool, int, str]]:
+async def user_registration(db: Session, name: str, login: str, password: str) -> form_user_registration: #Dict[str, Union[bool, int, str]]:
     """
     Функция для регистрации аккаунта.
 
     Args:
         db (Session): Сессия SQLAlchemy для работы с БД.
         login (str): Логин пользователя.
-        password (str): Пароль пользователя.
+        password (str): Пароль пользователя (хеш).
 
     Returns:
         form_user_registration:
@@ -32,35 +31,37 @@ async def user_registration(db: Session, login: str, password: str) -> form_user
 
     try:
         new_user = Accounts(
+            name=name,
             login=login,
-            password_hash=hash_password(password),
+            password_hash=password,
         )
         db.add(new_user)
         db.commit()
         db.refresh(new_user)
         return {'result': True, 'user_id': new_user.id}
     except IntegrityError:
-        return {'result': False, 'error': 'Аккаунт уже существует'}
-    except Exception as e:
+        return {'result': False, 'error': f'Аккаунт с таким логином/именем уже существует'}
+    except Exception:
         return {'result': False, 'error': 'Ошибка сервера'}
 
-async def is_exists_login(db: Session, login: str) -> bool:
-    """
-    Функция для проверки существует ли пользователь.
 
-    Args:
-        db (Session): Сессия SQLAlchemy для работы с БД.
-        login (str): Логин пользователя.
+# async def is_exists_login(db: Session, login: str) -> bool:
+#     """
+#     Функция для проверки существует ли пользователь.
 
-    Returns:
-        bool: 
-            - При успехе: `{'result': True}`
-            - При ошибке: `{'result': False}`
-    """
-    if not Session or not login:
-        return {'result': False}
+#     Args:
+#         db (Session): Сессия SQLAlchemy для работы с БД.
+#         login (str): Логин пользователя.
 
-    if db.query(Accounts).filter(Accounts.login == login).first():
-        return {'result': True}
+#     Returns:
+#         bool: 
+#             - При успехе: `{'result': True}`
+#             - При ошибке: `{'result': False}`
+#     """
+#     if not Session or not login:
+#         return {'result': False}
 
-    return {'result': False}
+#     if db.query(Accounts).filter(Accounts.login == login).first():
+#         return {'result': True}
+
+#     return {'result': False}

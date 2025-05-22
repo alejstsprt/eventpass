@@ -1,6 +1,22 @@
 from fastapi import HTTPException, status
 
 
+class ValidationError(HTTPException):
+    """Ошибка при неверно введенных данных"""
+    def __init__(self, detail: str = "Некорректные данные"):
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=detail
+        )
+
+class InternalServerError(HTTPException):
+    """Ошибка для неожиданных серверных сбоев"""
+    def __init__(self, detail: str = "Внутренняя ошибка сервера"):
+        super().__init__(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=detail
+        )
+
 class RegistrationFailedException(HTTPException):
     def __init__(self):
         super().__init__(
