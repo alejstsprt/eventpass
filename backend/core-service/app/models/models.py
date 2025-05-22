@@ -8,6 +8,7 @@ class Accounts(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, index=True) # Айди пользователя
+    name = Column(String, unique=True, index=True) # Имя пользователя
     login = Column(String, unique=True, index=True) # Логин пользователя
     password_hash = Column(String) # Хеш пароля пользователя 
 
