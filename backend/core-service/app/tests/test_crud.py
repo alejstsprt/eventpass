@@ -1,7 +1,7 @@
-import pytest
 from unittest.mock import MagicMock
 
 from sqlalchemy.exc import IntegrityError
+import pytest
 
 """Файл для теста"""
 from ..models.crud import user_registration, is_exists_login

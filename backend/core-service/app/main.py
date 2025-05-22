@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .api.v1 import user, user_tickets, events_organizer
-
 from .models.session import Base, engine
 from .models.models import Accounts, Events, TicketTypes, Tickets
 

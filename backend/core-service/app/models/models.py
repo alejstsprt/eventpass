@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
+
 from .session import Base
+
 
 class Accounts(Base):
     __tablename__ = 'users'

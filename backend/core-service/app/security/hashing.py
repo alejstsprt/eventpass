@@ -1,6 +1,6 @@
-from passlib.context import CryptContext
-
 from typing import Union, Optional
+
+from passlib.context import CryptContext
 
 
 pwd_context = CryptContext(

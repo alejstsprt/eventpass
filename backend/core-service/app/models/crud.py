@@ -1,10 +1,9 @@
-from sqlalchemy.orm import Session
-from .models import Accounts, Events, TicketTypes, Tickets
-
 from typing import TypedDict, Optional
 
+from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
+from .models import Accounts, Events, TicketTypes, Tickets
 from ..security.hashing import hash_password
 
 
