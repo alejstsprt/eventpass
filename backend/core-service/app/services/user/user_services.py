@@ -12,5 +12,14 @@ class CreateUser:
     def __init__(self, db):
         self.db = db
 
-    def create_user(self, login, password):
-        return {'result': True}
+    async def create_user(self, user):
+        is_user = await is_exists_login(self.db, user.login)
+        if is_user['result']:
+            raise LoginAlreadyExistsException()
+
+        hash_pass = hash_password(user.login)
+        result = await user_registration(self.db, user.login, hash_pass)
+        if result['result']:
+            return {'result': True}
+        else:
+            raise RegistrationFailedException()
