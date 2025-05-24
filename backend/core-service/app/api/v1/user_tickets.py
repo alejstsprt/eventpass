@@ -1,12 +1,13 @@
-from fastapi import APIRouter, Depends
+from typing import Optional
+
+from fastapi import APIRouter, Depends, Cookie
 from fastapi_cache.decorator import cache
 
-from ...schemas.user import CreateUser, LoginUser
-from ...services.user.get_user_services import get_user_service
-from ...services.user.user_services import ManagementUsers
+from ...schemas.user_tickets import *
+from ...services.user_tickets.get_user_services import get_user_service
+from ...services.user_tickets.user_tickets_services import ManagementEvents
 from ...core.logger import Logger
-from ...services.user.responses import LOGIN_USER_RESPONSES, CREATE_USER_RESPONSES
-from ...security.jwt import create_access_token
+from ...services.user_tickets.responses import LOGIN_USER_RESPONSES, CREATE_USER_RESPONSES
 
 
 router = APIRouter()
@@ -19,29 +20,9 @@ logger = Logger("api_logger")
     description="ИНФО: Ручка для создания мероприятия. Принимает в себя ...",
     responses=CREATE_USER_RESPONSES
 )
-async def create_user(user: CreateUser, service: ManagementUsers = Depends(get_user_service)):
-    return {'await service.create_user(user)'}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@router.get(
-    '/create_token',
-    summary="Получить токен"
-)
-async def read_users_me():
-    token = await create_access_token(1)
-    return {"token": token}
+async def create_user(
+        user: CreateUser,
+        service: ManagementEvents = Depends(get_user_service),
+        jwt_token: Optional[str] = Cookie(None)
+    ):
+    return {jwt_token}
