@@ -1,7 +1,7 @@
 LOGIN_USER_RESPONSES = {
     200: {
         "description": "Успешный ответ: Пользователь вошел",
-        "content": {"application/json": {"example": {"result": True, "id": 1, "name": "alexey"}}}
+        "content": {"application/json": {"example": {"id": 1, "name": "alexey"}}}
     },
     401: {
         "description": "Ошибки пользователя",

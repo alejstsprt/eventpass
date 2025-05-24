@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from fastapi_cache.decorator import cache
 
 from ...schemas.user import CreateUser, LoginUser
@@ -18,8 +18,8 @@ logger = Logger("api_logger")
     description="ИНФО: Ручка для создания аккаунта. Принимает в себя имя, логин и пароль.",
     responses=CREATE_USER_RESPONSES
 )
-async def create_user(user: CreateUser, service: ManagementUsers = Depends(get_user_service)):
-    return await service.create_user(user)
+async def create_user(response: Response, user: CreateUser, service: ManagementUsers = Depends(get_user_service)):
+    return await service.create_user(response, user)
 
 @router.post(
     '/login_user',
@@ -28,5 +28,5 @@ async def create_user(user: CreateUser, service: ManagementUsers = Depends(get_u
     responses=LOGIN_USER_RESPONSES
 )
 @cache(expire=80)
-async def login_user(user: LoginUser, service: ManagementUsers = Depends(get_user_service)):
-    return await service.login_user(user)
+async def login_user(response: Response, user: LoginUser, service: ManagementUsers = Depends(get_user_service)):
+    return await service.login_user(response, user)

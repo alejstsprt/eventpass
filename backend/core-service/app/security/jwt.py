@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from jose import JWTError, jwt
@@ -8,13 +8,13 @@ from ..core.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
 
 async def set_jwt_cookie(response: Response, token: str):
-    expiration_time = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expires = datetime.utcnow().replace(tzinfo=timezone.utc) + timedelta(days=30)
 
     response.set_cookie(
         key="jwt_token",
         value=token,
         httponly=True,
-        expires=expiration_time,
+        expires=expires,
         secure=False,  # secure=True, если используешь HTTPS
         samesite="lax",
         path="/"
@@ -30,11 +30,14 @@ async def create_access_token(user_id: int) -> str:
     Returns:
         str: Созданный токен: `токен`.
     """
-    expires = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    payload = {"sub": str(user_id), "exp": expires}
+    expires = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    payload = {
+        "sub": str(user_id),
+        "exp": expires  # Время истечения в UTC
+    }
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
-async def token_verification(jwt_token) -> Optional[int]:
+async def token_verification(jwt_token: str) -> Optional[int]:
     """
     Для проверки токена + получения айди пользователя.
 
@@ -49,13 +52,12 @@ async def token_verification(jwt_token) -> Optional[int]:
     """
     if not jwt_token:
         return None
+
     try:
         payload = jwt.decode(jwt_token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id = payload.get("sub")
-        if not user_id:
-            return None
-        return user_id
-    except:
+        return int(user_id) if user_id else None
+    except (JWTError, ValueError):
         return None
 
 
