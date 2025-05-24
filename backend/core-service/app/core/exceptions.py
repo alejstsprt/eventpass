@@ -74,3 +74,15 @@ class LoginError(ValidationError):
 class PasswordError(ValidationError):
     def __init__(self):
         super().__init__(detail = "Неверный пароль")
+
+class TokenError(ValidationError):
+    def __init__(self):
+        super().__init__(detail = "Неверный токен")
+
+class NoTokenError(ValidationError):
+    def __init__(self):
+        super().__init__(detail = "Токен отсутствует")
+
+
+# HTTP_401_UNAUTHORIZED
+

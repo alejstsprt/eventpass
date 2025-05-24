@@ -25,9 +25,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(user.router, prefix='/api/user', tags=['🔐 Ручки для взаимодействия с профилем пользователя'])
-# app.include_router(user_tickets.router, prefix='/api/tickets')
-# app.include_router(events_organizer.router, prefix='/api/events')
+app.include_router(user.router, prefix='/api/user', tags=['Ручки для взаимодействия с профилем пользователя'])
+app.include_router(user_tickets.router, prefix='/api/user_tickets', tags=['Ручки для управления мероприятиями'])
+
 
 # if __name__ == "__main__":
 #     uvicorn.run("main:app", reload=True)
