@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
 
 from .api.v1 import user, user_tickets, events_organizer
 from .models.session import Base, engine
@@ -28,6 +29,8 @@ app.include_router(user.router, prefix='/api/user', tags=['🔐 Ручки дл�
 # app.include_router(user_tickets.router, prefix='/api/tickets')
 # app.include_router(events_organizer.router, prefix='/api/events')
 
+# if __name__ == "__main__":
+#     uvicorn.run("main:app", reload=True)
 
 # python -m venv venv
 # Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass

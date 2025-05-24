@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends
+from fastapi_cache.decorator import cache
 
 from ...schemas.user import CreateUser, LoginUser
 from ...services.user.get_user_services import get_user_service
 from ...services.user.user_services import ManagementUsers
 from ...core.logger import Logger
-from fastapi_cache.decorator import cache
 
 
 router = APIRouter()
@@ -55,22 +55,22 @@ async def create_user(user: CreateUser, service: ManagementUsers = Depends(get_u
             "description": "Успешный ответ: Пользователь вошел",
             "content": {
                 "application/json": {
-                    "example": {"result": True, "id": 6, "name": "qwe"}
+                    "example": {"result": True, "id": 1, "name": "alexey"}
                 }
             }
         },
-        400: {
-            "description": "Ошибки с кодом 400",
+        401: {
+            "description": "Ошибки пользователя",
             "content": {
                 "application/json": {
                     "examples": {
                         "login_exists": {
                             "summary": "Неверный логин",
-                            "value": {'result': False, 'error': 'Неверный логин'}
+                            "value": {'detail': 'Неверный логин'}
                         },
                         "registration_failed": {
                             "summary": "Неверный пароль",
-                            "value": {'result': False, 'error': 'Неверный пароль'}
+                            "value": {'detail': 'Неверный пароль'}
                         }
                     }
                 }

@@ -5,8 +5,14 @@ from sqlalchemy.orm import Session
 from ...schemas.user import CreateUser, LoginUser
 from ...models.crud import user_registration
 from ...models.models import Accounts, Events, TicketTypes, Tickets
-from ...core.exceptions import LoginAlreadyExistsException, RegistrationFailedException, ValidationError
 from ...security.hashing import hash_password, verify_password
+from ...core.exceptions import (
+        LoginAlreadyExistsException,
+        ValidationError,
+        PasswordError,
+        LoginError,
+        InternalServerError
+    )
 
 
 class ManagementUsers:
@@ -33,40 +39,41 @@ class ManagementUsers:
             - `RegistrationFailedException` (HTTPException): Ошибка регистрации.
         """
         if not user.name or not user.login or not user.password:
-            raise RegistrationFailedException()
+            raise ValidationError()
 
         hash_pass = hash_password(user.password)
         result = await user_registration(self.db, user.name, user.login, hash_pass)
 
         if result['result']:
-            return {'result': True}
+            return result
         elif result['error'] != 'Ошибка сервера':
             raise LoginAlreadyExistsException()
         else:
-            raise RegistrationFailedException()
+            raise InternalServerError()
 
     async def login_user(self, user: LoginUser) -> dict:
         """
-        Метод для входа в аккаунт
+        Метод для входа в аккаунт.
 
         Args:
             - user (LoginUser): Логин и пароль.
 
         Returns:
             - `{'result': True, 'id': ID, 'name': Name}` (dict): Успешный вход.
-            - `{'result': False, 'error': Error}` (dict): Логин/пароль неверный.
         Raises:
-            - `ValidationError` (HTTPException). Неверные данные
+            - `ValidationError` (HTTPException). Неверные данные.
+            - `LoginError` (HTTPException). Неверный логин.
+            - `PasswordError` (HTTPException). Неверный пароль.
         """
         if not self.db or not user.login or not user.password:
             raise ValidationError()
 
         db_user = self.db.query(Accounts).filter(Accounts.login == user.login).first()
         if not db_user:
-            return {'result': False, 'error': 'Неверный логин'}
+            raise LoginError()
 
         is_password = verify_password(user.password, db_user.password_hash)
         if not is_password:
-            return {'result': False, 'error': 'Неверный пароль'}
+            raise PasswordError()
 
         return {'result': True, 'id': db_user.id, 'name': db_user.name}

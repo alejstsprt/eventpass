@@ -21,9 +21,10 @@ async def user_registration(db: Session, name: str, login: str, password: str) -
         password (str): Пароль пользователя (хеш).
 
     Returns:
-        UserRegistrationResult (TypedDict):
-            - При успехе: `{"result": True, "user_id": int}`
-            - При ошибке: `{"result": False, "error": "Причина ошибки"}`
+        UserRegistrationResult (TypedDict). `{"result": True, "user_id": int}`
+
+    Raises:
+        UserRegistrationResult (TypedDict). `{"result": False, "error": "Причина ошибки"}`
     """
     # если один из параметров не указан
     if not db or not login or not password:
@@ -40,8 +41,8 @@ async def user_registration(db: Session, name: str, login: str, password: str) -
         db.refresh(new_user)
         return {'result': True, 'user_id': new_user.id}
     except IntegrityError:
-        return {'result': False, 'error': f'Аккаунт с таким логином/именем уже существует'}
-    except Exception:
+        return {'result': False, 'error': 'Аккаунт с таким логином/именем уже существует'}
+    except Exception as e:
         return {'result': False, 'error': 'Ошибка сервера'}
         # raise HTTPException(status_code=500)
 
