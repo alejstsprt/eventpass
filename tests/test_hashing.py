@@ -1,7 +1,7 @@
 import pytest
 
 """Файл для теста"""
-from ..security.hashing import hash_password, verify_password
+from backend.core_service.app.security.hashing import hash_password, verify_password
 
 
 class TestHashPassword():
