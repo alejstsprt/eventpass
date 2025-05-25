@@ -1,15 +1,30 @@
 from typing import TypedDict, Optional
 
+from sqlalchemy import DateTime
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
-from .models import Accounts, Events, TicketTypes, Tickets
+from .models import Accounts, Events
+from ..core.exceptions import ValidationError, LoginAlreadyExistsException, InternalServerError
 
 
 class UserRegistrationResult(TypedDict):
     result: True
     user_id: Optional[int]
     error: Optional[str]
+
+class EventDetails(TypedDict):
+    id: int
+    creator_id: int
+    title: str
+    description: str
+    address: str
+    time_create: DateTime
+
+class EventCreatedResult(TypedDict):
+    result: True
+    event: EventDetails
+
 
 async def user_registration(db: Session, name: str, login: str, password: str) -> UserRegistrationResult:
     """
@@ -21,14 +36,16 @@ async def user_registration(db: Session, name: str, login: str, password: str) -
         password (str): Пароль пользователя (хеш).
 
     Returns:
-        UserRegistrationResult (TypedDict). `{"result": True, "user_id": int}`
+        UserRegistrationResult (TypedDict): `{'result': True, 'user_id': int}`
 
     Raises:
-        UserRegistrationResult (TypedDict). `{"result": False, "error": "Причина ошибки"}`
+        ValidationError (HTTPException): Неверные входные данные.
+        LoginAlreadyExistsException (HTTPException): Имя/Логин уже занят.
+        InternalServerError (HTTPException): Ошибка сервера.
     """
     # если один из параметров не указан
     if not db or not login or not password:
-        return {'result': False, 'error': 'Укажите все данные'}
+        raise ValidationError()
 
     try:
         new_user = Accounts(
@@ -41,29 +58,62 @@ async def user_registration(db: Session, name: str, login: str, password: str) -
         db.refresh(new_user)
         return {'result': True, 'user_id': new_user.id}
     except IntegrityError:
-        return {'result': False, 'error': 'Аккаунт с таким логином/именем уже существует'}
+        raise LoginAlreadyExistsException()
     except Exception as e:
-        return {'result': False, 'error': 'Ошибка сервера'}
-        # raise HTTPException(status_code=500)
+        raise InternalServerError()
 
+async def create_event(db: Session, creator_id: str, title: str, description: str, address: str) -> EventCreatedResult:
+    """
+    Функция для создания мероприятия
 
-# async def is_exists_login(db: Session, login: str) -> bool:
-#     """
-#     Функция для проверки существует ли пользователь.
+    Args:
+        db (Session): Сессия SQLAlchemy для работы с БД.
+        creator_id (str): ID создателя мероприятия.
+        title (str): Название мероприятия.
+        description (str): Описание мероприятия.
+        address (str): Адрес мероприятия.
 
-#     Args:
-#         db (Session): Сессия SQLAlchemy для работы с БД.
-#         login (str): Логин пользователя.
+    Returns:
+        EventCreatedResult (TypedDict): `{
+            'result': True,
+            'event': {
+                'id': id,
+                'creator_id': creator_id,
+                'title': title,
+                'description': description,
+                'address': address,
+                'time_create': datetime
+            }
+        }`
 
-#     Returns:
-#         bool: 
-#             - При успехе: `{'result': True}`
-#             - При ошибке: `{'result': False}`
-#     """
-#     if not Session or not login:
-#         return {'result': False}
+    Raises:
+        ValidationError (HTTPException): Неверные входные данные.
+        InternalServerError (HTTPException): Ошибка сервера.
+    """
+    if not db or not creator_id or not title or not description or not address:
+        raise ValidationError()
 
-#     if db.query(Accounts).filter(Accounts.login == login).first():
-#         return {'result': True}
+    try:
+        new_event = Events(
+            creator_id=creator_id,
+            title=title,
+            description=description,
+            address=address
+        )
+        db.add(new_event)
+        db.commit()
+        db.refresh(new_event)
 
-#     return {'result': False}
+        return {
+            'result': True,
+            'event': {
+                'id': new_event.id,
+                'creator_id': new_event.creator_id,
+                'title': new_event.title,
+                'description': new_event.description,
+                'address': new_event.address,
+                'time_create': new_event.datetime
+            }
+        }
+    except Exception as e:
+        raise InternalServerError()

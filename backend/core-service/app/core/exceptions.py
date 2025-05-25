@@ -61,6 +61,7 @@ class InvalidTokenException(HTTPException):
 # HTTP_401_UNAUTHORIZED
 
 class ValidationError(HTTPException):
+    """[all] Ошибка неверные данные"""
     def __init__(self, detail="Неверные данные"):
         super().__init__(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -68,18 +69,22 @@ class ValidationError(HTTPException):
         )
 
 class LoginError(ValidationError):
+    """[NotAll] Ошибка Неверный логин"""
     def __init__(self):
         super().__init__(detail = "Неверный логин")
 
 class PasswordError(ValidationError):
+    """[NotAll] Ошибка Неверный пароль"""
     def __init__(self):
         super().__init__(detail = "Неверный пароль")
 
 class TokenError(ValidationError):
+    """[NotAll] Ошибка Неверный токен"""
     def __init__(self):
         super().__init__(detail = "Неверный токен")
 
 class NoTokenError(ValidationError):
+    """[NotAll] Ошибка Токен отсутствует"""
     def __init__(self):
         super().__init__(detail = "Токен отсутствует")
 

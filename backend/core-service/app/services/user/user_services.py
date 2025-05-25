@@ -18,9 +18,8 @@ from ...core.exceptions import (
 
 
 class ManagementUsers:
-    """Модуль для управления пользователем пользователем.
-
-    `create_user(user: LoginUser)` - создать пользователя
+    """
+    Модуль для управления пользователем.
     """
 
     def __init__(self, db: Session):
