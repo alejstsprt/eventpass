@@ -2,7 +2,7 @@ from logging.handlers import RotatingFileHandler
 import logging
 
 class Logger:
-    def __init__(self, name_logger, level=logging.DEBUG):
+    def __init__(self, name_logger: str, level: int = logging.DEBUG):
         self.logger = logging.getLogger(name_logger)
         if self.logger.handlers:
             return

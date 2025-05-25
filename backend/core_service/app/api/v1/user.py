@@ -8,6 +8,7 @@ from ...core.logger import Logger
 from ...services.user.responses import LOGIN_USER_RESPONSES, CREATE_USER_RESPONSES
 
 
+# TODO: разберись и сделай отдельный файл для TypedDict
 router = APIRouter()
 
 logger = Logger("api_logger")
@@ -28,5 +29,5 @@ async def create_user(response: Response, user: CreateUser, service: ManagementU
     responses=LOGIN_USER_RESPONSES
 )
 @cache(expire=80)
-async def login_user(response: Response, user: LoginUser, service: ManagementUsers = Depends(get_user_service)):
+async def login_user(response: Response, user: LoginUser, service: ManagementUsers = Depends(get_user_service)) -> dict:
     return await service.login_user(response, user)

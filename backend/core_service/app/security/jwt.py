@@ -8,7 +8,7 @@ from sqlalchemy import Column
 from ..core.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
 
-async def set_jwt_cookie(response: Response, token: str):
+async def set_jwt_cookie(response: Response, token: str) -> None:
     expires = datetime.utcnow().replace(tzinfo=timezone.utc) + timedelta(days=30)
 
     response.set_cookie(
