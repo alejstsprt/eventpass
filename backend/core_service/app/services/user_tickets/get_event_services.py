@@ -6,4 +6,5 @@ from ...models.session import get_db
 
 
 def get_event_service(db: Session = Depends(get_db)) -> ManagementEvents:
+    """Функция возвращает созданную сессию БД"""
     return ManagementEvents(db)

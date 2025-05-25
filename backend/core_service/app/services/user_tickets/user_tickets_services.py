@@ -23,7 +23,7 @@ class ManagementEvents:
             event (CreateEvent): Название, описание и адрес мероприятия.
 
         Returns:
-            dict: Возвращает всю информацию о мероприятии, используя `create_event()`.
+            EventCreatedResult (TypedDict): Возвращает всю информацию о мероприятии, используя `create_event()`.
 
         Raises:
             NoTokenError (HTTPException): Токен отсутствует.
@@ -48,7 +48,7 @@ class ManagementEvents:
             jwt_token (str): Токен пользователя.
 
         Returns:
-            dict: Все мероприятия.
+            list[object]: Все мероприятия.
 
         Raises:
             NoTokenError (HTTPException): Токен отсутствует.

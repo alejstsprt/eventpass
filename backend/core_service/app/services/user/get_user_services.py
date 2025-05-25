@@ -6,4 +6,5 @@ from ...models.session import get_db
 
 
 def get_user_service(db: Session = Depends(get_db)) -> ManagementUsers:
+    """Функция возвращает созданную сессию БД"""
     return ManagementUsers(db)

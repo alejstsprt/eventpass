@@ -31,7 +31,7 @@ class ManagementUsers:
             response (Response): ответ, который сервер (FastAPI) отправляет клиенту
 
         Returns:
-            dict: Возвращает `{'result': True}`.
+            UserRegistrationResult (TypedDict): Возвращает `{'result': True, 'user_id': int}`.
 
         Raises:
             LoginAlreadyExistsException (HTTPException): Пользователь уже существует.
