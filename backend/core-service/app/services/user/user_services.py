@@ -24,18 +24,18 @@ class ManagementUsers:
 
     async def create_user(self, response: Response, user: CreateUser) -> dict:
         """
-        Метод для создания пользователя в базе данных
+        Метод для создания пользователя в базе данных.
 
         Args:
-            - user (LoginUser): Имя, логин и пароль.
-            - response (Response)
+            user (LoginUser): Имя, логин и пароль.
+            response (Response): ответ, который сервер (FastAPI) отправляет клиенту
 
         Returns:
-            - `{'result': True}`
+            dict: Возвращает `{'result': True}`.
 
         Raises:
-            - `LoginAlreadyExistsException` (HTTPException): Пользователь уже существует.
-            - `RegistrationFailedException` (HTTPException): Ошибка регистрации.
+            LoginAlreadyExistsException (HTTPException): Пользователь уже существует.
+            RegistrationFailedException (HTTPException): Ошибка регистрации.
         """
         if not user.name or not user.login or not user.password:
             raise ValidationError()
@@ -59,15 +59,16 @@ class ManagementUsers:
         Метод для входа в аккаунт.
 
         Args:
-            - user (LoginUser): Логин и пароль.
-            - response (Response)
+            user (LoginUser): Логин и пароль.
+            response (Response): ответ, который сервер (FastAPI) отправляет клиенту
 
         Returns:
-            - `{'result': True, 'id': ID, 'name': Name}` (dict): Успешный вход.
+            dict: Возвращает `{'result': True, 'id': ID, 'name': Name}`.
+
         Raises:
-            - `ValidationError` (HTTPException). Неверные данные.
-            - `LoginError` (HTTPException). Неверный логин.
-            - `PasswordError` (HTTPException). Неверный пароль.
+            ValidationError (HTTPException): Неверные данные.
+            LoginError (HTTPException): Неверный логин.
+            PasswordError (HTTPException): Неверный пароль.
         """
         if not self.db or not user.login or not user.password:
             raise ValidationError()

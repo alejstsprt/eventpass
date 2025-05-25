@@ -13,7 +13,7 @@ router = APIRouter()
 logger = Logger("api_logger")
 
 @router.post(
-    '/create_user',
+    '/create-user',
     summary="Создание аккаунта",
     description="ИНФО: Ручка для создания аккаунта. Принимает в себя имя, логин и пароль.",
     responses=CREATE_USER_RESPONSES
@@ -22,7 +22,7 @@ async def create_user(response: Response, user: CreateUser, service: ManagementU
     return await service.create_user(response, user)
 
 @router.post(
-    '/login_user',
+    '/login-user',
     summary="Вход в аккаунт",
     description="ИНФО: Ручка для входа в аккаунт. Принимает в себя логин и пароль.",
     responses=LOGIN_USER_RESPONSES

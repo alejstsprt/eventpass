@@ -15,7 +15,23 @@ class ManagementEvents:
         self.db = db
 
     async def create_events(self, jwt_token: str, event: CreateEvent) -> dict:
-        """Метод для создания мероприятия"""
+        """
+        Метод для создания мероприятия.
+
+        Args:
+            jwt_token (str): Токен пользователя.
+            event (CreateEvent): Название, описание и адрес мероприятия.
+
+        Returns:
+            dict: Возвращает всю информацию о мероприятии, используя `create_event()`.
+
+        Raises:
+            NoTokenError (HTTPException): Токен отсутствует.
+            TokenError (HTTPException): Неправильный токен.
+            NoTokenError (HTTPException): Токен отсутствует.
+            ValidationError (HTTPException): Неверные входные данные.
+            InternalServerError (HTTPException): Ошибка сервера.
+        """
         if not (user_id := await token_verification(jwt_token)):
             raise NoTokenError() # выбрасываем ошибку чтобы запутать, если попытка подделать токен. фронтенд поймет.
 

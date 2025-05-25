@@ -25,7 +25,7 @@ app.add_middleware(
 )
 
 app.include_router(user.router, prefix='/api/user', tags=['Ручки для взаимодействия с профилем пользователя'])
-app.include_router(user_tickets.router, prefix='/api/user_tickets', tags=['Ручки для управления мероприятиями'])
+app.include_router(user_tickets.router, prefix='/api/user-tickets', tags=['Ручки для управления мероприятиями'])
 
 
 # if __name__ == "__main__":

@@ -1,43 +1,31 @@
-LOGIN_USER_RESPONSES = {
+CREATE_EVENT_RESPONSES = {
     200: {
         "description": "Успешный ответ: Пользователь вошел",
-        "content": {"application/json": {"example": {"id": 1, "name": "alexey"}}}
+        "content": {
+            "application/json": {
+                "example": {
+                    'result': True,
+                    'event': {
+                        'id': 'id',
+                        'creator_id': 'creator_id',
+                        'title': 'title',
+                        'description': 'description',
+                        'address': 'address',
+                        'time_create': 'datetime'
+                    }
+                }
+            }
+        }
     },
     401: {
         "description": "Ошибки пользователя",
         "content": {
             "application/json": {
                 "examples": {
-                    "login_exists": {"summary": "Неверный логин", "value": {'detail': 'Неверный логин'}},
-                    "registration_failed": {"summary": "Неверный пароль", "value": {'detail': 'Неверный пароль'}}
-                }
-            }
-        }
-    }
-}
-
-CREATE_USER_RESPONSES = {
-    200: {
-        "description": "Успешный ответ: Пользователь зарегестрирован",
-        "content": {
-            "application/json": {
-                "example": {'result': True}
-            }
-        }
-    },
-    400: {
-        "description": "Ошибки с кодом 400",
-        "content": {
-            "application/json": {
-                "examples": {
-                    "login_exists": {
-                        "summary": "Логин занят",
-                        "value": {"detail": "Логин уже занят"}
-                    },
-                    "registration_failed": {
-                        "summary": "Ошибка регистрации",
-                        "value": {"detail": "Ошибка при регистрации"}
-                    }
+                    "server_error": {"summary": "Внутренняя ошибка сервера", "value": {'detail': 'Внутренняя ошибка сервера'}},
+                    "validation_error": {"summary": "Неверные данные", "value": {'detail': 'Неверные данные'}},
+                    "no_token_error": {"summary": "Токен отсутствует", "value": {'detail': 'Токен отсутствует'}},
+                    "token_error": {"summary": "Неверный токен", "value": {'detail': 'Неверный токен'}}
                 }
             }
         }
