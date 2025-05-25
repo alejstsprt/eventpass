@@ -1,6 +1,7 @@
-from typing import TypedDict, Optional
+from typing import TypedDict, Literal, NotRequired, TypeVar
+from datetime import datetime
 
-from sqlalchemy import DateTime
+from sqlalchemy import Column
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
@@ -10,20 +11,20 @@ from ..core.config import GET_TABLE
 
 
 class UserRegistrationResult(TypedDict):
-    result: True
-    user_id: Optional[int]
-    error: Optional[str]
+    result: Literal[True]
+    user_id: NotRequired[Column[int]]
+    error: NotRequired[str]
 
 class EventDetails(TypedDict):
-    id: int
-    creator_id: int
-    title: str
-    description: str
-    address: str
-    time_create: DateTime
+    id: Column[int]
+    creator_id: Column[int]
+    title: Column[str]
+    description: Column[str]
+    address: Column[str]
+    time_create: Column[datetime]
 
 class EventCreatedResult(TypedDict):
-    result: True
+    result: Literal[True]
     event: EventDetails
 
 
@@ -63,13 +64,13 @@ async def user_registration(db: Session, name: str, login: str, password: str) -
     except Exception as e:
         raise InternalServerError()
 
-async def create_event(db: Session, creator_id: str, title: str, description: str, address: str) -> EventCreatedResult:
+async def create_event(db: Session, creator_id: int, title: str, description: str, address: str) -> EventCreatedResult:
     """
     Функция для создания мероприятия
 
     Args:
         db (Session): Сессия SQLAlchemy для работы с БД.
-        creator_id (str): ID создателя мероприятия.
+        creator_id (int): ID создателя мероприятия.
         title (str): Название мероприятия.
         description (str): Описание мероприятия.
         address (str): Адрес мероприятия.
@@ -139,7 +140,7 @@ async def search_user(db: Session, *, user_id: int | None = None, login: str | N
     }
     return result
 
-async def all_info_table(db: Session, table_name: str) -> dict:
+async def all_info_table(db: Session, table_name: str) -> list[object]:
     if not table_name:
         raise ValidationError()
 

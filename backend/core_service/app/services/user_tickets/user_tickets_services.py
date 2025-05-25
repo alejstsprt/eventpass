@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
 from ...schemas.user_tickets import CreateEvent
-from ...models.crud import create_event, search_user, all_info_table
+from ...models.crud import EventCreatedResult, create_event, search_user, all_info_table
 from ...security.jwt import token_verification
 from ...core.exceptions import NoTokenError, TokenError
 
@@ -14,7 +14,7 @@ class ManagementEvents:
     def __init__(self, db: Session):
         self.db = db
 
-    async def create_events(self, jwt_token: str, event: CreateEvent) -> dict:
+    async def create_events(self, jwt_token: str, event: CreateEvent) -> EventCreatedResult:
         """
         Метод для создания мероприятия.
 
@@ -40,7 +40,7 @@ class ManagementEvents:
 
         return await create_event(self.db, user_id, event.title, event.description, event.address)
 
-    async def all_events(self, jwt_token: str) -> dict:
+    async def all_events(self, jwt_token: str) -> list[object]:
         """
         Метод для вывода всех мероприятий (не оптимизирован для больших данных)
 
