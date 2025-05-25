@@ -3,6 +3,7 @@ from typing import Optional
 
 from jose import JWTError, jwt
 from fastapi import Request, Response
+from sqlalchemy import Column
 
 from ..core.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
@@ -20,12 +21,12 @@ async def set_jwt_cookie(response: Response, token: str):
         path="/"
     )
 
-async def create_access_token(user_id: int) -> str:
+async def create_access_token(user_id: int | Column[int]) -> str:
     """
     Создание токена
 
     Args:
-        int: user_id: Айди пользователя.
+        int/Column[int]: user_id: Айди пользователя.
 
     Returns:
         str: Созданный токен: `токен`.

@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import Response
 
 from ...schemas.user import CreateUser, LoginUser
-from ...models.crud import user_registration, search_user
+from ...models.crud import UserRegistrationResult, user_registration, search_user
 from ...security.hashing import hash_password, verify_password
 from ...security.jwt import set_jwt_cookie, create_access_token
 from ...core.exceptions import (
@@ -22,7 +22,7 @@ class ManagementUsers:
     def __init__(self, db: Session):
         self.db = db
 
-    async def create_user(self, response: Response, user: CreateUser) -> dict:
+    async def create_user(self, response: Response, user: CreateUser) -> UserRegistrationResult:
         """
         Метод для создания пользователя в базе данных.
 
@@ -73,12 +73,12 @@ class ManagementUsers:
         if not self.db or not user.login or not user.password:
             raise ValidationError()
 
-        db_user = await search_user(self.db, login=user.login)
-        db_user = db_user['login']
+        user_data = await search_user(self.db, login=user.login)
+        db_user = user_data['login']
         if not db_user:
             raise LoginError()
 
-        is_password = verify_password(user.password, db_user.password_hash)
+        is_password = verify_password(user.password, str(db_user.password_hash))
         if not is_password:
             raise PasswordError()
 

@@ -34,7 +34,7 @@ app.include_router(user_tickets.router, prefix='/api/user-tickets', tags=['Ру�
 # python -m venv venv
 # Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 # venv\Scripts\activate || venv\Scripts\activate.bat
-# uvicorn backend.core-service.app.main:app --host 192.168.0.104 --port 8000 --reload
+# uvicorn backend.core_service.app.main:app --host 192.168.0.104 --port 8000 --reload
 # ipconfig
 
 # tasklist | findstr uvicorn

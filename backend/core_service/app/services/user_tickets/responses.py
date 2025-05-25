@@ -1,4 +1,7 @@
-CREATE_EVENT_RESPONSES = {
+from typing import Any
+
+
+CREATE_EVENT_RESPONSES: dict[int | str, dict[str, Any]] = {
     200: {
         "description": "Успешный ответ: Пользователь вошел",
         "content": {

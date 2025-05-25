@@ -1,4 +1,4 @@
-from typing import TypedDict, Literal, NotRequired, TypeVar
+from typing import TypedDict, Literal, NotRequired, Optional, Union
 from datetime import datetime
 
 from sqlalchemy import Column
@@ -9,6 +9,10 @@ from .models import Accounts, Events, TicketTypes, Tickets
 from ..core.exceptions import ValidationError, LoginAlreadyExistsException, InternalServerError
 from ..core.config import GET_TABLE
 
+
+class SearchUserResult(TypedDict):
+    id: Optional[int]
+    login: Optional[str]
 
 class UserRegistrationResult(TypedDict):
     result: Literal[True]
@@ -120,7 +124,7 @@ async def create_event(db: Session, creator_id: int, title: str, description: st
     except Exception as e:
         raise InternalServerError()
 
-async def search_user(db: Session, *, user_id: int | None = None, login: str | None = None) -> dict:
+async def search_user(db: Session, *, user_id: int | None = None, login: str | None = None) -> dict[str, Accounts | None]:
     """
     Возвращает Результат поиска пользователя.
 

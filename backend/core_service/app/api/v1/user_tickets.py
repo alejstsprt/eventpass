@@ -20,10 +20,10 @@ logger = Logger("api_logger")
     description="ИНФО: Ручка для создания мероприятия. Принимает в себя название, описание и адрес мероприятия.",
     responses=CREATE_EVENT_RESPONSES
 )
-async def create_user(
+async def add_events(
         event: CreateEvent,
         service: ManagementEvents = Depends(get_event_service),
-        jwt_token: Optional[str] = Cookie(None)
+        jwt_token: str = Cookie(None)
     ):
     return await service.create_events(jwt_token, event)
 
@@ -33,8 +33,8 @@ async def create_user(
     description="ИНФО: Ручка для получения списка всех мероприятий. Принимает в себя ...",
     responses=None
 )
-async def create_user(
+async def all_events(
         service: ManagementEvents = Depends(get_event_service),
-        jwt_token: Optional[str] = Cookie(None)
+        jwt_token: str = Cookie(None)
     ):
     return await service.all_events(jwt_token)

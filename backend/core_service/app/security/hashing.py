@@ -1,6 +1,7 @@
-from typing import Union, Optional
-
 from passlib.context import CryptContext
+from sqlalchemy import Column
+
+from ..core.exceptions import ValidationError
 
 
 pwd_context = CryptContext(
@@ -10,7 +11,7 @@ pwd_context = CryptContext(
     deprecated="auto"         # Автоматически помечает устаревшие методы
 )
 
-def hash_password(password: str) -> Optional[str]:
+def hash_password(password: str) -> str:
     """
     Функция для хеширования пароля
 
@@ -21,7 +22,7 @@ def hash_password(password: str) -> Optional[str]:
         str: Хеш пароля
     """
     if not password:
-        return None
+        raise ValidationError()
 
     return pwd_context.hash(password)
 

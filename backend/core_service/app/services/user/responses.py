@@ -1,4 +1,7 @@
-LOGIN_USER_RESPONSES = {
+from typing import Any
+
+
+LOGIN_USER_RESPONSES: dict[int | str, dict[str, Any]] = {
     200: {
         "description": "Успешный ответ: Пользователь вошел",
         "content": {"application/json": {"example": {"id": 1, "name": "alexey"}}}
@@ -16,7 +19,7 @@ LOGIN_USER_RESPONSES = {
     }
 }
 
-CREATE_USER_RESPONSES = {
+CREATE_USER_RESPONSES: dict[int | str, dict[str, Any]] = {
     200: {
         "description": "Успешный ответ: Пользователь зарегестрирован",
         "content": {
