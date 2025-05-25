@@ -4,8 +4,9 @@ from sqlalchemy import DateTime
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
-from .models import Accounts, Events
+from .models import Accounts, Events, TicketTypes, Tickets
 from ..core.exceptions import ValidationError, LoginAlreadyExistsException, InternalServerError
+from ..core.config import GET_TABLE
 
 
 class UserRegistrationResult(TypedDict):
@@ -137,3 +138,9 @@ async def search_user(db: Session, *, user_id: int | None = None, login: str | N
         'login': query.filter(Accounts.login == login).first() if login is not None else None
     }
     return result
+
+async def all_info_table(db: Session, table_name: str) -> dict:
+    if not table_name:
+        raise ValidationError()
+
+    return db.query(GET_TABLE[table_name]).all()

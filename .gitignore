@@ -3,3 +3,5 @@ __pycache__/
 eventpass.db
 venv
 .env
+.mypy_cache
+.pytest_cache

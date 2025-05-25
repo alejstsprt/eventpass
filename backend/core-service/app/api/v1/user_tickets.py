@@ -37,4 +37,4 @@ async def create_user(
         service: ManagementEvents = Depends(get_event_service),
         jwt_token: Optional[str] = Cookie(None)
     ):
-    return await service
+    return await service.all_events(jwt_token)

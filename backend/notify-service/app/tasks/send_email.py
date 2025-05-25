@@ -1,1 +1,0 @@
-# Celery-задачи для email
