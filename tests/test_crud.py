@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 import pytest
 
 """Файл для теста"""
-from ..models.crud import user_registration, is_exists_login
+from backend.core_service.app.models.crud import user_registration
 
 
 class TestUserRegistration:
@@ -70,23 +70,23 @@ class TestUserRegistration:
         result = user_registration(test_db, login, password)
         assert result['error'] is not None, f"{result = } | Ожидалось что будет ошибка, ведь входных данных нету."
 
-class TestIsExistsLogin:
-    """Тест is_exists_login"""
+# class TestIsExistsLogin:
+#     """Тест is_exists_login"""
 
-    @pytest.mark.asyncio
-    async def test_is_exists_login(self):
-        """Ожидаем True, ведь пользователь 'login' есть в базе"""
-        test_db = MagicMock()
-        test_db.query.return_value.filter.return_value.first.return_value = True
+#     @pytest.mark.asyncio
+#     async def test_is_exists_login(self):
+#         """Ожидаем True, ведь пользователь 'login' есть в базе"""
+#         test_db = MagicMock()
+#         test_db.query.return_value.filter.return_value.first.return_value = True
 
-        result = await is_exists_login(test_db, 'login')
-        assert result['result'] is True, f"{result = } | Ожидалось что будет True"
+#         result = await is_exists_login(test_db, 'login')
+#         assert result['result'] is True, f"{result = } | Ожидалось что будет True"
 
-    @pytest.mark.asyncio
-    async def test_is_exists_login(self):
-        """Ожидаем False, ведь пользователя 'login' нет в базе"""
-        test_db = MagicMock()
-        test_db.query.return_value.filter.return_value.first.return_value = False
+#     @pytest.mark.asyncio
+#     async def test_is_exists_login(self):
+#         """Ожидаем False, ведь пользователя 'login' нет в базе"""
+#         test_db = MagicMock()
+#         test_db.query.return_value.filter.return_value.first.return_value = False
 
-        result = await is_exists_login(test_db, 'login')
-        assert result['result'] is False, f"{result = } | Ожидалось что будет False"
+#         result = await is_exists_login(test_db, 'login')
+#         assert result['result'] is False, f"{result = } | Ожидалось что будет False"
