@@ -117,3 +117,23 @@ async def create_event(db: Session, creator_id: str, title: str, description: st
         }
     except Exception as e:
         raise InternalServerError()
+
+async def search_user(db: Session, *, user_id: int | None = None, login: str | None = None) -> dict:
+    """
+    Возвращает Результат поиска пользователя.
+
+    Args:
+        db (Session): Сессия SQLAlchemy для работы с БД.
+        user_id (int): ID пользователя.
+        login (str): Логин пользователя.
+
+    Returns:
+        dict: Вернет `None`, если элемент не найден, либо данные не указаны. Иначе - все данные пользователя в формате `{'id': user_info, 'login': user_info}`.
+    """
+    query = db.query(Accounts)
+
+    result = {
+        'id': query.filter(Accounts.id == user_id).first() if user_id is not None else None,
+        'login': query.filter(Accounts.login == login).first() if login is not None else None
+    }
+    return result

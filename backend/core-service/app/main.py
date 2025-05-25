@@ -2,9 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
-from .api.v1 import user, user_tickets, events_organizer
+from .api.v1 import user, user_tickets
 from .models.session import Base, engine
-from .models.models import Accounts, Events, TicketTypes, Tickets
 
 
 Base.metadata.create_all(bind=engine)

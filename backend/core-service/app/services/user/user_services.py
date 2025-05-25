@@ -1,20 +1,17 @@
-from typing import Union
-
 from sqlalchemy.orm import Session
 from fastapi import Response
 
 from ...schemas.user import CreateUser, LoginUser
-from ...models.crud import user_registration
-from ...models.models import Accounts, Events, TicketTypes, Tickets
+from ...models.crud import user_registration, search_user
 from ...security.hashing import hash_password, verify_password
 from ...security.jwt import set_jwt_cookie, create_access_token
 from ...core.exceptions import (
-        LoginAlreadyExistsException,
-        ValidationError,
-        PasswordError,
-        LoginError,
-        InternalServerError
-    )
+    LoginAlreadyExistsException,
+    ValidationError,
+    PasswordError,
+    LoginError,
+    InternalServerError
+)
 
 
 class ManagementUsers:
@@ -50,8 +47,10 @@ class ManagementUsers:
             token = await create_access_token(result['user_id'])
             await set_jwt_cookie(response, token)
             return result
+
         elif result['error'] != 'Ошибка сервера':
             raise LoginAlreadyExistsException()
+
         else:
             raise InternalServerError()
 
@@ -73,7 +72,8 @@ class ManagementUsers:
         if not self.db or not user.login or not user.password:
             raise ValidationError()
 
-        db_user = self.db.query(Accounts).filter(Accounts.login == user.login).first()
+        db_user = await search_user(self.db, login=user.login)
+        db_user = db_user['login']
         if not db_user:
             raise LoginError()
 
@@ -81,7 +81,6 @@ class ManagementUsers:
         if not is_password:
             raise PasswordError()
 
-        print(db_user.id)
         token = await create_access_token(db_user.id)
         await set_jwt_cookie(response, token)
 
