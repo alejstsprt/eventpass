@@ -7,9 +7,8 @@ from ...services import get_user_service, LOGIN_USER_RESPONSES, CREATE_USER_RESP
 from ...core.logger import Logger
 
 if TYPE_CHECKING:
-    from ...schemas import CreateUser, LoginUser, UserRegistrationResult
+    from ...schemas import CreateUser, LoginUser, UserRegistrationResult, LoginUserResult
     from ...services import ManagementUsers
-    from sqlalchemy import Column
 
 
 router = APIRouter()
@@ -32,5 +31,5 @@ async def create_user(response: Response, user: 'CreateUser', service: 'Manageme
     responses=LOGIN_USER_RESPONSES
 )
 @cache(expire=80)
-async def login_user(response: Response, user: 'LoginUser', service: 'ManagementUsers' = Depends(get_user_service)) -> dict[str, 'Column'[int] | 'Column'[str]]:
+async def login_user(response: Response, user: 'LoginUser', service: 'ManagementUsers' = Depends(get_user_service)) -> 'LoginUserResult':
     return await service.login_user(response, user)

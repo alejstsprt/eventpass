@@ -15,8 +15,7 @@ from ...core.exceptions import (
 )
 
 if TYPE_CHECKING:
-    from ...schemas import UserRegistrationResult, CreateUser, LoginUser
-    from sqlalchemy import Column
+    from ...schemas import UserRegistrationResult, CreateUser, LoginUser, LoginUserResult
 
 
 class ManagementUsers:
@@ -59,7 +58,7 @@ class ManagementUsers:
         else:
             raise InternalServerError()
 
-    async def login_user(self, response: Response, user: 'LoginUser') -> dict[str, 'Column'[int] | 'Column'[str]]:
+    async def login_user(self, response: Response, user: 'LoginUser') -> 'LoginUserResult':
         """
         Метод для входа в аккаунт.
 
