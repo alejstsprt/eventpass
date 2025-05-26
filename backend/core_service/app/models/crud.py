@@ -124,8 +124,9 @@ async def search_user(db: Session, *, user_id: int | None = None, login: str | N
     }
     return result
 
-async def all_info_table(db: Session, table_name: str) -> list['BaseModel']:
+async def all_info_table(db: Session, table_name: str) -> list:
     if not table_name:
         raise ValidationError()
 
-    return db.query(GET_TABLE[table_name]).all()
+    result = db.query(GET_TABLE[table_name]).all()
+    return result

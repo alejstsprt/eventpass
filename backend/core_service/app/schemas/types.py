@@ -1,8 +1,6 @@
-from typing import TypedDict, Literal, NotRequired, Optional, TYPE_CHECKING
+from typing import TypedDict, Literal, NotRequired, Optional
 from datetime import datetime
-
-if TYPE_CHECKING:
-    from sqlalchemy import Column
+from sqlalchemy import Column
 
 
 # [SearchUserResult]
@@ -15,17 +13,17 @@ class SearchUserResult(TypedDict):
 class UserRegistrationResult(TypedDict):
     """Формат ответа"""
     result: Literal[True]
-    user_id: NotRequired['Column'[int]]
+    user_id: NotRequired[Column[int]]
     error: NotRequired[str]
 
 # [EventCreatedResult]
 class EventDetails(TypedDict):
-    id: 'Column'[int]
-    creator_id: 'Column'[int]
-    title: 'Column'[str]
-    description: 'Column'[str]
-    address: 'Column'[str]
-    time_create: 'Column'[datetime]
+    id: Column[int]
+    creator_id: Column[int]
+    title: Column[str]
+    description: Column[str]
+    address: Column[str]
+    time_create: Column[datetime]
 
 class EventCreatedResult(TypedDict):
     """Формат ответа"""
@@ -35,5 +33,5 @@ class EventCreatedResult(TypedDict):
 # [LoginUserResult]
 class LoginUserResult(TypedDict):
     """Формат ответа"""
-    id: 'Column'[int]
-    name: 'Column'[str]
+    id: Column[int]
+    name: Column[str]

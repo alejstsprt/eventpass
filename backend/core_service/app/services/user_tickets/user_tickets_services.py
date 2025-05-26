@@ -46,7 +46,7 @@ class ManagementEvents:
 
         return await create_event(self.db, user_id, event.title, event.description, event.address)
 
-    async def all_events(self, jwt_token: str) -> list['BaseModel']:
+    async def all_events(self, jwt_token: str) -> list:
         """
         Метод для вывода всех мероприятий (не оптимизирован для больших данных)
 

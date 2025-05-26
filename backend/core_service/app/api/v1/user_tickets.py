@@ -10,7 +10,6 @@ from ...core.logger import Logger
 if TYPE_CHECKING:
     from ...services import ManagementEvents
     from ...schemas import EventCreatedResult
-    from ...models.session import BaseModel
 
 
 router = APIRouter()
@@ -39,5 +38,5 @@ async def add_events(
 async def all_events(
         service: 'ManagementEvents' = Depends(get_event_service),
         jwt_token: str = Cookie(None)
-    ) -> list['BaseModel']:
+    ):
     return await service.all_events(jwt_token)
