@@ -63,3 +63,21 @@ class ManagementEvents:
             raise NoTokenError() # выбрасываем ошибку чтобы запутать, если попытка подделать токен. фронтенд поймет.
 
         return await all_info_table(self.db, 'Events')
+
+    async def edit_events(self, jwt_token: str, event) -> list:
+        """
+        Метод для вывода всех мероприятий (не оптимизирован для больших данных)
+
+        Args:
+            jwt_token (str): Токен пользователя.
+
+        Returns:
+            list[object]: Все мероприятия.
+
+        Raises:
+            NoTokenError (HTTPException): Токен отсутствует.
+        """
+        if not await token_verification(jwt_token):
+            raise NoTokenError() # выбрасываем ошибку чтобы запутать, если попытка подделать токен. фронтенд поймет.
+
+        return event

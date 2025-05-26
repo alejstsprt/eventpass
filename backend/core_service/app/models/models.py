@@ -26,6 +26,7 @@ class Events(BaseModel):
     description = Column(String) # Полное описание мероприятия
     address = Column(String, nullable=False) # Адрес мероприятия
     datetime = Column(DateTime(timezone=True), nullable=False, server_default=func.now()) # Дата в формате 11:11 21.05.2025
+    # end_datetime = Column(DateTime(timezone=True), nullable=False, server_default=func.now()) # Дата в формате 11:11 21.05.2025
 
     creator = relationship("Accounts", back_populates="events")
     ticket_types = relationship("TicketTypes", back_populates="event")

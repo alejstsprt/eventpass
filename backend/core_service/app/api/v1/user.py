@@ -16,7 +16,7 @@ router = APIRouter()
     description="ИНФО: Ручка для создания аккаунта. Принимает в себя имя, логин и пароль.",
     responses=CREATE_USER_RESPONSES
 )
-async def create_user(response: Response, user: 'CreateUser', service: 'ManagementUsers' = Depends(get_user_service)):
+async def create_user(response: Response, user: CreateUser, service: 'ManagementUsers' = Depends(get_user_service)):
     return await service.create_user(response, user)
 
 @router.post(
@@ -26,5 +26,5 @@ async def create_user(response: Response, user: 'CreateUser', service: 'Manageme
     responses=LOGIN_USER_RESPONSES
 )
 @cache(expire=80)
-async def login_user(response: Response, user: 'LoginUser', service: 'ManagementUsers' = Depends(get_user_service)):
+async def login_user(response: Response, user: LoginUser, service: 'ManagementUsers' = Depends(get_user_service)):
     return await service.login_user(response, user)

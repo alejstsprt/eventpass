@@ -1,11 +1,28 @@
+from typing import Annotated
+
 from pydantic import BaseModel, EmailStr, Field
 
 
-CorrectForm = Field(min_length=2, max_length=50)
-
+# [LoginUser]
 class LoginUser(BaseModel):
-    login: EmailStr
-    password: str = CorrectForm
+    login: Annotated[EmailStr, Field(
+        description="Логин пользователя",
+        min_length=2,
+        max_length=50
+    )]
 
+    password: Annotated[str, Field(
+        description="Пароль пользователя",
+        examples=["mypassword123"],
+        min_length=5,
+        max_length=50
+    )]
+
+# [CreateUser]
 class CreateUser(LoginUser):
-    name: str = CorrectForm
+    name: Annotated[str, Field(
+        description="Имя пользователя",
+        examples=["Витя"],
+        min_length=5,
+        max_length=50
+    )]
