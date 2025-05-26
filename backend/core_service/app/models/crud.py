@@ -6,6 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from .models import Accounts, Events, TicketTypes, Tickets
 from ..core.exceptions import ValidationError, LoginAlreadyExistsException, InternalServerError
 from ..core.config import GET_TABLE
+from ..core.logger import logger_api
 
 if TYPE_CHECKING:
     from ..models.session import BaseModel
@@ -31,6 +32,7 @@ async def user_registration(db: Session, name: str, login: str, password: str) -
     """
     # если один из параметров не указан
     if not db or not login or not password:
+        logger_api.error(f'Неправильно переданы данные. {db = }, {login = }, {password = }')
         raise ValidationError()
 
     try:
@@ -44,8 +46,10 @@ async def user_registration(db: Session, name: str, login: str, password: str) -
         db.refresh(new_user)
         return {'result': True, 'user_id': new_user.id}
     except IntegrityError:
+        logger_api.error('Имя/Логин уже занят')
         raise LoginAlreadyExistsException()
     except Exception as e:
+        logger_api.exception(f'Внутренняя ошибка сервера: Проблемы с сейвом БД: {e}')
         raise InternalServerError()
 
 async def create_event(db: Session, creator_id: int, title: str, description: str, address: str) -> 'EventCreatedResult':
@@ -77,6 +81,7 @@ async def create_event(db: Session, creator_id: int, title: str, description: st
         InternalServerError (HTTPException): Ошибка сервера.
     """
     if not db or not creator_id or not title or not description or not address:
+        logger_api.error(f'Неправильно переданы данные. {db = }, {creator_id = }, {title = }, {description = }, {address = }')
         raise ValidationError()
 
     try:
@@ -102,6 +107,7 @@ async def create_event(db: Session, creator_id: int, title: str, description: st
             }
         }
     except Exception as e:
+        logger_api.exception(f'Внутренняя ошибка сервера: Проблемы с сейвом БД: {e}')
         raise InternalServerError()
 
 async def search_user(db: Session, *, user_id: int | None = None, login: str | None = None) -> dict[str, Accounts | None]:
@@ -126,6 +132,7 @@ async def search_user(db: Session, *, user_id: int | None = None, login: str | N
 
 async def all_info_table(db: Session, table_name: str) -> list:
     if not table_name:
+        logger_api.error(f'Неправильно переданы данные. {db = }, {table_name = }')
         raise ValidationError()
 
     result = db.query(GET_TABLE[table_name]).all()

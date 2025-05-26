@@ -5,14 +5,11 @@ from fastapi_cache.decorator import cache
 
 from ...schemas import CreateEvent
 from ...services import get_event_service, CREATE_EVENT_RESPONSES
-from ...core.logger import Logger
 from ...services import ManagementEvents
 from ...schemas import EventCreatedResult
 
 
 router = APIRouter()
-
-logger = Logger("api_logger")
 
 @router.post(
     '/add-events',

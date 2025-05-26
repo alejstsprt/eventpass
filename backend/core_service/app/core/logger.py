@@ -28,3 +28,9 @@ class Logger:
 
     def error(self, text: str) -> None:
         self.logger.error(text)
+
+    def exception(self, text: str) -> None:
+        self.logger.exception(text)
+
+
+logger_api = Logger("api_logger")

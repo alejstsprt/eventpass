@@ -4,14 +4,11 @@ from fastapi import APIRouter, Depends, Response
 from fastapi_cache.decorator import cache
 
 from ...services import get_user_service, LOGIN_USER_RESPONSES, CREATE_USER_RESPONSES
-from ...core.logger import Logger
 from ...schemas import CreateUser, LoginUser, UserRegistrationResult, LoginUserResult
 from ...services import ManagementUsers
 
 
 router = APIRouter()
-
-logger = Logger("api_logger")
 
 @router.post(
     '/create-user',

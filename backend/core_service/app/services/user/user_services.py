@@ -7,11 +7,9 @@ from ...models.crud import user_registration, search_user
 from ...security.hashing import hash_password, verify_password
 from ...security.jwt import set_jwt_cookie, create_access_token
 from ...core.exceptions import (
-    LoginAlreadyExistsException,
     ValidationError,
     PasswordError,
-    LoginError,
-    InternalServerError
+    LoginError
 )
 
 if TYPE_CHECKING:
@@ -40,6 +38,8 @@ class ManagementUsers:
         Raises:
             LoginAlreadyExistsException (HTTPException): Пользователь уже существует.
             RegistrationFailedException (HTTPException): Ошибка регистрации.
+            ValidationError (HTTPException): Неверные входные данные.
+            InternalServerError (HTTPException): Ошибка сервера.
         """
         if not user.name or not user.login or not user.password:
             raise ValidationError()
@@ -47,16 +47,9 @@ class ManagementUsers:
         hash_pass = hash_password(user.password)
         result = await user_registration(self.db, user.name, user.login, hash_pass)
 
-        if result['result']:
-            token = await create_access_token(result['user_id'])
-            await set_jwt_cookie(response, token)
-            return result
-
-        elif result['error'] != 'Ошибка сервера':
-            raise LoginAlreadyExistsException()
-
-        else:
-            raise InternalServerError()
+        token = await create_access_token(result['user_id'])
+        await set_jwt_cookie(response, token)
+        return result
 
     async def login_user(self, response: Response, user: 'LoginUser') -> 'LoginUserResult':
         """
