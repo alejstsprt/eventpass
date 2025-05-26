@@ -31,10 +31,9 @@ async def user_registration(db: Session, name: str, login: str, password: str) -
         LoginAlreadyExistsException (HTTPException): Имя/Логин уже занят.
         InternalServerError (HTTPException): Ошибка сервера.
     """
-    # если один из параметров не указан
-    if not db or not login or not password:
-        logger_api.error(f'Неправильно переданы данные. {db = }, {login = }, {password = }')
-        raise ValidationError()
+    # if not db or not login or not password:
+    #     logger_api.error(f'Неправильно переданы данные. {db = }, {login = }, {password = }')
+    #     raise ValidationError()
 
     try:
         new_user = Accounts(
@@ -82,9 +81,9 @@ async def create_event(db: Session, creator_id: int, status: str, title: str, de
         ValidationError (HTTPException): Неверные входные данные.
         InternalServerError (HTTPException): Ошибка сервера.
     """
-    if not db or not creator_id or not status or not title or not description or not address:
-        logger_api.error(f'Неправильно переданы данные. {db = }, {creator_id = }, {status = }, {title = }, {description = }, {address = }')
-        raise ValidationError()
+    # if not db or not creator_id or not status or not title or not description or not address:
+    #     logger_api.error(f'Неправильно переданы данные. {db = }, {creator_id = }, {status = }, {title = }, {description = }, {address = }')
+    #     raise ValidationError()
 
     if status not in status_events:
         logger_api.error(f'Неправильно передан статус. Должен быть "опубликовано"/"завершено"/"черновик", а на деле {status = }')

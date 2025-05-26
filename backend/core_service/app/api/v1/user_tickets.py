@@ -24,13 +24,13 @@ async def add_events(
     ):
     return await service.create_events(jwt_token, event)
 
-@router.post(
+@router.get(
     '/all-events',
     summary="Список всех мероприятий",
     description="ИНФО: Ручка для получения списка всех мероприятий. Принимает в себя ...",
     responses=None
 )
-@cache(expire=80)
+# @cache(expire=80)
 async def all_events(
         service: 'ManagementEvents' = Depends(get_event_service),
         jwt_token: str = Cookie(None)
