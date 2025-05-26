@@ -21,7 +21,7 @@ class Events(BaseModel):
 
     id = Column(Integer, primary_key=True, index=True) # Айди мероприятия
     creator_id = Column(Integer, ForeignKey('users.id'), nullable=False) # Айди пользователя, который создал мероприятие (users.id)
-    status = Column(String, nullable=False) # Статус мероприятия (опубликованно/завершено/черновик).
+    status = Column(String, nullable=False) # Статус мероприятия (опубликовано/завершено/черновик).
     title = Column(String) # Название мероприятия
     description = Column(String) # Полное описание мероприятия
     address = Column(String, nullable=False) # Адрес мероприятия

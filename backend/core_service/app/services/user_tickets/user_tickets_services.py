@@ -44,7 +44,7 @@ class ManagementEvents:
         if is_user['id'] is None:
             raise TokenError()
 
-        return await create_event(self.db, user_id, event.title, event.description, event.address)
+        return await create_event(self.db, user_id, event.status, event.title, event.description, event.address)
 
     async def all_events(self, jwt_token: str) -> list:
         """

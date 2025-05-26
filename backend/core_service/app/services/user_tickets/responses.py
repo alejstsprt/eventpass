@@ -10,6 +10,7 @@ CREATE_EVENT_RESPONSES: dict[int | str, dict[str, Any]] = {
                     'result': True,
                     'event': {
                         'id': 'id',
+                        'status': 'status',
                         'creator_id': 'creator_id',
                         'title': 'title',
                         'description': 'description',

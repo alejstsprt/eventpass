@@ -12,7 +12,9 @@ SECRET_KEY = os.getenv("SECRET_KEY", 'atgeg4wetg4ge')
 ALGORITHM = os.getenv("ALGORITHM", 'HS256')
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "10080"))
 
-GET_TABLE = {
+status_events: set = ('опубликовано', 'завершено', 'черновик')
+
+GET_TABLE: dict = {
     'Accounts': Accounts,
     'Events': Events,
     'TicketTypes': TicketTypes,

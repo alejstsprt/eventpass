@@ -7,6 +7,7 @@ from .models import Accounts, Events, TicketTypes, Tickets
 from ..core.exceptions import ValidationError, LoginAlreadyExistsException, InternalServerError
 from ..core.config import GET_TABLE
 from ..core.logger import logger_api
+from ..core.config import status_events
 
 if TYPE_CHECKING:
     from ..models.session import BaseModel
@@ -49,10 +50,10 @@ async def user_registration(db: Session, name: str, login: str, password: str) -
         logger_api.error('Имя/Логин уже занят')
         raise LoginAlreadyExistsException()
     except Exception as e:
-        logger_api.exception(f'Внутренняя ошибка сервера: Проблемы с сейвом БД: {e}')
+        logger_api.exception(f'Внутренняя ошибка сервера. Проблемы с сейвом БД: {e}')
         raise InternalServerError()
 
-async def create_event(db: Session, creator_id: int, title: str, description: str, address: str) -> 'EventCreatedResult':
+async def create_event(db: Session, creator_id: int, status: str, title: str, description: str, address: str) -> 'EventCreatedResult':
     """
     Функция для создания мероприятия
 
@@ -68,6 +69,7 @@ async def create_event(db: Session, creator_id: int, title: str, description: st
             'result': True,
             'event': {
                 'id': id,
+                'status': status,
                 'creator_id': creator_id,
                 'title': title,
                 'description': description,
@@ -80,13 +82,18 @@ async def create_event(db: Session, creator_id: int, title: str, description: st
         ValidationError (HTTPException): Неверные входные данные.
         InternalServerError (HTTPException): Ошибка сервера.
     """
-    if not db or not creator_id or not title or not description or not address:
-        logger_api.error(f'Неправильно переданы данные. {db = }, {creator_id = }, {title = }, {description = }, {address = }')
+    if not db or not creator_id or not status or not title or not description or not address:
+        logger_api.error(f'Неправильно переданы данные. {db = }, {creator_id = }, {status = }, {title = }, {description = }, {address = }')
+        raise ValidationError()
+
+    if status not in status_events:
+        logger_api.error(f'Неправильно передан статус. Должен быть "опубликовано"/"завершено"/"черновик", а на деле {status = }')
         raise ValidationError()
 
     try:
         new_event = Events(
             creator_id=creator_id,
+            status=status,
             title=title,
             description=description,
             address=address
@@ -99,6 +106,7 @@ async def create_event(db: Session, creator_id: int, title: str, description: st
             'result': True,
             'event': {
                 'id': new_event.id,
+                'status': new_event.status,
                 'creator_id': new_event.creator_id,
                 'title': new_event.title,
                 'description': new_event.description,
@@ -107,7 +115,7 @@ async def create_event(db: Session, creator_id: int, title: str, description: st
             }
         }
     except Exception as e:
-        logger_api.exception(f'Внутренняя ошибка сервера: Проблемы с сейвом БД: {e}')
+        logger_api.exception(f'Внутренняя ошибка сервера. Проблемы с сейвом БД: {e}')
         raise InternalServerError()
 
 async def search_user(db: Session, *, user_id: int | None = None, login: str | None = None) -> dict[str, Accounts | None]:
