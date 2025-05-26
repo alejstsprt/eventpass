@@ -1,5 +1,4 @@
 from passlib.context import CryptContext
-from sqlalchemy import Column
 
 from ..core.exceptions import ValidationError
 

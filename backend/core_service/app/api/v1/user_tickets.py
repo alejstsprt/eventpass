@@ -1,13 +1,16 @@
-from typing import Optional
+from typing import TYPE_CHECKING
 
 from fastapi import APIRouter, Depends, Cookie
-from fastapi_cache.decorator import cache
+# from fastapi_cache.decorator import cache
 
-from ...schemas.user_tickets import CreateEvent
-from ...services.user_tickets.get_event_services import get_event_service
-from ...services.user_tickets.user_tickets_services import ManagementEvents
+from ...schemas import CreateEvent
+from ...services import get_event_service, CREATE_EVENT_RESPONSES
 from ...core.logger import Logger
-from ...services.user_tickets.responses import CREATE_EVENT_RESPONSES
+
+if TYPE_CHECKING:
+    from ...services import ManagementEvents
+    from ...schemas import EventCreatedResult
+    from ...models.session import BaseModel
 
 
 router = APIRouter()
@@ -22,9 +25,9 @@ logger = Logger("api_logger")
 )
 async def add_events(
         event: CreateEvent,
-        service: ManagementEvents = Depends(get_event_service),
+        service: 'ManagementEvents' = Depends(get_event_service),
         jwt_token: str = Cookie(None)
-    ):
+    ) -> 'EventCreatedResult':
     return await service.create_events(jwt_token, event)
 
 @router.post(
@@ -34,7 +37,7 @@ async def add_events(
     responses=None
 )
 async def all_events(
-        service: ManagementEvents = Depends(get_event_service),
+        service: 'ManagementEvents' = Depends(get_event_service),
         jwt_token: str = Cookie(None)
-    ):
+    ) -> list['BaseModel']:
     return await service.all_events(jwt_token)

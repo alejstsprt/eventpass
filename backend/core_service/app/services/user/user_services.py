@@ -1,8 +1,9 @@
+from typing import TYPE_CHECKING
+
 from sqlalchemy.orm import Session
 from fastapi import Response
 
-from ...schemas.user import CreateUser, LoginUser
-from ...models.crud import UserRegistrationResult, user_registration, search_user
+from ...models.crud import user_registration, search_user
 from ...security.hashing import hash_password, verify_password
 from ...security.jwt import set_jwt_cookie, create_access_token
 from ...core.exceptions import (
@@ -13,6 +14,10 @@ from ...core.exceptions import (
     InternalServerError
 )
 
+if TYPE_CHECKING:
+    from ...schemas import UserRegistrationResult, CreateUser, LoginUser
+    from sqlalchemy import Column
+
 
 class ManagementUsers:
     """
@@ -22,7 +27,7 @@ class ManagementUsers:
     def __init__(self, db: Session):
         self.db = db
 
-    async def create_user(self, response: Response, user: CreateUser) -> UserRegistrationResult:
+    async def create_user(self, response: Response, user: 'CreateUser') -> 'UserRegistrationResult':
         """
         Метод для создания пользователя в базе данных.
 
@@ -54,7 +59,7 @@ class ManagementUsers:
         else:
             raise InternalServerError()
 
-    async def login_user(self, response: Response, user: LoginUser) -> dict:
+    async def login_user(self, response: Response, user: 'LoginUser') -> dict[str, 'Column'[int] | 'Column'[str]]:
         """
         Метод для входа в аккаунт.
 

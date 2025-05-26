@@ -3,10 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 from .api.v1 import user, user_tickets
-from .models.session import Base, engine
+from .models.session import BaseModel, engine
 
 
-Base.metadata.create_all(bind=engine)
+BaseModel.metadata.create_all(bind=engine)
 
 app = FastAPI()
 

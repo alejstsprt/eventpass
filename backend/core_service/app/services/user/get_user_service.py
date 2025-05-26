@@ -1,10 +1,14 @@
+from typing import TYPE_CHECKING
+
 from fastapi import Depends
-from sqlalchemy.orm import Session
 
 from .user_services import ManagementUsers
 from ...models.session import get_db
 
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
 
-def get_user_service(db: Session = Depends(get_db)) -> ManagementUsers:
+
+def get_user_service(db: 'Session' = Depends(get_db)) -> ManagementUsers:
     """Функция возвращает созданную сессию БД"""
     return ManagementUsers(db)

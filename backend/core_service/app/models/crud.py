@@ -1,7 +1,5 @@
-from typing import TypedDict, Literal, NotRequired, Optional, Union
-from datetime import datetime
+from typing import TYPE_CHECKING
 
-from sqlalchemy import Column
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
@@ -9,30 +7,12 @@ from .models import Accounts, Events, TicketTypes, Tickets
 from ..core.exceptions import ValidationError, LoginAlreadyExistsException, InternalServerError
 from ..core.config import GET_TABLE
 
-
-class SearchUserResult(TypedDict):
-    id: Optional[int]
-    login: Optional[str]
-
-class UserRegistrationResult(TypedDict):
-    result: Literal[True]
-    user_id: NotRequired[Column[int]]
-    error: NotRequired[str]
-
-class EventDetails(TypedDict):
-    id: Column[int]
-    creator_id: Column[int]
-    title: Column[str]
-    description: Column[str]
-    address: Column[str]
-    time_create: Column[datetime]
-
-class EventCreatedResult(TypedDict):
-    result: Literal[True]
-    event: EventDetails
+if TYPE_CHECKING:
+    from ..models.session import BaseModel
+    from ..schemas import UserRegistrationResult, EventCreatedResult
 
 
-async def user_registration(db: Session, name: str, login: str, password: str) -> UserRegistrationResult:
+async def user_registration(db: Session, name: str, login: str, password: str) -> 'UserRegistrationResult':
     """
     Функция для регистрации аккаунта.
 
@@ -68,7 +48,7 @@ async def user_registration(db: Session, name: str, login: str, password: str) -
     except Exception as e:
         raise InternalServerError()
 
-async def create_event(db: Session, creator_id: int, title: str, description: str, address: str) -> EventCreatedResult:
+async def create_event(db: Session, creator_id: int, title: str, description: str, address: str) -> 'EventCreatedResult':
     """
     Функция для создания мероприятия
 
@@ -134,7 +114,7 @@ async def search_user(db: Session, *, user_id: int | None = None, login: str | N
         login (str): Логин пользователя.
 
     Returns:
-        dict: Вернет `None`, если элемент не найден, либо данные не указаны. Иначе - все данные пользователя в формате `{'id': user_info, 'login': user_info}`.
+        dict[str, Accounts | None]: Вернет `None`, если элемент не найден, либо данные не указаны. Иначе - все данные пользователя в формате `{'id': user_info, 'login': user_info}`.
     """
     query = db.query(Accounts)
 
@@ -144,7 +124,7 @@ async def search_user(db: Session, *, user_id: int | None = None, login: str | N
     }
     return result
 
-async def all_info_table(db: Session, table_name: str) -> list[object]:
+async def all_info_table(db: Session, table_name: str) -> list['BaseModel']:
     if not table_name:
         raise ValidationError()
 

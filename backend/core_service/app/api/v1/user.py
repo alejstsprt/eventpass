@@ -1,14 +1,17 @@
+from typing import TYPE_CHECKING
+
 from fastapi import APIRouter, Depends, Response
 from fastapi_cache.decorator import cache
 
-from ...schemas.user import CreateUser, LoginUser
-from ...services.user.get_user_services import get_user_service
-from ...services.user.user_services import ManagementUsers
+from ...services import get_user_service, LOGIN_USER_RESPONSES, CREATE_USER_RESPONSES
 from ...core.logger import Logger
-from ...services.user.responses import LOGIN_USER_RESPONSES, CREATE_USER_RESPONSES
+
+if TYPE_CHECKING:
+    from ...schemas import CreateUser, LoginUser, UserRegistrationResult
+    from ...services import ManagementUsers
+    from sqlalchemy import Column
 
 
-# TODO: разберись и сделай отдельный файл для TypedDict
 router = APIRouter()
 
 logger = Logger("api_logger")
@@ -19,7 +22,7 @@ logger = Logger("api_logger")
     description="ИНФО: Ручка для создания аккаунта. Принимает в себя имя, логин и пароль.",
     responses=CREATE_USER_RESPONSES
 )
-async def create_user(response: Response, user: CreateUser, service: ManagementUsers = Depends(get_user_service)):
+async def create_user(response: Response, user: 'CreateUser', service: 'ManagementUsers' = Depends(get_user_service)) -> 'UserRegistrationResult':
     return await service.create_user(response, user)
 
 @router.post(
@@ -29,5 +32,5 @@ async def create_user(response: Response, user: CreateUser, service: ManagementU
     responses=LOGIN_USER_RESPONSES
 )
 @cache(expire=80)
-async def login_user(response: Response, user: LoginUser, service: ManagementUsers = Depends(get_user_service)) -> dict:
+async def login_user(response: Response, user: 'LoginUser', service: 'ManagementUsers' = Depends(get_user_service)) -> dict[str, 'Column'[int] | 'Column'[str]]:
     return await service.login_user(response, user)

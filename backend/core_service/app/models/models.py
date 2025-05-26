@@ -1,10 +1,10 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime, func
 from sqlalchemy.orm import relationship
 
-from .session import Base
+from .session import BaseModel
 
 
-class Accounts(Base):
+class Accounts(BaseModel):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, index=True, nullable=False) # Айди пользователя
@@ -16,7 +16,7 @@ class Accounts(Base):
     tickets = relationship("Tickets", back_populates="user")
 
 
-class Events(Base):
+class Events(BaseModel):
     __tablename__ = 'events'
 
     id = Column(Integer, primary_key=True, index=True) # Айди мероприятия
@@ -31,7 +31,7 @@ class Events(Base):
     tickets = relationship("Tickets", back_populates="event")
 
 
-class TicketTypes(Base):
+class TicketTypes(BaseModel):
     __tablename__ = 'ticket_types'
 
     id = Column(Integer, primary_key=True, index=True) # Айди билета (это тип. родитель.)
@@ -44,7 +44,7 @@ class TicketTypes(Base):
     event = relationship("Events", back_populates="ticket_types")
 
 
-class Tickets(Base):
+class Tickets(BaseModel):
     __tablename__ = 'tickets'
 
     id = Column(Integer, primary_key=True, index=True) # Айди билета (кьюаркода) (это сам билет)
