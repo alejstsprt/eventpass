@@ -1,7 +1,7 @@
 from functools import wraps
 import json
 import hashlib
-from typing import Any, Dict, Callable, ParamSpec, Tuple, TypeVar, Awaitable, NewType
+from typing import Any, Dict, Callable, ParamSpec, Tuple, TypeVar, Awaitable
 
 from fastapi.encoders import jsonable_encoder
 
@@ -9,10 +9,10 @@ from ..models.session import get_db
 from ..models.crud import search_user
 from ..security.jwt import token_verification
 from ..core.exceptions import NoTokenError, TokenError
+from ..schemas import IntUserId
 
 P = ParamSpec('P')
 R = TypeVar('R')
-UserId = NewType('UserId', int)
 
 
 def create_cache_key(name: str, data: Dict[str, Any]) -> str:
@@ -105,7 +105,7 @@ class ICache:
         return wrapper
 
     @staticmethod
-    async def valid_token_and_user_in_db(func: Callable[..., Any], kwargs: Dict[str, Any], jwt_token_path: str) -> Tuple[UserId, str]:
+    async def valid_token_and_user_in_db(func: Callable[..., Any], kwargs: Dict[str, Any], jwt_token_path: str) -> Tuple[IntUserId, str]:
         """
         Метод для проверки JWT токена.
 
@@ -120,7 +120,7 @@ class ICache:
             TokenError (HTTPException): Неверный токен.
 
         Returns:
-            (Tuple[int, str]): Айди пользователя и JWT токен.
+            (Tuple[IntUserId, str]): Айди пользователя и JWT токен.
         """
         if (result_search_token := kwargs.get(jwt_token_path)) is None:
             error = f"Неверный путь к токену ({jwt_token_path} not in {func.__name__})"
@@ -141,4 +141,4 @@ class ICache:
         finally:
             db_gen.close()
 
-        return UserId(user_id), result_search_token
+        return IntUserId(user_id), result_search_token

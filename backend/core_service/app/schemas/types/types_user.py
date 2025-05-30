@@ -1,6 +1,10 @@
 from typing import NewType
 
 
+# [User]
+IntUserId = NewType('IntUserId', int)
+"""Уникальный айди пользователя (Integer)"""
+
 StrUserName = NewType('StrUserName', str)
 """Уникальное имя пользователя (String)"""
 

@@ -1,4 +1,5 @@
-from .types.types_user import StrUserName, StrUserLogin, StrUserPassword
+from .types.types_user import StrUserName, StrUserLogin, StrUserPassword, IntUserId
+from .types.types_event import IntEventCreatorId, StrEventAddress, StrEventDescription, StrEventTitle
 from .dicts import UserRegistrationResult, EventCreatedResult, LoginUserResult
 from .pydantics.user import LoginUser, CreateUser
 from .pydantics.user_tickets import CreateEvent, EditEvent
@@ -11,7 +12,12 @@ __all__ = [
     'CreateUser',
     'CreateEvent',
     'EditEvent',
+    'IntUserId',
     'StrUserName',
     'StrUserLogin',
-    'StrUserPassword'
+    'StrUserPassword',
+    'IntEventCreatorId',
+    'StrEventAddress',
+    'StrEventDescription',
+    'StrEventTitle'
 ]

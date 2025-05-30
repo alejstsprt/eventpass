@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, NewType
+from typing import TYPE_CHECKING, Literal, Optional, Any, Dict
 
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
@@ -14,9 +14,13 @@ if TYPE_CHECKING:
         EventCreatedResult,
         StrUserName,
         StrUserLogin,
-        StrUserPassword
+        StrUserPassword,
+        IntEventCreatorId,
+        StrEventAddress,
+        StrEventDescription,
+        StrEventTitle,
+        IntUserId
     )
-    from ..models.session import BaseModel
 
 
 async def user_registration(db: Session, name: 'StrUserName', login: 'StrUserLogin', password: 'StrUserPassword') -> 'UserRegistrationResult':
@@ -58,16 +62,24 @@ async def user_registration(db: Session, name: 'StrUserName', login: 'StrUserLog
         logger_api.exception(f'Внутренняя ошибка сервера. Проблемы с сейвом БД: {e}')
         raise InternalServerError()
 
-async def create_event(db: Session, creator_id: int, status: str, title: str, description: str, address: str) -> 'EventCreatedResult':
+async def create_event(
+        db: Session,
+        creator_id: 'IntEventCreatorId',
+        status: Literal['опубликовано', 'завершено', 'черновик'],
+        title: 'StrEventTitle',
+        description: 'StrEventDescription',
+        address: 'StrEventAddress'
+    ) -> 'EventCreatedResult':
     """
     Функция для создания мероприятия
 
     Args:
         db (Session): Сессия SQLAlchemy для работы с БД.
-        creator_id (int): ID создателя мероприятия.
-        title (str): Название мероприятия.
-        description (str): Описание мероприятия.
-        address (str): Адрес мероприятия.
+        creator_id (IntEventCreatorId): ID создателя мероприятия.
+        status (Literal['опубликовано', 'завершено', 'черновик']): Статус мероприятия.
+        title (StrEventTitle): Название мероприятия.
+        description (StrEventDescription): Описание мероприятия.
+        address (StrEventAddress): Адрес мероприятия.
 
     Returns:
         EventCreatedResult (TypedDict): `{
@@ -123,14 +135,14 @@ async def create_event(db: Session, creator_id: int, status: str, title: str, de
         logger_api.exception(f'Внутренняя ошибка сервера. Проблемы с сейвом БД: {e}')
         raise InternalServerError()
 
-async def search_user(db: Session, *, user_id: int | None = None, login: str | None = None) -> dict[str, Accounts | None]:
+async def search_user(db: Session, *, user_id: Optional['IntUserId'] = None, login: Optional['StrUserLogin'] = None) -> dict[str, Accounts | None]:
     """
     Возвращает Результат поиска пользователя.
 
     Args:
         db (Session): Сессия SQLAlchemy для работы с БД.
-        user_id (int): ID пользователя.
-        login (str): Логин пользователя.
+        user_id (IntUserId): ID пользователя.
+        login (StrUserLogin): Логин пользователя.
 
     Returns:
         dict[str, Accounts | None]: Вернет `None`, если элемент не найден, либо данные не указаны. Иначе - все данные пользователя в формате `{'id': user_info, 'login': user_info}`.
@@ -143,8 +155,21 @@ async def search_user(db: Session, *, user_id: int | None = None, login: str | N
     }
     return result
 
-async def all_info_table(db: Session, table_name: str) -> list:
-    if not table_name:
+async def all_info_table(db: Session, table_name: Literal['Accounts', 'Events', 'TicketTypes', 'Tickets']) -> list[Dict[str, Any]]:
+    """
+    Функция для возврата всех данных таблицы.
+
+    Args:
+        db (Session): Сессия SQLAlchemy для работы с БД.
+        table_name (Literal['Accounts', 'Events', 'TicketTypes', 'Tickets']): Название таблицы.
+
+    Raises:
+        ValidationError: Неправильные данные.
+
+    Returns:
+        (list[str, Any]): Все данные таблицы.
+    """
+    if not table_name or table_name not in GET_TABLE:
         logger_api.error(f'Неправильно переданы данные. {db = }, {table_name = }')
         raise ValidationError()
 

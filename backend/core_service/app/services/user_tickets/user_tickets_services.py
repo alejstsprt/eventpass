@@ -1,15 +1,19 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict, Any
 
 from sqlalchemy.orm import Session
 
-from ...schemas import CreateEvent
+from ...schemas import (
+    IntEventCreatorId,
+    StrEventTitle,
+    StrEventDescription,
+    StrEventAddress
+)
 from ...models.crud import create_event, search_user, all_info_table
 from ...security.jwt import token_verification
 from ...core.exceptions import NoTokenError, TokenError
 
 if TYPE_CHECKING:
-    from ...schemas import EventCreatedResult
-    from ...models.session import BaseModel
+    from ...schemas import EventCreatedResult, CreateEvent
 
 
 class ManagementEvents:
@@ -20,7 +24,7 @@ class ManagementEvents:
     def __init__(self, db: Session):
         self.db = db
 
-    async def create_events(self, jwt_token: str, event: CreateEvent) -> 'EventCreatedResult':
+    async def create_events(self, jwt_token: str, event: 'CreateEvent') -> 'EventCreatedResult':
         """
         Метод для создания мероприятия.
 
@@ -44,9 +48,16 @@ class ManagementEvents:
         if is_user['id'] is None:
             raise TokenError()
 
-        return await create_event(self.db, user_id, event.status, event.title, event.description, event.address)
+        return await create_event(
+            self.db,
+            IntEventCreatorId(user_id),
+            event.status,
+            StrEventTitle(event.title),
+            StrEventDescription(event.description),
+            StrEventAddress(event.address)
+        )
 
-    async def all_events(self, jwt_token: str) -> list:
+    async def all_events(self, jwt_token: str) -> list[Dict[str, Any]]:
         """
         Метод для вывода всех мероприятий (не оптимизирован для больших данных)
 

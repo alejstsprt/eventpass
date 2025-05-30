@@ -58,8 +58,6 @@ async def edit_events(
 @ICache(
     unique_name='alexey',
     jwt_token_path='jwt_token',
-    add_pydantic_model='event',
-    add_jwt_token=True,
     add_jwt_user_id=True
 )
 async def all_events(
