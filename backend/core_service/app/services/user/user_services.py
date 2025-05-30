@@ -3,17 +3,19 @@ from typing import TYPE_CHECKING
 from sqlalchemy.orm import Session
 from fastapi import Response
 
+from ...schemas import StrUserName, StrUserLogin, StrUserPassword
 from ...models.crud import user_registration, search_user
 from ...security.hashing import hash_password, verify_password
 from ...security.jwt import set_jwt_cookie, create_access_token
-from ...core.exceptions import (
-    ValidationError,
-    PasswordError,
-    LoginError
-)
+from ...core.exceptions import ValidationError, PasswordError, LoginError
 
 if TYPE_CHECKING:
-    from ...schemas import UserRegistrationResult, CreateUser, LoginUser, LoginUserResult
+    from ...schemas import (
+        UserRegistrationResult, 
+        CreateUser,
+        LoginUser,
+        LoginUserResult
+    )
 
 
 class ManagementUsers:
@@ -45,8 +47,8 @@ class ManagementUsers:
             raise ValidationError()
 
         hash_pass = hash_password(user.password)
-        result = await user_registration(self.db, user.name, user.login, hash_pass)
-
+        result = await user_registration(self.db, StrUserName(user.name), StrUserLogin(user.login), StrUserPassword(hash_pass))
+ 
         token = await create_access_token(result['user_id'])
         await set_jwt_cookie(response, token)
         return result

@@ -7,8 +7,8 @@ from ...services import get_user_service, LOGIN_USER_RESPONSES, CREATE_USER_RESP
 from ...schemas import CreateUser, LoginUser, UserRegistrationResult, LoginUserResult
 from ...services import ManagementUsers
 
-
 router = APIRouter()
+
 
 @router.post(
     '/create-user',
@@ -18,6 +18,7 @@ router = APIRouter()
 )
 async def create_user(response: Response, user: CreateUser, service: 'ManagementUsers' = Depends(get_user_service)):
     return await service.create_user(response, user)
+
 
 @router.post(
     '/login-user',

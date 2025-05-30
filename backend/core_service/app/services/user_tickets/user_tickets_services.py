@@ -80,4 +80,4 @@ class ManagementEvents:
         if not await token_verification(jwt_token):
             raise NoTokenError() # выбрасываем ошибку чтобы запутать, если попытка подделать токен. фронтенд поймет.
 
-        return event
+        return event # TODO: сделать функционал

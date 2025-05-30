@@ -15,6 +15,7 @@ class BaseModel(DeclarativeBase):
     pass
 
 def get_db() -> Generator[Session, None, None]:
+    """Сессия БД"""
     db = SessionLocal()
     try:
         yield db

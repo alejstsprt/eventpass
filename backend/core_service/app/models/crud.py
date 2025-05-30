@@ -1,27 +1,33 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NewType
 
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
 from .models import Accounts, Events, TicketTypes, Tickets
 from ..core.exceptions import ValidationError, LoginAlreadyExistsException, InternalServerError
-from ..core.config import GET_TABLE
+from ..core.config import GET_TABLE, status_events
 from ..core.logger import logger_api
-from ..core.config import status_events
 
 if TYPE_CHECKING:
+    from ..schemas import (
+        UserRegistrationResult,
+        EventCreatedResult,
+        StrUserName,
+        StrUserLogin,
+        StrUserPassword
+    )
     from ..models.session import BaseModel
-    from ..schemas import UserRegistrationResult, EventCreatedResult
 
 
-async def user_registration(db: Session, name: str, login: str, password: str) -> 'UserRegistrationResult':
+async def user_registration(db: Session, name: 'StrUserName', login: 'StrUserLogin', password: 'StrUserPassword') -> 'UserRegistrationResult':
     """
     Функция для регистрации аккаунта.
 
     Args:
         db (Session): Сессия SQLAlchemy для работы с БД.
-        login (str): Логин пользователя.
-        password (str): Пароль пользователя (хеш).
+        name (StrUserName): Имя пользователя.
+        login (StrUserLogin): Логин пользователя.
+        password (StrUserPassword): Пароль пользователя (хеш).
 
     Returns:
         UserRegistrationResult (TypedDict): `{'result': True, 'user_id': int}`
