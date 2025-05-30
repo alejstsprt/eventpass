@@ -1,8 +1,8 @@
 *.pyc
 __pycache__/
+.mypy_cache/
+.pytest_cache/
 eventpass.db
 venv
 .env
-.mypy_cache
-.pytest_cache
 config.py

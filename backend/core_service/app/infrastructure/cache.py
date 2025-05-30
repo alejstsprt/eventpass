@@ -30,7 +30,7 @@ def create_cache_key(name: str, data: Dict[str, Any]) -> str:
     key_hash = hashlib.sha256(serialized_data).hexdigest()
     return f"name:{name}:cache:{key_hash}"
 
-class IClearCache:
+class iClearCache:
     def __init__(
         self,
         *,
@@ -52,7 +52,7 @@ class IClearCache:
         return wrapper
 
 
-class ICache:
+class iCache:
     def __init__(
         self,
         *,
