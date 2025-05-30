@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
 from fastapi import APIRouter, Depends, Cookie
-from fastapi_cache.decorator import cache
+# from fastapi_cache.decorator import cache
 
 from ...schemas import CreateEvent, EditEvent
 from ...services import get_event_service, CREATE_EVENT_RESPONSES
@@ -9,8 +9,8 @@ from ...services import get_event_service, CREATE_EVENT_RESPONSES
 if TYPE_CHECKING:
     from ...services import ManagementEvents
 
-
 router = APIRouter()
+
 
 @router.post(
     '/add-events',
@@ -25,6 +25,7 @@ async def add_events(
     ):
     return await service.create_events(jwt_token, event)
 
+
 @router.patch(
     '/edit-events',
     summary="Изменение мероприятия",
@@ -37,6 +38,7 @@ async def edit_events(
         jwt_token: str = Cookie(None)
     ):
     return await service.edit_events(jwt_token, event)
+
 
 @router.get(
     '/all-events',
