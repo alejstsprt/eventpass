@@ -53,12 +53,15 @@ async def valid_token_and_user_in_db(func: Callable[..., Any], kwargs: Dict[str,
         Returns:
             (Tuple[IntUserId, str]): Айди пользователя и JWT токен.
         """
-        if (result_search_token := kwargs.get(jwt_token_path)) is None:
+        try:
+            if (result_search_token := kwargs[jwt_token_path]) is None:
+                raise NoTokenError()
+        except KeyError:
             error = f"Неверный путь к токену ({jwt_token_path} not in {func.__name__})"
             raise ValueError(error)
 
         if (result_search_user_id := await token_verification(result_search_token)) is None:
-            raise NoTokenError()
+            raise TokenError()
 
         # Делаем сессию БД и проверяем данные токена
         db_gen = get_db()
