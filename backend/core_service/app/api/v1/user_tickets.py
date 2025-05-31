@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Cookie
 
 from ...schemas import CreateEvent, EditEvent, ManagementEventsProtocol
 from ...services import get_event_service, CREATE_EVENT_RESPONSES
-from ...infrastructure.cache import iClearCache, iCache
+from ...infrastructure.cache import IClearCache, ICache
 
 router = APIRouter()
 
@@ -16,7 +16,11 @@ router = APIRouter()
     description="ИНФО: Ручка для создания мероприятия. Принимает в себя название, описание и адрес мероприятия.",
     responses=CREATE_EVENT_RESPONSES
 )
-@iClearCache(unique_name='alexey')
+@IClearCache(
+    unique_name='event-cache',
+    jwt_token_path='jwt_token',
+    add_jwt_user_id=True
+)
 async def create_event(
         event: CreateEvent,
         service: ManagementEventsProtocol = Depends(get_event_service),
@@ -45,8 +49,8 @@ async def edit_events(
     description="ИНФО: Ручка для получения списка всех мероприятий. Принимает в себя ...", # TODO: дописать
     responses=None # TODO: дописать
 )
-@iCache(
-    unique_name='alexey',
+@ICache(
+    unique_name='event-cache',
     jwt_token_path='jwt_token',
     add_jwt_user_id=True
 )

@@ -1,7 +1,8 @@
+from typing import Any, Dict, Callable, ParamSpec, Tuple, TypeVar, Awaitable
 from functools import wraps
 import json
 import hashlib
-from typing import Any, Dict, Callable, ParamSpec, Tuple, TypeVar, Awaitable
+from dataclasses import dataclass
 
 from fastapi.encoders import jsonable_encoder
 
@@ -13,6 +14,8 @@ from ..schemas import IntUserId
 
 P = ParamSpec('P')
 R = TypeVar('R')
+
+iprefix = '[ICache]'
 
 
 def create_cache_key(name: str, data: Dict[str, Any]) -> str:
@@ -30,82 +33,8 @@ def create_cache_key(name: str, data: Dict[str, Any]) -> str:
     key_hash = hashlib.sha256(serialized_data).hexdigest()
     return f"name:{name}:cache:{key_hash}"
 
-class iClearCache:
-    def __init__(
-        self,
-        *,
-        unique_name: None | str,
-        jwt_token: None | str = None,
-        jwt_token_id: None | str = None
-    ) -> None:
-        self.unique_name = unique_name
-        self.jwt_token = jwt_token
-        self.jwt_token_id = jwt_token_id
 
-    def __call__(self, func):
-        @wraps(func)
-        async def wrapper(*args, **kwargs):
-            print(f"Входной запрос от {self.unique_name}")
-            result = await func(*args, **kwargs)
-            print(f'Результат: {result}')
-            return result
-        return wrapper
-
-
-class iCache:
-    def __init__(
-        self,
-        *,
-        unique_name: None | str,
-        jwt_token_path: None | str = None,
-        add_pydantic_model: None | str = None,
-        add_jwt_token: None | bool = False,
-        add_jwt_user_id: None | bool = False,
-        time_ttl: None | int = 0
-    ) -> None:
-        self.unique_name = unique_name
-        self.jwt_token_path = jwt_token_path
-        self.add_pydantic_model = add_pydantic_model
-        self.add_jwt_token = add_jwt_token
-        self.add_jwt_user_id= add_jwt_user_id
-        self.time_ttl = time_ttl
-
-    def __call__(self, func: Callable[P, Awaitable[R]]) -> Callable[P, Awaitable[R]]:
-        @wraps(func)
-        async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-            if self.jwt_token_path is None and (self.add_jwt_token or self.add_jwt_user_id):
-                raise ValueError('Вы не указали путь к токену')
-
-            parameters = {}
-
-            if self.jwt_token_path is not None:
-                user_id, token = await self.valid_token_and_user_in_db(func, kwargs, self.jwt_token_path)
-
-            if self.add_jwt_token:
-                parameters['user_id'] = user_id
-
-            if self.add_jwt_user_id:
-                parameters['jwt_token'] = token
-
-            if self.add_pydantic_model is not None:
-                if (result_search_pydantic_model := kwargs.get(self.add_pydantic_model)) is None:
-                    error = f"Неверный путь к pydantic модели ({self.add_pydantic_model} not in {func.__name__})"
-                    raise ValueError(error)
-                parameters.update(jsonable_encoder(result_search_pydantic_model))
-
-            key_redis = create_cache_key(self.unique_name, parameters)
-
-            # Временная заглуша вместо Редиса
-            if False:
-                result = await func(*args, **kwargs)
-                json_value = jsonable_encoder(result)
-                return result
-            else:
-                return key_redis
-        return wrapper
-
-    @staticmethod
-    async def valid_token_and_user_in_db(func: Callable[..., Any], kwargs: Dict[str, Any], jwt_token_path: str) -> Tuple[IntUserId, str]:
+async def valid_token_and_user_in_db(func: Callable[..., Any], kwargs: Dict[str, Any], jwt_token_path: str) -> Tuple[IntUserId, str]:
         """
         Метод для проверки JWT токена.
 
@@ -142,3 +71,181 @@ class iCache:
             db_gen.close()
 
         return IntUserId(user_id), result_search_token
+
+
+@dataclass(frozen=True)
+class Colors:
+    """Цвета для консоли"""
+    RED: str = "\033[91m"
+    GREEN: str = "\033[92m"
+    BLUE: str = "\033[94m"
+    MAGENTA: str = "\033[35m"
+    CYAN: str = "\033[36m"
+    RESET: str = "\033[0m"
+
+
+class LogInfo:
+    """Красивый вывод логов в консоль"""
+
+    def __init__(self, session_name: str) -> None:
+        self.name = f'[{session_name}]'
+
+    def iprint(self, text: str) -> bool:
+        """
+        Вывод логов в консоль.
+
+        Args:
+            text (str): Текст для вывода.
+
+        Returns:
+            bool: Произошел ли вывод.
+        """
+        output = f"{Colors.BLUE}{iprefix}{Colors.RESET} {Colors.CYAN}{self.name}{Colors.RESET} {text}"
+        print(output)
+        return True
+
+
+class IClearCache:
+    """Декоратор для чистки кеша"""
+    loger_name = LogInfo
+
+    def __init__(
+        self,
+        *,
+        unique_name: str,
+        jwt_token_path: None | str = None,
+        add_pydantic_model: None | str = None,
+        add_jwt_token: bool = False,
+        add_jwt_user_id: bool = False,
+    ) -> None:
+
+        check_data = {
+            unique_name: str,
+            jwt_token_path: (type(None), str),
+            add_pydantic_model: (type(None), str),
+            add_jwt_token: bool,
+            add_jwt_user_id: bool
+        }
+        for key, value in check_data.items():
+            if not isinstance(key, value):
+                text_error = f"Ошибка. {key = } должно быть {value}"
+                raise ValueError(text_error)
+
+        self.unique_name = unique_name
+        self.jwt_token_path = jwt_token_path
+        self.add_pydantic_model = add_pydantic_model
+        self.add_jwt_token = add_jwt_token
+        self.add_jwt_user_id= add_jwt_user_id
+
+        # устанавливаем сессию логера
+        self.log = self.loger_name(unique_name)
+
+    def __call__(self, func: Callable[P, Awaitable[R]]) -> Callable[P, Awaitable[R]]:
+        @wraps(func)
+        async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+            if self.jwt_token_path is None and (self.add_jwt_token or self.add_jwt_user_id):
+                raise ValueError('Вы не указали путь к токену')
+
+            parameters = {}
+
+            if self.jwt_token_path is not None:
+                user_id, token = await valid_token_and_user_in_db(func, kwargs, self.jwt_token_path)
+
+            if self.add_jwt_token:
+                parameters['user_id'] = user_id
+
+            if self.add_jwt_user_id:
+                parameters['jwt_token'] = token
+
+            if self.add_pydantic_model is not None:
+                if (result_search_pydantic_model := kwargs.get(self.add_pydantic_model)) is None:
+                    error = f"Неверный путь к pydantic модели ({self.add_pydantic_model} not in {func.__name__})"
+                    raise ValueError(error)
+                parameters.update(jsonable_encoder(result_search_pydantic_model))
+
+            key_redis = create_cache_key(self.unique_name, parameters)
+
+            # Временная заглуша вместо Редиса
+            print(key_redis)
+            self.log.iprint('вот так вот')
+
+            return await func(*args, **kwargs)
+
+        return wrapper
+
+
+class ICache:
+    """Декоратор для использования кеша"""
+    loger_name = LogInfo
+
+    def __init__(
+        self,
+        *,
+        unique_name: str,
+        jwt_token_path: None | str = None,
+        add_pydantic_model: None | str = None,
+        add_jwt_token: bool = False,
+        add_jwt_user_id: bool = False,
+        time_ttl: int = 0
+    ) -> None:
+
+        check_data = {
+            unique_name: str,
+            jwt_token_path: (type(None), str),
+            add_pydantic_model: (type(None), str),
+            add_jwt_token: bool,
+            add_jwt_user_id: bool,
+            time_ttl: int,
+        }
+        for key, value in check_data.items():
+            if not isinstance(key, value):
+                text_error = f"Ошибка. {key = } должно быть {value}"
+                raise ValueError(text_error)
+
+        self.unique_name = unique_name
+        self.jwt_token_path = jwt_token_path
+        self.add_pydantic_model = add_pydantic_model
+        self.add_jwt_token = add_jwt_token
+        self.add_jwt_user_id= add_jwt_user_id
+
+        if 2_147_483_647 > time_ttl > -1:
+            self.time_ttl = time_ttl
+        else:
+            raise ValueError('Время должно быть в пределах 2_147_483_647 > time_ttl > -1')
+
+        # устанавливаем сессию логера
+        self.log = self.loger_name(unique_name)
+
+    def __call__(self, func: Callable[P, Awaitable[R]]) -> Callable[P, Awaitable[R]]:
+        @wraps(func)
+        async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+            if self.jwt_token_path is None and (self.add_jwt_token or self.add_jwt_user_id):
+                raise ValueError('Вы не указали путь к токену')
+
+            parameters = {}
+
+            if self.jwt_token_path is not None:
+                user_id, token = await valid_token_and_user_in_db(func, kwargs, self.jwt_token_path)
+
+            if self.add_jwt_token:
+                parameters['user_id'] = user_id
+
+            if self.add_jwt_user_id:
+                parameters['jwt_token'] = token
+
+            if self.add_pydantic_model is not None:
+                if (result_search_pydantic_model := kwargs.get(self.add_pydantic_model)) is None:
+                    error = f"Неверный путь к pydantic модели ({self.add_pydantic_model} not in {func.__name__})"
+                    raise ValueError(error)
+                parameters.update(jsonable_encoder(result_search_pydantic_model))
+
+            key_redis = create_cache_key(self.unique_name, parameters)
+
+            # Временная заглуша вместо Редиса
+            if False:
+                result = await func(*args, **kwargs)
+                json_value = jsonable_encoder(result)
+                return result
+            else:
+                return key_redis
+        return wrapper
