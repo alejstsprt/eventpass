@@ -1,10 +1,11 @@
-from typing import Any, Dict, Callable, ParamSpec, Tuple, TypeVar, Awaitable
+from typing import Any, Dict, Callable, ParamSpec, Tuple, TypeVar, Awaitable, Union, Optional, Self
 from functools import wraps
 import json
 import hashlib
 from dataclasses import dataclass
 
 from fastapi.encoders import jsonable_encoder
+from redis import Redis
 
 from ..models.session import get_db
 from ..models.crud import search_user
@@ -84,6 +85,54 @@ class Colors:
     RESET: str = "\033[0m"
 
 
+@dataclass(frozen=True)
+class SettingsRedis:
+    """Настройки Redis"""
+    HOST: str = 'localhost'
+    PORT: int = 6379
+    DB: int = 0
+    DECODE_RESPONSES: bool = True
+
+
+class RedisService:
+    """Управление редисом"""
+    __instance = None
+
+    def __new__(cls, *args: P.args, **kwargs: P.kwargs) -> Self:
+        if cls.__instance is None:
+            cls.__instance = super().__new__(cls)
+            cls.__connect_redis()
+            return cls.__instance
+        else:
+           return cls.__instance 
+
+    @classmethod
+    def __connect_redis(cls) -> bool:
+        """Устанавливаем соединение"""
+        try:
+            cls.__instance.redis = Redis(
+                host=SettingsRedis.HOST,
+                port=SettingsRedis.PORT,
+                db=SettingsRedis.DB,
+                decode_responses=SettingsRedis.DECODE_RESPONSES
+            )
+            cls.__instance.redis.ping()
+            return True
+        except Exception as e:
+            raise ConnectionError('Ошибка подключения к Redis')
+
+    def search_key(self, cache: str) -> Dict[str, Any] | None:
+        return self.redis.get(cache)
+
+    def save_key(self, cache: str, value: Dict[str, Any], time: int) -> bool:
+        if time:
+            return self.redis.setex(cache, time, str(value))
+        return self.redis.set(cache, str(value))
+
+    def delete_key(self, cache: str) -> bool:
+        return self.redis.delete(cache)
+
+
 class LogInfo:
     """Красивый вывод логов в консоль"""
 
@@ -104,17 +153,32 @@ class LogInfo:
         print(output)
         return True
 
+    def ierror(self, text: str) -> bool:
+        """
+        Вывод логов в консоль.
+
+        Args:
+            text (str): Текст для вывода.
+
+        Returns:
+            bool: Произошел ли вывод.
+        """
+        output = f"{Colors.BLUE}{iprefix}{Colors.RESET} {Colors.CYAN}{self.name}{Colors.RESET} {Colors.RED}{text}{Colors.RESET}"
+        print(output)
+        return True
+
 
 class IClearCache:
     """Декоратор для чистки кеша"""
     loger_name = LogInfo
+    redis_name = RedisService
 
     def __init__(
         self,
         *,
         unique_name: str,
-        jwt_token_path: None | str = None,
-        add_pydantic_model: None | str = None,
+        jwt_token_path: str | None = None,
+        add_pydantic_model: str | None = None,
         add_jwt_token: bool = False,
         add_jwt_user_id: bool = False,
     ) -> None:
@@ -137,8 +201,9 @@ class IClearCache:
         self.add_jwt_token = add_jwt_token
         self.add_jwt_user_id= add_jwt_user_id
 
-        # устанавливаем сессию логера
+        # устанавливаем сессию логера и редис
         self.log = self.loger_name(unique_name)
+        self.redis = self.redis_name()
 
     def __call__(self, func: Callable[P, Awaitable[R]]) -> Callable[P, Awaitable[R]]:
         @wraps(func)
@@ -165,9 +230,13 @@ class IClearCache:
 
             key_redis = create_cache_key(self.unique_name, parameters)
 
-            # Временная заглуша вместо Редиса
-            print(key_redis)
-            self.log.iprint('вот так вот')
+            try:
+                # Временная заглуша вместо Редиса
+                if self.redis.search_key(key_redis) is not None:
+                    self.redis.delete_key(key_redis)
+                    self.log.iprint('Кеш удален')
+            except Exception as e:
+                self.log.ierror(f'Не удалось удалить кеш. {e}')
 
             return await func(*args, **kwargs)
 
@@ -177,13 +246,14 @@ class IClearCache:
 class ICache:
     """Декоратор для использования кеша"""
     loger_name = LogInfo
+    redis_name = RedisService
 
     def __init__(
         self,
         *,
         unique_name: str,
-        jwt_token_path: None | str = None,
-        add_pydantic_model: None | str = None,
+        jwt_token_path: str | None = None,
+        add_pydantic_model: str | None = None,
         add_jwt_token: bool = False,
         add_jwt_user_id: bool = False,
         time_ttl: int = 0
@@ -213,8 +283,9 @@ class ICache:
         else:
             raise ValueError('Время должно быть в пределах 2_147_483_647 > time_ttl > -1')
 
-        # устанавливаем сессию логера
+        # устанавливаем сессию логера и редис
         self.log = self.loger_name(unique_name)
+        self.redis = self.redis_name()
 
     def __call__(self, func: Callable[P, Awaitable[R]]) -> Callable[P, Awaitable[R]]:
         @wraps(func)
@@ -242,10 +313,21 @@ class ICache:
             key_redis = create_cache_key(self.unique_name, parameters)
 
             # Временная заглуша вместо Редиса
-            if False:
+            if self.redis.search_key(key_redis) is None:
                 result = await func(*args, **kwargs)
                 json_value = jsonable_encoder(result)
+
+                self.redis.save_key(key_redis, json_value, self.time_ttl)
+                self.log.iprint('Кеш сохранен')
                 return result
             else:
-                return key_redis
+                try:
+                    self.log.iprint('Кеш использован')
+                    json_str = self.redis.search_key(key_redis)
+                    fixed_json = json_str.replace("'", '"')
+                    return json.loads(fixed_json)
+                except Exception as e:
+                    self.log.ierror(f'Не удалось использовать кеш. {e}')
+                    self.redis.delete_key(key_redis)
+                    return await func(*args, **kwargs)
         return wrapper

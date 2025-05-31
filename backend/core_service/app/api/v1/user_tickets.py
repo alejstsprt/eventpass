@@ -18,8 +18,7 @@ router = APIRouter()
 )
 @IClearCache(
     unique_name='event-cache',
-    jwt_token_path='jwt_token',
-    add_jwt_user_id=True
+    jwt_token_path='jwt_token'
 )
 async def create_event(
         event: CreateEvent,
@@ -34,6 +33,10 @@ async def create_event(
     summary="Изменение мероприятия",
     description="ИНФО: Ручка для изменения мероприятия. Принимает в себя ...", # TODO: дописать
     responses=None # TODO: дописать
+)
+@IClearCache(
+    unique_name='event-cache',
+    jwt_token_path='jwt_token'
 )
 async def edit_events(
         event: EditEvent,
@@ -51,8 +54,7 @@ async def edit_events(
 )
 @ICache(
     unique_name='event-cache',
-    jwt_token_path='jwt_token',
-    add_jwt_user_id=True
+    jwt_token_path='jwt_token'
 )
 async def list_events(
         service: ManagementEventsProtocol = Depends(get_event_service),
