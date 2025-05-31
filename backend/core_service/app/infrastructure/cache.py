@@ -1,11 +1,12 @@
 from typing import Any, Dict, Callable, ParamSpec, Tuple, TypeVar, Awaitable, Self, Literal, Final
-from functools import wraps
-import json
-import hashlib
 from dataclasses import dataclass
+from functools import wraps
+import hashlib
+import json
 
 from fastapi.encoders import jsonable_encoder
 from redis import Redis
+import redis
 
 from ..models.session import get_db
 from ..models.crud import search_user
@@ -92,6 +93,7 @@ class SettingsRedis:
     PORT: Final[int] = 6379
     DB: Final[int] = 0
     DECODE_RESPONSES: Final[bool] = True
+    TIME_SAVE_NO_CONNECTING: Final[int] = 10 # TODO: сделать умный обход подключеня к редис если он упал
 
 
 class RedisService:
@@ -122,7 +124,7 @@ class RedisService:
                 host=SettingsRedis.HOST,
                 port=SettingsRedis.PORT,
                 db=SettingsRedis.DB,
-                decode_responses=SettingsRedis.DECODE_RESPONSES
+                decode_responses=SettingsRedis.DECODE_RESPONSES,
             )
             cls.__instance.redis.ping()
             return True
@@ -176,7 +178,7 @@ class LogInfo:
     def __init__(self, session_name: str) -> None:
         self.name = f'[{session_name}]'
 
-    def iprint(self, text: str) -> bool:
+    def iprint(self, text: str) -> Literal[True]:
         """
         Вывод логов в консоль.
 
@@ -190,7 +192,7 @@ class LogInfo:
         print(output)
         return True
 
-    def ierror(self, text: str) -> bool:
+    def ierror(self, text: str) -> Literal[True]:
         """
         Вывод логов в консоль.
 
@@ -224,7 +226,7 @@ class IClearCache:
 
         Args:
             unique_name (str): Уникальное имя сессии кеша.
-            jwt_token_path (str | None, optional): Путь к токену. Defaults to None.
+            jwt_token_path (str | None, optional): Путь к токену. `Декоратор сам проверяет токен и есть ли user в db`. Defaults to None.
             add_pydantic_model (str | None, optional): Путь к pydantic модели. Defaults to None.
             add_jwt_token (bool, optional): Добавить ли токен в кеш. Defaults to False.
             add_jwt_user_id (bool, optional): Добавить ли айди из токена в кеш. Defaults to False.
@@ -285,7 +287,7 @@ class IClearCache:
                 if self.redis.search_key(key_redis) is not None:
                     self.redis.delete_key(key_redis)
                     self.log.iprint('Кеш удален')
-            except Exception as e:
+            except redis.ConnectionError as e:
                 self.log.ierror(f'Не удалось удалить кеш. {e}')
 
             return await func(*args, **kwargs)
@@ -313,7 +315,7 @@ class ICache:
 
         Args:
             unique_name (str): Уникальное имя сессии кеша.
-            jwt_token_path (str | None, optional): Путь к токену. Defaults to None.
+            jwt_token_path (str | None, optional): Путь к токену. `Декоратор сам проверяет токен и есть ли user в db`. Defaults to None.
             add_pydantic_model (str | None, optional): Путь к pydantic модели. Defaults to None.
             add_jwt_token (bool, optional): Добавить ли токен в кеш. Defaults to False.
             add_jwt_user_id (bool, optional): Добавить ли айди из токена в кеш. Defaults to False.
@@ -376,22 +378,22 @@ class ICache:
 
             key_redis = create_cache_key(self.unique_name, parameters)
 
-            # Временная заглуша вместо Редиса
-            if self.redis.search_key(key_redis) is None:
-                result = await func(*args, **kwargs)
-                json_value = jsonable_encoder(result)
+            try:
+                if self.redis.search_key(key_redis) is None:
+                    result = await func(*args, **kwargs)
+                    json_value = jsonable_encoder(result)
 
-                self.redis.save_key(key_redis, json_value, self.time_ttl)
-                self.log.iprint('Кеш сохранен')
-                return result
-            else:
-                try:
-                    self.log.iprint('Кеш использован')
+                    self.redis.save_key(key_redis, json_value, self.time_ttl)
+
+                    self.log.iprint('Кеш сохранен')
+                    return result
+                else:
                     json_str = self.redis.search_key(key_redis)
                     fixed_json = json_str.replace("'", '"')
+
+                    self.log.iprint('Кеш использован')
                     return json.loads(fixed_json)
-                except Exception as e:
-                    self.log.ierror(f'Не удалось использовать кеш. {e}')
-                    self.redis.delete_key(key_redis)
-                    return await func(*args, **kwargs)
+            except redis.ConnectionError as e:
+                self.log.ierror(f'Не удалось использовать кеш. {e}')
+                return await func(*args, **kwargs)
         return wrapper
