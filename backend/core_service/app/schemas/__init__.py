@@ -3,7 +3,8 @@ from .types.types_event import IntEventCreatorId, StrEventAddress, StrEventDescr
 from .dicts import UserRegistrationResult, EventCreatedResult, LoginUserResult
 from .pydantics.user import LoginUser, CreateUser
 from .pydantics.user_tickets import CreateEvent, EditEvent
-from .protocols.protocol import ManagementEventsProtocol
+from .protocols.protocol_user_tickets import ManagementEventsProtocol
+from .protocols.protocol_user import ManagementUsersProtocol
 
 __all__ = [
     'UserRegistrationResult',
@@ -21,5 +22,6 @@ __all__ = [
     'StrEventAddress',
     'StrEventDescription',
     'StrEventTitle',
-    'ManagementEventsProtocol'
+    'ManagementEventsProtocol',
+    'ManagementUsersProtocol'
 ]

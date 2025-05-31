@@ -98,7 +98,8 @@ class SettingsRedis:
 
 class RedisService:
     """Управление редисом"""
-    __instance = None
+    __instance: Self | None = None
+    redis: Redis
 
     def __new__(cls, *args: P.args, **kwargs: P.kwargs) -> Self:
         if cls.__instance is None:

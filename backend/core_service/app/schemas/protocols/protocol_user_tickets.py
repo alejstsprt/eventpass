@@ -1,7 +1,7 @@
 from typing import Protocol, Dict, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ...schemas import EventCreatedResult, CreateEvent
+    from .. import EventCreatedResult, CreateEvent
 
 
 class ManagementEventsProtocol(Protocol):

@@ -1,16 +1,9 @@
-from typing import TYPE_CHECKING
+from typing import Protocol, TYPE_CHECKING
 
-from sqlalchemy.orm import Session
 from fastapi import Response
 
-from ...schemas import StrUserName, StrUserLogin, StrUserPassword
-from ...models.crud import user_registration, search_user
-from ...security.hashing import hash_password, verify_password
-from ...security.jwt import set_jwt_cookie, create_access_token
-from ...core.exceptions import ValidationError, PasswordError, LoginError
-
 if TYPE_CHECKING:
-    from ...schemas import (
+    from .. import (
         UserRegistrationResult, 
         CreateUser,
         LoginUser,
@@ -18,14 +11,7 @@ if TYPE_CHECKING:
     )
 
 
-class ManagementUsers:
-    """
-    Модуль для управления пользователем.
-    """
-
-    def __init__(self, db: Session):
-        self.db = db
-
+class ManagementUsersProtocol(Protocol):
     async def create_user(self, response: Response, user: 'CreateUser') -> 'UserRegistrationResult':
         """
         Метод для создания пользователя в базе данных.
@@ -43,15 +29,7 @@ class ManagementUsers:
             ValidationError (HTTPException): Неверные входные данные.
             InternalServerError (HTTPException): Ошибка сервера.
         """
-        if not user.name or not user.login or not user.password:
-            raise ValidationError()
-
-        hash_pass = hash_password(user.password)
-        result = await user_registration(self.db, StrUserName(user.name), StrUserLogin(user.login), StrUserPassword(hash_pass))
- 
-        token = await create_access_token(result['user_id'])
-        await set_jwt_cookie(response, token)
-        return result
+        ...
 
     async def login_user(self, response: Response, user: 'LoginUser') -> 'LoginUserResult':
         """
@@ -69,19 +47,4 @@ class ManagementUsers:
             LoginError (HTTPException): Неверный логин.
             PasswordError (HTTPException): Неверный пароль.
         """
-        if not self.db or not user.login or not user.password:
-            raise ValidationError()
-
-        user_data = await search_user(self.db, login=user.login)
-        db_user = user_data['login']
-        if not db_user:
-            raise LoginError()
-
-        is_password = verify_password(user.password, str(db_user.password_hash))
-        if not is_password:
-            raise PasswordError()
-
-        token = await create_access_token(db_user.id)
-        await set_jwt_cookie(response, token)
-
-        return {'id': db_user.id, 'name': db_user.name}
+        ...
