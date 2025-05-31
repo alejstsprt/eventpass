@@ -1,4 +1,4 @@
-from typing import Any, Dict, Callable, ParamSpec, Tuple, TypeVar, Awaitable, Union, Optional, Self
+from typing import Any, Dict, Callable, ParamSpec, Tuple, TypeVar, Awaitable, Self, Literal
 from functools import wraps
 import json
 import hashlib
@@ -21,14 +21,14 @@ iprefix = '[ICache]'
 
 def create_cache_key(name: str, data: Dict[str, Any]) -> str:
     """
-    Возвращает ключ для Redis
+    Возвращает ключ для Redis.
 
     Args:
         name (str): Уникальное имя сессии.
         data (Dict[str, Any]): json запрос пользователя.
 
     Returns:
-        str: Готовый ключ для Redis
+        str: Готовый ключ для Redis.
     """
     serialized_data = json.dumps(data, sort_keys=True).encode('utf-8')
     key_hash = hashlib.sha256(serialized_data).hexdigest()
@@ -107,8 +107,16 @@ class RedisService:
            return cls.__instance 
 
     @classmethod
-    def __connect_redis(cls) -> bool:
-        """Устанавливаем соединение"""
+    def __connect_redis(cls) -> Literal[True]:
+        """
+        Устанавливаем соединение.
+
+        Raises:
+            ConnectionError: не удалось подключиться к Redis.
+
+        Returns:
+            Literal[True]: Соединение установлено.
+        """
         try:
             cls.__instance.redis = Redis(
                 host=SettingsRedis.HOST,
@@ -122,14 +130,43 @@ class RedisService:
             raise ConnectionError('Ошибка подключения к Redis')
 
     def search_key(self, cache: str) -> Dict[str, Any] | None:
+        """
+        Метод для поиска кеша в Redis.
+
+        Args:
+            cache (str): Кеш-ключ.
+
+        Returns:
+            Dict[str, Any] | None: Результат поиска.
+        """
         return self.redis.get(cache)
 
     def save_key(self, cache: str, value: Dict[str, Any], time: int) -> bool:
+        """
+        Метод для сохранения кеша в Redis.
+
+        Args:
+            cache (str): Кеш-ключ.
+            value (Dict[str, Any]): Данные-значение.
+            time (int): Время жизни кеша. `time=0` - бесконечно.
+
+        Returns:
+            bool: Результат сохранения.
+        """
         if time:
             return self.redis.setex(cache, time, str(value))
         return self.redis.set(cache, str(value))
 
     def delete_key(self, cache: str) -> bool:
+        """
+        Метод для удаления кеша Redis.
+
+        Args:
+            cache (str): Кеш-ключ.
+
+        Returns:
+            bool: Результат удаления.
+        """
         return self.redis.delete(cache)
 
 
@@ -182,6 +219,19 @@ class IClearCache:
         add_jwt_token: bool = False,
         add_jwt_user_id: bool = False,
     ) -> None:
+        """
+        Декоратор для очистки кеша. Полезен, чтобы не выдавало старых данных.
+
+        Args:
+            unique_name (str): Уникальное имя сессии кеша.
+            jwt_token_path (str | None, optional): Путь к токену. Defaults to None.
+            add_pydantic_model (str | None, optional): Путь к pydantic модели. Defaults to None.
+            add_jwt_token (bool, optional): Добавить ли токен в кеш. Defaults to False.
+            add_jwt_user_id (bool, optional): Добавить ли айди из токена в кеш. Defaults to False.
+
+        Raises:
+            ValueError: Неверные входные данные.
+        """
 
         check_data = {
             unique_name: str,
@@ -258,6 +308,20 @@ class ICache:
         add_jwt_user_id: bool = False,
         time_ttl: int = 0
     ) -> None:
+        """
+        Декоратор для использования кеша. Полностью сохраняет результат и переиспользует.
+
+        Args:
+            unique_name (str): Уникальное имя сессии кеша.
+            jwt_token_path (str | None, optional): Путь к токену. Defaults to None.
+            add_pydantic_model (str | None, optional): Путь к pydantic модели. Defaults to None.
+            add_jwt_token (bool, optional): Добавить ли токен в кеш. Defaults to False.
+            add_jwt_user_id (bool, optional): Добавить ли айди из токена в кеш. Defaults to False.
+            time_ttl (int, optional): Время жизни кеша. По умолчанию бесконечное. Defaults to 0.
+
+        Raises:
+            ValueError: Неверные входные данные.
+        """
 
         check_data = {
             unique_name: str,

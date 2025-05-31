@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
 from fastapi import APIRouter, Depends, Cookie
-# from fastapi_cache.decorator import cache # имеет маленький функционал. я создал свой
+from fastapi_cache.decorator import cache # имеет маленький функционал. я создал свой
 
 from ...schemas import CreateEvent, EditEvent, ManagementEventsProtocol
 from ...services import get_event_service, CREATE_EVENT_RESPONSES
