@@ -18,6 +18,7 @@ class UserRegistrationResult(TypedDict):
 
 # [EventCreatedResult]
 class EventDetails(TypedDict):
+    """-> EventCreatedResult"""
     id: Column[int]
     creator_id: Column[int]
     title: Column[str]

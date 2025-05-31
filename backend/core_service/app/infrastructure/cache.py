@@ -1,4 +1,4 @@
-from typing import Any, Dict, Callable, ParamSpec, Tuple, TypeVar, Awaitable, Self, Literal
+from typing import Any, Dict, Callable, ParamSpec, Tuple, TypeVar, Awaitable, Self, Literal, Final
 from functools import wraps
 import json
 import hashlib
@@ -77,21 +77,21 @@ async def valid_token_and_user_in_db(func: Callable[..., Any], kwargs: Dict[str,
 @dataclass(frozen=True)
 class Colors:
     """Цвета для консоли"""
-    RED: str = "\033[91m"
-    GREEN: str = "\033[92m"
-    BLUE: str = "\033[94m"
-    MAGENTA: str = "\033[35m"
-    CYAN: str = "\033[36m"
-    RESET: str = "\033[0m"
+    RED: Final[str] = "\033[91m"
+    GREEN: Final[str] = "\033[92m"
+    BLUE: Final[str] = "\033[94m"
+    MAGENTA: Final[str] = "\033[35m"
+    CYAN: Final[str] = "\033[36m"
+    RESET: Final[str] = "\033[0m"
 
 
 @dataclass(frozen=True)
 class SettingsRedis:
     """Настройки Redis"""
-    HOST: str = 'localhost'
-    PORT: int = 6379
-    DB: int = 0
-    DECODE_RESPONSES: bool = True
+    HOST: Final[str] = 'localhost'
+    PORT: Final[int] = 6379
+    DB: Final[int] = 0
+    DECODE_RESPONSES: Final[bool] = True
 
 
 class RedisService:
