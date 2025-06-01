@@ -39,6 +39,19 @@ class ManagementEventsProtocol(Protocol):
         """
         ...
 
-    async def edit_events(self, jwt_token: str, event_id: int, event: 'EditEvent') -> list: # TODO: доделать
-        """Метод для редактирования мероприятия"""
+    async def edit_events(self, jwt_token: str, event_id: int, event: 'EditEvent') -> list[Dict[str, Any]]:
+        """
+        Редактирование данных мероприятия.
+
+        Args:
+            jwt_token (str): Токен пользователя.
+            event_id (int): ID мероприятия.
+            event (EditEvent): Данные которые нужно изменить.
+
+        Returns:
+            (list[Dict[str, Any]]): Вся информация об измененном обьекте.
+
+        Raises:
+            NoTokenError: Токен отстутствует/Неверный
+        """
         ...

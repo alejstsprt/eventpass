@@ -164,11 +164,11 @@ async def all_info_table(db: Session, table_name: Literal['Accounts', 'Events', 
         db (Session): Сессия SQLAlchemy для работы с БД.
         table_name (Literal['Accounts', 'Events', 'TicketTypes', 'Tickets']): Название таблицы.
 
-    Raises:
-        ValidationError: Неправильные данные.
-
     Returns:
         (list[str, Any]): Все данные таблицы.
+
+    Raises:
+        ValidationError: Неправильные данные.
     """
     if table_name not in GET_TABLE:
         text_error = f'Неправильно переданы данные. {db = }, {table_name = }'
@@ -188,12 +188,12 @@ async def edit_info(db: Session, table_name: Literal['Accounts', 'Events', 'Tick
         id (int): Айди мероприятия.
         data (EditEvent): Данные которые нужно изменить.
 
+    Returns:
+        (list[Dict[str, Any]]): Вся информация об измененном обьекте.
+
     Raises:
         ValueError: Неправильноe название таблицы.
         ValidationError: Неверные данные.
-
-    Returns:
-        list[Dict[str, Any]]: Вся информация об измененном обьекте.
     """
     if table_name not in GET_TABLE:
         text_error = f'Неправильно переданы данные. {db = }, {table_name = }'

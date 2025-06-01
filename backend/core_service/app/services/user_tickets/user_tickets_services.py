@@ -75,18 +75,20 @@ class ManagementEvents:
 
         return await all_info_table(self.db, 'Events')
 
-    async def edit_events(self, jwt_token: str, event_id: int, event: 'EditEvent') -> list:
+    async def edit_events(self, jwt_token: str, event_id: int, event: 'EditEvent') -> list[Dict[str, Any]]:
         """
-        Метод для вывода всех мероприятий (не оптимизирован для больших данных)
+        Редактирование данных мероприятия.
 
         Args:
             jwt_token (str): Токен пользователя.
+            event_id (int): ID мероприятия.
+            event (EditEvent): Данные которые нужно изменить.
 
         Returns:
-            list[object]: Все мероприятия.
+            (list[Dict[str, Any]]): Вся информация об измененном обьекте.
 
         Raises:
-            NoTokenError (HTTPException): Токен отсутствует.
+            NoTokenError: Токен отстутствует/Неверный
         """
         if not await token_verification(jwt_token):
             raise NoTokenError() # выбрасываем ошибку чтобы запутать, если попытка подделать токен. фронтенд поймет.
