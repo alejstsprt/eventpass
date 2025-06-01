@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-from jose import JWTError, jwt
 from fastapi import Request, Response
+from jose import JWTError, jwt
 from sqlalchemy import Column
 
 from ..core.config import config
@@ -18,8 +18,9 @@ async def set_jwt_cookie(response: Response, token: str) -> None:
         expires=expires,
         secure=False,  # secure=True, если используешь HTTPS
         samesite="lax",
-        path="/"
+        path="/",
     )
+
 
 async def create_access_token(user_id: int | Column[int]) -> str:
     """
@@ -31,12 +32,12 @@ async def create_access_token(user_id: int | Column[int]) -> str:
     Returns:
         str: Созданный токен: `токен`.
     """
-    expires = datetime.now(timezone.utc) + timedelta(minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
-    payload = {
-        "sub": str(user_id),
-        "exp": expires  # Время истечения в UTC
-    }
+    expires = datetime.now(timezone.utc) + timedelta(
+        minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES
+    )
+    payload = {"sub": str(user_id), "exp": expires}  # Время истечения в UTC
     return jwt.encode(payload, config.SECRET_KEY, algorithm=config.ALGORITHM)
+
 
 async def token_verification(jwt_token: str) -> Optional[int]:
     """
@@ -55,7 +56,9 @@ async def token_verification(jwt_token: str) -> Optional[int]:
         return None
 
     try:
-        payload = jwt.decode(jwt_token, config.SECRET_KEY, algorithms=[config.ALGORITHM])
+        payload = jwt.decode(
+            jwt_token, config.SECRET_KEY, algorithms=[config.ALGORITHM]
+        )
         user_id = payload.get("sub")
         return int(user_id) if user_id else None
     except (JWTError, ValueError):

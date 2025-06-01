@@ -1,21 +1,21 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy.orm import Session
 from fastapi import Response
+from sqlalchemy.orm import Session
 
-from ...schemas import StrUserName, StrUserLogin, StrUserPassword
-from ...models.crud import user_registration, search_user
+from ...core.exceptions import LoginError, PasswordError, ValidationError
+from ...models.crud import search_user, user_registration
+from ...schemas import StrUserLogin, StrUserName, StrUserPassword
 from ...security.hashing import hash_password, verify_password
-from ...security.jwt import set_jwt_cookie, create_access_token
-from ...core.exceptions import ValidationError, PasswordError, LoginError
+from ...security.jwt import create_access_token, set_jwt_cookie
 
 if TYPE_CHECKING:
     from ...schemas import (
-        UserRegistrationResult, 
         CreateUser,
         LoginUser,
         LoginUserResult,
-        StrUserLogin
+        StrUserLogin,
+        UserRegistrationResult,
     )
 
 
@@ -27,7 +27,9 @@ class ManagementUsers:
     def __init__(self, db: Session):
         self.db = db
 
-    async def create_user(self, response: Response, user: 'CreateUser') -> 'UserRegistrationResult':
+    async def create_user(
+        self, response: Response, user: "CreateUser"
+    ) -> "UserRegistrationResult":
         """
         Метод для создания пользователя в базе данных.
 
@@ -48,13 +50,20 @@ class ManagementUsers:
             raise ValidationError()
 
         hash_pass = hash_password(user.password)
-        result = await user_registration(self.db, StrUserName(user.name), StrUserLogin(user.login), StrUserPassword(hash_pass))
- 
-        token = await create_access_token(result['user_id'])
+        result = await user_registration(
+            self.db,
+            StrUserName(user.name),
+            StrUserLogin(user.login),
+            StrUserPassword(hash_pass),
+        )
+
+        token = await create_access_token(result["user_id"])
         await set_jwt_cookie(response, token)
         return result
 
-    async def login_user(self, response: Response, user: 'LoginUser') -> 'LoginUserResult':
+    async def login_user(
+        self, response: Response, user: "LoginUser"
+    ) -> "LoginUserResult":
         """
         Метод для входа в аккаунт.
 
@@ -74,7 +83,7 @@ class ManagementUsers:
             raise ValidationError()
 
         user_data = await search_user(self.db, login=StrUserLogin(user.login))
-        db_user = user_data['login']
+        db_user = user_data["login"]
         if not db_user:
             raise LoginError()
 
@@ -85,4 +94,4 @@ class ManagementUsers:
         token = await create_access_token(db_user.id)
         await set_jwt_cookie(response, token)
 
-        return {'id': db_user.id, 'name': db_user.name}
+        return {"id": db_user.id, "name": db_user.name}

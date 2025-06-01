@@ -1,21 +1,21 @@
-from typing import TYPE_CHECKING, Dict, Any
+from typing import TYPE_CHECKING, Any, Dict
 
 from sqlalchemy.orm import Session
 
+from ...core.exceptions import NoTokenError, TokenError
+from ...models.crud import all_info_table, create_event, edit_info, search_user
 from ...schemas import (
     IntEventCreatorId,
-    StrEventTitle,
-    StrEventDescription,
+    IntUserId,
     StrEventAddress,
-    IntUserId
+    StrEventDescription,
+    StrEventTitle,
 )
-from ...models.crud import create_event, search_user, all_info_table, edit_info
 from ...security.jwt import token_verification
-from ...core.exceptions import NoTokenError, TokenError
 
 if TYPE_CHECKING:
-    from ...schemas import EventCreatedResult, CreateEvent, EditEvent
     from ...models.session import BaseModel
+    from ...schemas import CreateEvent, EditEvent, EventCreatedResult
 
 
 class ManagementEvents:
@@ -26,7 +26,9 @@ class ManagementEvents:
     def __init__(self, db: Session):
         self.db = db
 
-    async def create_events(self, jwt_token: str, event: 'CreateEvent') -> 'EventCreatedResult':
+    async def create_events(
+        self, jwt_token: str, event: "CreateEvent"
+    ) -> "EventCreatedResult":
         """
         Метод для создания мероприятия.
 
@@ -44,10 +46,10 @@ class ManagementEvents:
             InternalServerError (HTTPException): Ошибка сервера.
         """
         if not (user_id := await token_verification(jwt_token)):
-            raise NoTokenError() # выбрасываем ошибку чтобы запутать, если попытка подделать токен. фронтенд поймет.
+            raise NoTokenError()  # выбрасываем ошибку чтобы запутать, если попытка подделать токен. фронтенд поймет.
 
         is_user = await search_user(self.db, user_id=IntUserId(user_id))
-        if is_user['id'] is None:
+        if is_user["id"] is None:
             raise TokenError()
 
         return await create_event(
@@ -56,10 +58,10 @@ class ManagementEvents:
             event.status.value,
             StrEventTitle(event.title),
             StrEventDescription(event.description),
-            StrEventAddress(event.address)
+            StrEventAddress(event.address),
         )
 
-    async def all_events(self, jwt_token: str) -> list['BaseModel']:
+    async def all_events(self, jwt_token: str) -> list["BaseModel"]:
         """
         Метод для вывода всех мероприятий (не оптимизирован для больших данных)
 
@@ -73,11 +75,13 @@ class ManagementEvents:
             NoTokenError (HTTPException): Токен отсутствует.
         """
         if not await token_verification(jwt_token):
-            raise NoTokenError() # выбрасываем ошибку чтобы запутать, если попытка подделать токен. фронтенд поймет.
+            raise NoTokenError()  # выбрасываем ошибку чтобы запутать, если попытка подделать токен. фронтенд поймет.
 
-        return await all_info_table(self.db, 'Events')
+        return await all_info_table(self.db, "Events")
 
-    async def edit_events(self, jwt_token: str, event_id: int, event: 'EditEvent') -> 'BaseModel':
+    async def edit_events(
+        self, jwt_token: str, event_id: int, event: "EditEvent"
+    ) -> "BaseModel":
         """
         Редактирование данных мероприятия.
 
@@ -93,6 +97,6 @@ class ManagementEvents:
             NoTokenError: Токен отстутствует/Неверный
         """
         if not await token_verification(jwt_token):
-            raise NoTokenError() # выбрасываем ошибку чтобы запутать, если попытка подделать токен. фронтенд поймет.
+            raise NoTokenError()  # выбрасываем ошибку чтобы запутать, если попытка подделать токен. фронтенд поймет.
 
-        return await edit_info(self.db, 'Events', event_id, event)
+        return await edit_info(self.db, "Events", event_id, event)

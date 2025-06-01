@@ -1,10 +1,9 @@
+import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import uvicorn
 
-from .api.v1 import user, user_tickets, ticket_types
+from .api.v1 import ticket_types, user, user_tickets
 from .models.session import BaseModel, engine
-
 
 BaseModel.metadata.create_all(bind=engine)
 
@@ -13,20 +12,32 @@ app = FastAPI()
 # Разрешаем запросы с вашего фронтенда
 app.add_middleware(
     CORSMiddleware,
-    allow_origins = [
+    allow_origins=[
         "http://localhost",
         "http://localhost:8000",
         "http://192.168.0.104",  # Добавьте ваш IP-адрес
-        "http://192.168.0.104:8000"  # И порт, если используется
-    ], # И адреса
+        "http://192.168.0.104:8000",  # И порт, если используется
+    ],  # И адреса
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-app.include_router(user.router, prefix='/api/v1/auth', tags=['Ручки для взаимодействия с профилем пользователя'])
-app.include_router(user_tickets.router, prefix='/api/v1/events', tags=['Ручки для управления мероприятиями'])
-app.include_router(ticket_types.router, prefix='/api/v1/ticket-types', tags=['Ручки для управления типом мероприятий'])
+app.include_router(
+    user.router,
+    prefix="/api/v1/auth",
+    tags=["Ручки для взаимодействия с профилем пользователя"],
+)
+app.include_router(
+    user_tickets.router,
+    prefix="/api/v1/events",
+    tags=["Ручки для управления мероприятиями"],
+)
+app.include_router(
+    ticket_types.router,
+    prefix="/api/v1/ticket-types",
+    tags=["Ручки для управления типом мероприятий"],
+)
 
 
 # if __name__ == "__main__":

@@ -1,11 +1,13 @@
-from typing import Protocol, Dict, Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, Protocol
 
 if TYPE_CHECKING:
-    from .. import EventCreatedResult, CreateEvent, EditEvent
+    from .. import CreateEvent, EditEvent, EventCreatedResult
 
 
 class ManagementEventsProtocol(Protocol):
-    async def create_events(self, jwt_token: str, event: 'CreateEvent') -> 'EventCreatedResult':
+    async def create_events(
+        self, jwt_token: str, event: "CreateEvent"
+    ) -> "EventCreatedResult":
         """
         Метод для создания мероприятия.
 
@@ -25,7 +27,7 @@ class ManagementEventsProtocol(Protocol):
         ...
 
     async def all_events(self, jwt_token: str) -> list[Dict[str, Any]]:
-        """"
+        """ "
         Метод для вывода всех мероприятий (не оптимизирован для больших данных)
 
         Args:
@@ -39,7 +41,9 @@ class ManagementEventsProtocol(Protocol):
         """
         ...
 
-    async def edit_events(self, jwt_token: str, event_id: int, event: 'EditEvent') -> list[Dict[str, Any]]:
+    async def edit_events(
+        self, jwt_token: str, event_id: int, event: "EditEvent"
+    ) -> list[Dict[str, Any]]:
         """
         Редактирование данных мероприятия.
 

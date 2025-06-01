@@ -3,28 +3,34 @@ from typing import TYPE_CHECKING
 from fastapi import APIRouter, Depends, Response
 from fastapi_cache.decorator import cache
 
-from ...services import get_user_service, LOGIN_USER_RESPONSES, CREATE_USER_RESPONSES
-from ...schemas import CreateUser, LoginUser, UserRegistrationResult, LoginUserResult, ManagementUsersProtocol
+from ...schemas import (
+    CreateUser,
+    LoginUser,
+    LoginUserResult,
+    ManagementUsersProtocol,
+    UserRegistrationResult,
+)
+from ...services import CREATE_USER_RESPONSES, LOGIN_USER_RESPONSES, get_user_service
 
 router = APIRouter()
 
 
 @router.post(
-    '/register',
+    "/register",
     summary="Создание аккаунта.",
     description="ИНФО: Ручка для создания аккаунта. Принимает в себя name, login, password.",
-    responses=CREATE_USER_RESPONSES
+    responses=CREATE_USER_RESPONSES,
 )
-async def create_user(response: Response, user: CreateUser, service: ManagementUsersProtocol = Depends(get_user_service)): # type: ignore[no-untyped-def]
+async def create_user(response: Response, user: CreateUser, service: ManagementUsersProtocol = Depends(get_user_service)):  # type: ignore[no-untyped-def]
     return await service.create_user(response, user)
 
 
 @router.post(
-    '/login',
+    "/login",
     summary="Вход в аккаунт",
     description="ИНФО: Ручка для входа в аккаунт. Принимает в себя login, password.",
-    responses=LOGIN_USER_RESPONSES
+    responses=LOGIN_USER_RESPONSES,
 )
 # @cache(expire=80)
-async def login_user(response: Response, user: LoginUser, service: ManagementUsersProtocol = Depends(get_user_service)): # type: ignore[no-untyped-def]
+async def login_user(response: Response, user: LoginUser, service: ManagementUsersProtocol = Depends(get_user_service)):  # type: ignore[no-untyped-def]
     return await service.login_user(response, user)

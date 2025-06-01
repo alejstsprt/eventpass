@@ -8,9 +8,9 @@ Create Date: 2025-05-26 20:51:54.549412
 
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
 
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "cfd80ec41ab7"
@@ -81,9 +81,7 @@ def downgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index(
-        op.f("ix_ticket_types_id"), "ticket_types", ["id"], unique=False
-    )
+    op.create_index(op.f("ix_ticket_types_id"), "ticket_types", ["id"], unique=False)
     op.create_table(
         "users",
         sa.Column("id", sa.INTEGER(), nullable=False),
@@ -118,9 +116,7 @@ def downgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("unique_code"),
     )
-    op.create_index(
-        op.f("ix_tickets_user_id"), "tickets", ["user_id"], unique=False
-    )
+    op.create_index(op.f("ix_tickets_user_id"), "tickets", ["user_id"], unique=False)
     op.create_index(
         op.f("ix_tickets_ticket_type_id"),
         "tickets",
@@ -128,7 +124,5 @@ def downgrade() -> None:
         unique=False,
     )
     op.create_index(op.f("ix_tickets_id"), "tickets", ["id"], unique=False)
-    op.create_index(
-        op.f("ix_tickets_event_id"), "tickets", ["event_id"], unique=False
-    )
+    op.create_index(op.f("ix_tickets_event_id"), "tickets", ["event_id"], unique=False)
     # ### end Alembic commands ###

@@ -1,5 +1,5 @@
-from logging.handlers import RotatingFileHandler
 import logging
+from logging.handlers import RotatingFileHandler
 
 
 class Logger:
@@ -10,12 +10,14 @@ class Logger:
 
         self.logger.setLevel(level)
 
-        formatter = logging.Formatter("[%(asctime)s] [%(levelname)s] %(name)s: %(message)s")
+        formatter = logging.Formatter(
+            "[%(asctime)s] [%(levelname)s] %(name)s: %(message)s"
+        )
 
         console_handler = logging.StreamHandler()
         console_handler.setFormatter(formatter)
 
-        file_handler = RotatingFileHandler(f'{name_logger}.log', encoding='utf-8')
+        file_handler = RotatingFileHandler(f"{name_logger}.log", encoding="utf-8")
         file_handler.setFormatter(formatter)
 
         self.logger.addHandler(console_handler)

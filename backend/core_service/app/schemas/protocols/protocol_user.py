@@ -1,18 +1,15 @@
-from typing import Protocol, TYPE_CHECKING
+from typing import TYPE_CHECKING, Protocol
 
 from fastapi import Response
 
 if TYPE_CHECKING:
-    from .. import (
-        UserRegistrationResult, 
-        CreateUser,
-        LoginUser,
-        LoginUserResult
-    )
+    from .. import CreateUser, LoginUser, LoginUserResult, UserRegistrationResult
 
 
 class ManagementUsersProtocol(Protocol):
-    async def create_user(self, response: Response, user: 'CreateUser') -> 'UserRegistrationResult':
+    async def create_user(
+        self, response: Response, user: "CreateUser"
+    ) -> "UserRegistrationResult":
         """
         Метод для создания пользователя в базе данных.
 
@@ -31,7 +28,9 @@ class ManagementUsersProtocol(Protocol):
         """
         ...
 
-    async def login_user(self, response: Response, user: 'LoginUser') -> 'LoginUserResult':
+    async def login_user(
+        self, response: Response, user: "LoginUser"
+    ) -> "LoginUserResult":
         """
         Метод для входа в аккаунт.
 
