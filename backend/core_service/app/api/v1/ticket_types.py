@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 @router.post(
-    '/ticket-types',
+    '',
     summary="Создание типа мероприятия",
     description="ИНФО: Ручка для создания мероприятия. Принимает в себя название, описание и адрес мероприятия.",
     responses=None # TODO: дописать

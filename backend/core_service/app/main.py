@@ -24,8 +24,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(user.router, prefix='/api/user', tags=['Ручки для взаимодействия с профилем пользователя'])
-app.include_router(user_tickets.router, prefix='/api/user-tickets', tags=['Ручки для управления мероприятиями'])
+app.include_router(user.router, prefix='/api/auth', tags=['Ручки для взаимодействия с профилем пользователя'])
+app.include_router(user_tickets.router, prefix='/api/events', tags=['Ручки для управления мероприятиями'])
 app.include_router(ticket_types.router, prefix='/api/ticket-types', tags=['Ручки для управления типом мероприятий'])
 
 
