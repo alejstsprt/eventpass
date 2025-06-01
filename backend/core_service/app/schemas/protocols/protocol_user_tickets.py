@@ -1,7 +1,7 @@
 from typing import Protocol, Dict, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .. import EventCreatedResult, CreateEvent
+    from .. import EventCreatedResult, CreateEvent, EditEvent
 
 
 class ManagementEventsProtocol(Protocol):
@@ -39,6 +39,6 @@ class ManagementEventsProtocol(Protocol):
         """
         ...
 
-    async def edit_events(self, jwt_token: str, event) -> list: # TODO: доделать
+    async def edit_events(self, jwt_token: str, event_id: int, event: 'EditEvent') -> list: # TODO: доделать
         """Метод для редактирования мероприятия"""
         ...

@@ -13,6 +13,7 @@ class StatusForm(str, Enum):
 # [CreateEvent]
 class CreateEvent(BaseModel):
     """Модель данных для создания мероприятия"""
+
     status: Annotated[StatusForm, Field(
         description="Статус мероприятия"
     )]
@@ -41,10 +42,6 @@ class CreateEvent(BaseModel):
 # [EditEvent]
 class EditEvent(BaseModel):
     """Модель данных для редактирования мероприятия"""
-    id: Annotated[int, Field(
-        description="Айди мероприятия",
-        examples=["1"]
-    )]
 
     status: Optional[Annotated[StatusForm, Field(
         description="Статус мероприятия"

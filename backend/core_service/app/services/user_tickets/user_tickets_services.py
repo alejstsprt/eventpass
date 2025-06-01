@@ -13,7 +13,7 @@ from ...security.jwt import token_verification
 from ...core.exceptions import NoTokenError, TokenError
 
 if TYPE_CHECKING:
-    from ...schemas import EventCreatedResult, CreateEvent
+    from ...schemas import EventCreatedResult, CreateEvent, EditEvent
 
 
 class ManagementEvents:
@@ -75,7 +75,7 @@ class ManagementEvents:
 
         return await all_info_table(self.db, 'Events')
 
-    async def edit_events(self, jwt_token: str, event) -> list:
+    async def edit_events(self, jwt_token: str, event_id: int, event: 'EditEvent') -> list:
         """
         Метод для вывода всех мероприятий (не оптимизирован для больших данных)
 

@@ -44,8 +44,7 @@ async def edit_events(
         jwt_token: str = Cookie(None),
         service: ManagementEventsProtocol = Depends(get_event_service),
     ):
-    print(event_id)
-    return await service.edit_events(jwt_token, event)
+    return await service.edit_events(jwt_token, event_id, event)
 
 
 @router.get(
