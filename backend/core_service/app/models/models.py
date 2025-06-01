@@ -34,6 +34,7 @@ class Events(BaseModel):
 
 
 class TicketTypes(BaseModel):
+    """Это тип билета (вип и тд)"""
     __tablename__ = 'ticket_types'
 
     id = Column(Integer, primary_key=True, index=True) # Айди билета (это тип. родитель.)
@@ -47,6 +48,7 @@ class TicketTypes(BaseModel):
 
 
 class Tickets(BaseModel):
+    """Сами билеты"""
     __tablename__ = 'tickets'
 
     id = Column(Integer, primary_key=True, index=True) # Айди билета (кьюаркода) (это сам билет)

@@ -25,6 +25,6 @@ async def create_user(response: Response, user: CreateUser, service: ManagementU
     description="ИНФО: Ручка для входа в аккаунт. Принимает в себя логин и пароль.",
     responses=LOGIN_USER_RESPONSES
 )
-@cache(expire=80)
+# @cache(expire=80)
 async def login_user(response: Response, user: LoginUser, service: ManagementUsersProtocol = Depends(get_user_service)):
     return await service.login_user(response, user)

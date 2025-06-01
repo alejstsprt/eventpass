@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
-from .api.v1 import user, user_tickets
+from .api.v1 import user, user_tickets, ticket_types
 from .models.session import BaseModel, engine
 
 
@@ -26,6 +26,7 @@ app.add_middleware(
 
 app.include_router(user.router, prefix='/api/user', tags=['Ручки для взаимодействия с профилем пользователя'])
 app.include_router(user_tickets.router, prefix='/api/user-tickets', tags=['Ручки для управления мероприятиями'])
+app.include_router(ticket_types.router, prefix='/api/ticket-types', tags=['Ручки для управления типом мероприятий'])
 
 
 # if __name__ == "__main__":

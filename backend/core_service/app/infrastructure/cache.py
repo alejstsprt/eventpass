@@ -99,6 +99,41 @@ class SettingsRedis:
     TIME_SAVE_NO_CONNECTING: Final[int] = 10 # TODO: сделать умный обход подключеня к редис если он упал
 
 
+class LogInfo:
+    """Красивый вывод логов в консоль"""
+
+    def __init__(self, session_name: str) -> None:
+        self.name = f'[{session_name}]'
+
+    def iprint(self, text: str) -> Literal[True]:
+        """
+        Вывод логов в консоль.
+
+        Args:
+            text (str): Текст для вывода.
+
+        Returns:
+            bool: Произошел ли вывод.
+        """
+        output = f"{Colors.BLUE}{iprefix}{Colors.RESET} {Colors.CYAN}{self.name}{Colors.RESET} {text}"
+        print(output)
+        return True
+
+    def ierror(self, text: str) -> Literal[True]:
+        """
+        Вывод логов в консоль.
+
+        Args:
+            text (str): Текст для вывода.
+
+        Returns:
+            bool: Произошел ли вывод.
+        """
+        output = f"{Colors.BLUE}{iprefix}{Colors.RESET} {Colors.CYAN}{self.name}{Colors.RESET} {Colors.RED}{text}{Colors.RESET}"
+        print(output)
+        return True
+
+
 class RedisService:
     """Управление редисом"""
     __instance: Self | None = None
@@ -174,41 +209,6 @@ class RedisService:
             bool: Результат удаления.
         """
         return self.redis.delete(cache)
-
-
-class LogInfo:
-    """Красивый вывод логов в консоль"""
-
-    def __init__(self, session_name: str) -> None:
-        self.name = f'[{session_name}]'
-
-    def iprint(self, text: str) -> Literal[True]:
-        """
-        Вывод логов в консоль.
-
-        Args:
-            text (str): Текст для вывода.
-
-        Returns:
-            bool: Произошел ли вывод.
-        """
-        output = f"{Colors.BLUE}{iprefix}{Colors.RESET} {Colors.CYAN}{self.name}{Colors.RESET} {text}"
-        print(output)
-        return True
-
-    def ierror(self, text: str) -> Literal[True]:
-        """
-        Вывод логов в консоль.
-
-        Args:
-            text (str): Текст для вывода.
-
-        Returns:
-            bool: Произошел ли вывод.
-        """
-        output = f"{Colors.BLUE}{iprefix}{Colors.RESET} {Colors.CYAN}{self.name}{Colors.RESET} {Colors.RED}{text}{Colors.RESET}"
-        print(output)
-        return True
 
 
 class IClearCache:

@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from fastapi import APIRouter, Depends, Cookie
+from fastapi import APIRouter, Depends, Cookie, Path, Body
 # from fastapi_cache.decorator import cache # имеет маленький функционал. я создал свой
 
 from ...schemas import CreateEvent, EditEvent, ManagementEventsProtocol
@@ -29,7 +29,7 @@ async def create_event(
 
 
 @router.patch(
-    '/event',
+    '/event/{event_id}',
     summary="Изменение мероприятия",
     description="ИНФО: Ручка для изменения мероприятия. Принимает в себя ...", # TODO: дописать
     responses=None # TODO: дописать
@@ -40,9 +40,11 @@ async def create_event(
 )
 async def edit_events(
         event: EditEvent,
+        event_id: int = Path(..., title="ID мероприятия", ge=1),
+        jwt_token: str = Cookie(None),
         service: ManagementEventsProtocol = Depends(get_event_service),
-        jwt_token: str = Cookie(None)
     ):
+    print(event_id)
     return await service.edit_events(jwt_token, event)
 
 
