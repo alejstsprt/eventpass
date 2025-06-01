@@ -8,7 +8,7 @@ from ...schemas import (
     StrEventDescription,
     StrEventAddress
 )
-from ...models.crud import create_event, search_user, all_info_table
+from ...models.crud import create_event, search_user, all_info_table, edit_info
 from ...security.jwt import token_verification
 from ...core.exceptions import NoTokenError, TokenError
 
@@ -91,4 +91,4 @@ class ManagementEvents:
         if not await token_verification(jwt_token):
             raise NoTokenError() # выбрасываем ошибку чтобы запутать, если попытка подделать токен. фронтенд поймет.
 
-        return event # TODO: сделать функционал
+        return await edit_info(self.db, 'Events', event_id, event)

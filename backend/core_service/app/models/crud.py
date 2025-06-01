@@ -19,7 +19,8 @@ if TYPE_CHECKING:
         StrEventAddress,
         StrEventDescription,
         StrEventTitle,
-        IntUserId
+        IntUserId,
+        EditEvent
     )
 
 
@@ -169,9 +170,42 @@ async def all_info_table(db: Session, table_name: Literal['Accounts', 'Events', 
     Returns:
         (list[str, Any]): Все данные таблицы.
     """
-    if not table_name or table_name not in GET_TABLE:
-        logger_api.error(f'Неправильно переданы данные. {db = }, {table_name = }')
-        raise ValidationError()
+    if table_name not in GET_TABLE:
+        text_error = f'Неправильно переданы данные. {db = }, {table_name = }'
+        raise ValueError(text_error)
 
     result = db.query(GET_TABLE[table_name]).all()
     return result
+
+# TODO: event_id, EditEvent заменить на другое, ведь функция для всех таблиц
+async def edit_info(db: Session, table_name: Literal['Accounts', 'Events', 'TicketTypes', 'Tickets'], event_id: int, data: 'EditEvent') -> list[Dict[str, Any]]:
+    """
+    Редактирование информации в таблицах db.
+
+    Args:
+        db (Session): Сессия SQLAlchemy для работы с БД.
+        table_name (Literal['Accounts', 'Events', 'TicketTypes', 'Tickets']): Название таблицы.
+        id (int): Айди мероприятия.
+        data (EditEvent): Данные которые нужно изменить.
+
+    Raises:
+        ValueError: Неправильноe название таблицы.
+        ValidationError: Неверные данные.
+
+    Returns:
+        list[Dict[str, Any]]: Вся информация об измененном обьекте.
+    """
+    if table_name not in GET_TABLE:
+        text_error = f'Неправильно переданы данные. {db = }, {table_name = }'
+        raise ValueError(text_error)
+
+    event = db.query(GET_TABLE[table_name]).filter_by(id=event_id).first()
+    if not event:
+        raise ValidationError()
+
+    for field, value in data.dict(exclude_unset=True).items():
+        setattr(event, field, value)
+
+    db.commit()
+    db.refresh(event)
+    return event

@@ -1,4 +1,4 @@
-from typing import Annotated, Optional
+from typing import Annotated, Optional, NotRequired
 from enum import Enum
 
 from pydantic import BaseModel, Field
@@ -43,25 +43,25 @@ class CreateEvent(BaseModel):
 class EditEvent(BaseModel):
     """Модель данных для редактирования мероприятия"""
 
-    status: Optional[Annotated[StatusForm, Field(
+    status: Annotated[StatusForm | None, Field(
         description="Статус мероприятия"
-    )]] = None
+    )] = None
 
-    title: Annotated[str, Field(
+    title: Annotated[str | None, Field(
         description="Название мероприятия",
         examples=["Конференция по Python"],
         min_length=2,
         max_length=50
     )] = None
 
-    description: Annotated[str, Field(
+    description: Annotated[str | None, Field(
         description="Описание мероприятия",
         examples=["Ежегодная конференция для разработчиков"],
         min_length=10,
         max_length=2000
     )] = None
 
-    address: Annotated[str, Field(
+    address: Annotated[str | None, Field(
         description="Адрес мероприятия",
         examples=["Ул. Штурманская, д. 30"],
         min_length=5,

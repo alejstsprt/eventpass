@@ -11,8 +11,8 @@ router = APIRouter()
 
 @router.post(
     '/register',
-    summary="Создание аккаунта",
-    description="ИНФО: Ручка для создания аккаунта. Принимает в себя имя, логин и пароль.",
+    summary="Создание аккаунта.",
+    description="ИНФО: Ручка для создания аккаунта. Принимает в себя name, login, password.",
     responses=CREATE_USER_RESPONSES
 )
 async def create_user(response: Response, user: CreateUser, service: ManagementUsersProtocol = Depends(get_user_service)):
@@ -22,7 +22,7 @@ async def create_user(response: Response, user: CreateUser, service: ManagementU
 @router.post(
     '/login',
     summary="Вход в аккаунт",
-    description="ИНФО: Ручка для входа в аккаунт. Принимает в себя логин и пароль.",
+    description="ИНФО: Ручка для входа в аккаунт. Принимает в себя login, password.",
     responses=LOGIN_USER_RESPONSES
 )
 # @cache(expire=80)

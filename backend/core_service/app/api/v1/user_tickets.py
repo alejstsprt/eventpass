@@ -12,8 +12,8 @@ router = APIRouter()
 
 @router.post(
     '',
-    summary="Создание мероприятия",
-    description="ИНФО: Ручка для создания мероприятия. Принимает в себя название, описание и адрес мероприятия.",
+    summary="Создание мероприятия.",
+    description="ИНФО: Ручка для создания мероприятия. Принимает в себя status, title, description, address.",
     responses=CREATE_EVENT_RESPONSES
 )
 @IClearCache(
@@ -30,8 +30,8 @@ async def create_event(
 
 @router.patch(
     '/{event_id}',
-    summary="Изменение мероприятия",
-    description="ИНФО: Ручка для изменения мероприятия. Принимает в себя ...", # TODO: дописать
+    summary="Изменение мероприятия.",
+    description="ИНФО: Ручка для изменения мероприятия. Принимает в себя status | None, title | None, description | None, address | None.",
     responses=None # TODO: дописать
 )
 @IClearCache(
@@ -49,8 +49,8 @@ async def edit_events(
 
 @router.get(
     '',
-    summary="Список всех мероприятий",
-    description="ИНФО: Ручка для получения списка всех мероприятий. Принимает в себя ...", # TODO: дописать
+    summary="Список всех мероприятий.",
+    description="ИНФО: Ручка для получения списка всех мероприятий.",
     responses=None # TODO: дописать
 )
 @ICache(
