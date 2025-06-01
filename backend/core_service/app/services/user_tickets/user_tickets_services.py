@@ -6,7 +6,8 @@ from ...schemas import (
     IntEventCreatorId,
     StrEventTitle,
     StrEventDescription,
-    StrEventAddress
+    StrEventAddress,
+    IntUserId
 )
 from ...models.crud import create_event, search_user, all_info_table, edit_info
 from ...security.jwt import token_verification
@@ -14,6 +15,7 @@ from ...core.exceptions import NoTokenError, TokenError
 
 if TYPE_CHECKING:
     from ...schemas import EventCreatedResult, CreateEvent, EditEvent
+    from ...models.session import BaseModel
 
 
 class ManagementEvents:
@@ -44,20 +46,20 @@ class ManagementEvents:
         if not (user_id := await token_verification(jwt_token)):
             raise NoTokenError() # выбрасываем ошибку чтобы запутать, если попытка подделать токен. фронтенд поймет.
 
-        is_user = await search_user(self.db, user_id=user_id)
+        is_user = await search_user(self.db, user_id=IntUserId(user_id))
         if is_user['id'] is None:
             raise TokenError()
 
         return await create_event(
             self.db,
             IntEventCreatorId(user_id),
-            event.status,
+            event.status.value,
             StrEventTitle(event.title),
             StrEventDescription(event.description),
             StrEventAddress(event.address)
         )
 
-    async def all_events(self, jwt_token: str) -> list[Dict[str, Any]]:
+    async def all_events(self, jwt_token: str) -> list['BaseModel']:
         """
         Метод для вывода всех мероприятий (не оптимизирован для больших данных)
 
@@ -75,7 +77,7 @@ class ManagementEvents:
 
         return await all_info_table(self.db, 'Events')
 
-    async def edit_events(self, jwt_token: str, event_id: int, event: 'EditEvent') -> list[Dict[str, Any]]:
+    async def edit_events(self, jwt_token: str, event_id: int, event: 'EditEvent') -> 'BaseModel':
         """
         Редактирование данных мероприятия.
 

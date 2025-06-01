@@ -9,6 +9,7 @@ from ..core.config import config
 from ..core.logger import logger_api
 
 if TYPE_CHECKING:
+    from .session import BaseModel
     from ..schemas import (
         UserRegistrationResult,
         EventCreatedResult,
@@ -156,7 +157,7 @@ async def search_user(db: Session, *, user_id: Optional['IntUserId'] = None, log
     }
     return result
 
-async def all_info_table(db: Session, table_name: Literal['Accounts', 'Events', 'TicketTypes', 'Tickets']) -> list[Dict[str, Any]]:
+async def all_info_table(db: Session, table_name: Literal['Accounts', 'Events', 'TicketTypes', 'Tickets']) -> list['BaseModel']:
     """
     Функция для возврата всех данных таблицы.
 
@@ -178,7 +179,7 @@ async def all_info_table(db: Session, table_name: Literal['Accounts', 'Events', 
     return result
 
 # TODO: event_id, EditEvent заменить на другое, ведь функция для всех таблиц
-async def edit_info(db: Session, table_name: Literal['Accounts', 'Events', 'TicketTypes', 'Tickets'], event_id: int, data: 'EditEvent') -> list[Dict[str, Any]]:
+async def edit_info(db: Session, table_name: Literal['Accounts', 'Events', 'TicketTypes', 'Tickets'], event_id: int, data: 'EditEvent') -> 'BaseModel':
     """
     Редактирование информации в таблицах db.
 

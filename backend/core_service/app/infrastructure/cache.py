@@ -1,4 +1,4 @@
-from typing import Any, Dict, Callable, ParamSpec, Tuple, TypeVar, Awaitable, Self, Literal, Final
+from typing import Any, Dict, Callable, ParamSpec, Tuple, TypeVar, Awaitable, Self, Literal, Final, ClassVar
 from dataclasses import dataclass
 from functools import wraps
 import hashlib
@@ -17,7 +17,7 @@ from ..schemas import IntUserId
 P = ParamSpec('P')
 R = TypeVar('R')
 
-iprefix = '[ICache]'
+IPREFIX = '[ICache]'
 
 
 def create_cache_key(name: str, data: Dict[str, Any]) -> str:
@@ -67,7 +67,7 @@ async def valid_token_and_user_in_db(func: Callable[..., Any], kwargs: Dict[str,
         db_gen = get_db()
         db = next(db_gen)
         try:
-            user_info = await search_user(db, user_id=result_search_user_id)
+            user_info = await search_user(db, user_id=IntUserId(result_search_user_id))
             if user_info['id'] is None:
                 raise TokenError()
 
@@ -115,7 +115,7 @@ class LogInfo:
         Returns:
             bool: Произошел ли вывод.
         """
-        output = f"{Colors.BLUE}{iprefix}{Colors.RESET} {Colors.CYAN}{self.name}{Colors.RESET} {text}"
+        output = f"{Colors.BLUE}{IPREFIX}{Colors.RESET} {Colors.CYAN}{self.name}{Colors.RESET} {text}"
         print(output)
         return True
 
@@ -129,23 +129,22 @@ class LogInfo:
         Returns:
             bool: Произошел ли вывод.
         """
-        output = f"{Colors.BLUE}{iprefix}{Colors.RESET} {Colors.CYAN}{self.name}{Colors.RESET} {Colors.RED}{text}{Colors.RESET}"
+        output = f"{Colors.BLUE}{IPREFIX}{Colors.RESET} {Colors.CYAN}{self.name}{Colors.RESET} {Colors.RED}{text}{Colors.RESET}"
         print(output)
         return True
 
 
 class RedisService:
     """Управление редисом"""
-    __instance: Self | None = None
+    __instance: ClassVar[Self | None] = None
     redis: Redis
 
-    def __new__(cls, *args: P.args, **kwargs: P.kwargs) -> Self:
+    def __new__(cls, *args: object, **kwargs: object) -> Self:
         if cls.__instance is None:
             cls.__instance = super().__new__(cls)
             cls.__connect_redis()
             return cls.__instance
-        else:
-           return cls.__instance 
+        return cls.__instance 
 
     @classmethod
     def __connect_redis(cls) -> Literal[True]:
@@ -158,6 +157,8 @@ class RedisService:
         Returns:
             Literal[True]: Соединение установлено.
         """
+        if cls.__instance is None:
+            raise RuntimeError("Экземпляр RedisService не был создан")
         try:
             cls.__instance.redis = Redis(
                 host=SettingsRedis.HOST,
@@ -170,7 +171,7 @@ class RedisService:
         except Exception as e:
             raise ConnectionError('Ошибка подключения к Redis')
 
-    def search_key(self, cache: str) -> Dict[str, Any] | None:
+    def search_key(self, cache: str) -> Any:
         """
         Метод для поиска кеша в Redis.
 
@@ -178,11 +179,11 @@ class RedisService:
             cache (str): Кеш-ключ.
 
         Returns:
-            Dict[str, Any] | None: Результат поиска.
+            Any: Результат поиска.
         """
         return self.redis.get(cache)
 
-    def save_key(self, cache: str, value: Dict[str, Any], time: int) -> bool:
+    def save_key(self, cache: str, value: Dict[str, Any], time: int) -> Any:
         """
         Метод для сохранения кеша в Redis.
 
@@ -192,13 +193,13 @@ class RedisService:
             time (int): Время жизни кеша. `time=0` - бесконечно.
 
         Returns:
-            bool: Результат сохранения.
+            Any: Результат сохранения.
         """
         if time:
             return self.redis.setex(cache, time, str(value))
         return self.redis.set(cache, str(value))
 
-    def delete_key(self, cache: str) -> bool:
+    def delete_key(self, cache: str) -> Any:
         """
         Метод для удаления кеша Redis.
 
@@ -206,7 +207,7 @@ class RedisService:
             cache (str): Кеш-ключ.
 
         Returns:
-            bool: Результат удаления.
+            Any: Результат удаления.
         """
         return self.redis.delete(cache)
 
@@ -247,7 +248,7 @@ class IClearCache:
             add_jwt_user_id: bool
         }
         for key, value in check_data.items():
-            if not isinstance(key, value):
+            if not isinstance(key, value): # type: ignore[arg-type]
                 text_error = f"Ошибка. {key = } должно быть {value}"
                 raise ValueError(text_error)
 
@@ -267,7 +268,7 @@ class IClearCache:
             if self.jwt_token_path is None and (self.add_jwt_token or self.add_jwt_user_id):
                 raise ValueError('Вы не указали путь к токену')
 
-            parameters = {}
+            parameters: dict[str, Any] = {}
 
             if self.jwt_token_path is not None:
                 user_id, token = await valid_token_and_user_in_db(func, kwargs, self.jwt_token_path)
@@ -287,7 +288,6 @@ class IClearCache:
             key_redis = create_cache_key(self.unique_name, parameters)
 
             try:
-                # Временная заглуша вместо Редиса
                 if self.redis.search_key(key_redis) is not None:
                     self.redis.delete_key(key_redis)
                     self.log.iprint('Кеш удален')
@@ -338,7 +338,7 @@ class ICache:
             time_ttl: int,
         }
         for key, value in check_data.items():
-            if not isinstance(key, value):
+            if not isinstance(key, value): # type: ignore[arg-type]
                 text_error = f"Ошибка. {key = } должно быть {value}"
                 raise ValueError(text_error)
 
@@ -363,7 +363,7 @@ class ICache:
             if self.jwt_token_path is None and (self.add_jwt_token or self.add_jwt_user_id):
                 raise ValueError('Вы не указали путь к токену')
 
-            parameters = {}
+            parameters: dict[str, Any] = {}
 
             if self.jwt_token_path is not None:
                 user_id, token = await valid_token_and_user_in_db(func, kwargs, self.jwt_token_path)
@@ -380,7 +380,7 @@ class ICache:
                     raise ValueError(error)
                 parameters.update(jsonable_encoder(result_search_pydantic_model))
 
-            key_redis = create_cache_key(self.unique_name, parameters)
+            key_redis: str = create_cache_key(self.unique_name, parameters)
 
             try:
                 if self.redis.search_key(key_redis) is None:
@@ -394,9 +394,10 @@ class ICache:
                 else:
                     json_str = self.redis.search_key(key_redis)
                     fixed_json = json_str.replace("'", '"')
+                    json_result: R = json.loads(fixed_json)
 
                     self.log.iprint('Кеш использован')
-                    return json.loads(fixed_json)
+                    return json_result
             except redis.ConnectionError as e:
                 self.log.ierror(f'Не удалось использовать кеш. {e}')
                 return await func(*args, **kwargs)

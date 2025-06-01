@@ -20,6 +20,7 @@ class UserRegistrationResult(TypedDict):
 class EventDetails(TypedDict):
     """-> EventCreatedResult"""
     id: Column[int]
+    status: Column[str]
     creator_id: Column[int]
     title: Column[str]
     description: Column[str]

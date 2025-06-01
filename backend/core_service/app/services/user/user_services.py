@@ -14,7 +14,8 @@ if TYPE_CHECKING:
         UserRegistrationResult, 
         CreateUser,
         LoginUser,
-        LoginUserResult
+        LoginUserResult,
+        StrUserLogin
     )
 
 
@@ -72,7 +73,7 @@ class ManagementUsers:
         if not self.db or not user.login or not user.password:
             raise ValidationError()
 
-        user_data = await search_user(self.db, login=user.login)
+        user_data = await search_user(self.db, login=StrUserLogin(user.login))
         db_user = user_data['login']
         if not db_user:
             raise LoginError()

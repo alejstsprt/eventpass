@@ -20,7 +20,7 @@ router = APIRouter()
     unique_name='event-cache',
     jwt_token_path='jwt_token'
 )
-async def create_event(
+async def create_event( # type: ignore[no-untyped-def]
         event: CreateEvent,
         service: ManagementEventsProtocol = Depends(get_event_service),
         jwt_token: str = Cookie(None)

@@ -20,7 +20,7 @@ router = APIRouter()
     unique_name='event-cache',
     jwt_token_path='jwt_token'
 )
-async def create_event(
+async def create_event( # type: ignore[no-untyped-def]
         event: CreateEvent,
         service: ManagementEventsProtocol = Depends(get_event_service),
         jwt_token: str = Cookie(None)
@@ -38,7 +38,7 @@ async def create_event(
     unique_name='event-cache',
     jwt_token_path='jwt_token'
 )
-async def edit_events(
+async def edit_events( # type: ignore[no-untyped-def]
         event: EditEvent,
         event_id: int = Path(..., title="ID мероприятия", ge=1, le=9_223_372_036_854_775_807), # иначе будет ошибка бд
         jwt_token: str = Cookie(None),
@@ -57,7 +57,7 @@ async def edit_events(
     unique_name='event-cache',
     jwt_token_path='jwt_token'
 )
-async def list_events(
+async def list_events( # type: ignore[no-untyped-def]
         service: ManagementEventsProtocol = Depends(get_event_service),
         jwt_token: str = Cookie(None)
     ):
