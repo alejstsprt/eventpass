@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 
 from .models import Accounts, Events, TicketTypes, Tickets
 from ..core.exceptions import ValidationError, LoginAlreadyExistsException, InternalServerError
-from ..core.config import GET_TABLE, status_events
+from ..core.config import config
 from ..core.logger import logger_api
 
 if TYPE_CHECKING:
@@ -104,7 +104,7 @@ async def create_event(
     #     logger_api.error(f'Неправильно переданы данные. {db = }, {creator_id = }, {status = }, {title = }, {description = }, {address = }')
     #     raise ValidationError()
 
-    if status not in status_events:
+    if status not in config.STATUS_EVENTS:
         logger_api.error(f'Неправильно передан статус. Должен быть "опубликовано"/"завершено"/"черновик", а на деле {status = }')
         raise ValidationError()
 
@@ -170,11 +170,11 @@ async def all_info_table(db: Session, table_name: Literal['Accounts', 'Events', 
     Raises:
         ValidationError: Неправильные данные.
     """
-    if table_name not in GET_TABLE:
+    if table_name not in config.GET_TABLE:
         text_error = f'Неправильно переданы данные. {db = }, {table_name = }'
         raise ValueError(text_error)
 
-    result = db.query(GET_TABLE[table_name]).all()
+    result = db.query(config.GET_TABLE[table_name]).all()
     return result
 
 # TODO: event_id, EditEvent заменить на другое, ведь функция для всех таблиц
@@ -195,15 +195,18 @@ async def edit_info(db: Session, table_name: Literal['Accounts', 'Events', 'Tick
         ValueError: Неправильноe название таблицы.
         ValidationError: Неверные данные.
     """
-    if table_name not in GET_TABLE:
+    if table_name not in config.GET_TABLE:
         text_error = f'Неправильно переданы данные. {db = }, {table_name = }'
         raise ValueError(text_error)
 
-    event = db.query(GET_TABLE[table_name]).filter_by(id=event_id).first()
+    if not data.model_dump(exclude_unset=True):
+        raise ValidationError()
+
+    event = db.query(config.GET_TABLE[table_name]).filter_by(id=event_id).first()
     if not event:
         raise ValidationError()
 
-    for field, value in data.dict(exclude_unset=True).items():
+    for field, value in data.model_dump(exclude_unset=True).items():
         setattr(event, field, value)
 
     db.commit()

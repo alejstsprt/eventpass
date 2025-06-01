@@ -40,7 +40,7 @@ async def create_event(
 )
 async def edit_events(
         event: EditEvent,
-        event_id: int = Path(..., title="ID мероприятия", ge=1),
+        event_id: int = Path(..., title="ID мероприятия", ge=1, le=9_223_372_036_854_775_807), # иначе будет ошибка бд
         jwt_token: str = Cookie(None),
         service: ManagementEventsProtocol = Depends(get_event_service),
     ):

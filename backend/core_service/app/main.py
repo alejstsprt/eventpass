@@ -24,9 +24,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(user.router, prefix='/api/auth', tags=['Ручки для взаимодействия с профилем пользователя'])
-app.include_router(user_tickets.router, prefix='/api/events', tags=['Ручки для управления мероприятиями'])
-app.include_router(ticket_types.router, prefix='/api/ticket-types', tags=['Ручки для управления типом мероприятий'])
+app.include_router(user.router, prefix='/api/v1/auth', tags=['Ручки для взаимодействия с профилем пользователя'])
+app.include_router(user_tickets.router, prefix='/api/v1/events', tags=['Ручки для управления мероприятиями'])
+app.include_router(ticket_types.router, prefix='/api/v1/ticket-types', tags=['Ручки для управления типом мероприятий'])
 
 
 # if __name__ == "__main__":
