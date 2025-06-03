@@ -6,9 +6,6 @@ from ...infrastructure.cache import ICache, IClearCache
 from ...schemas import CreateEvent, EditEvent, ManagementEventsProtocol
 from ...services import get_event_service
 
-# from fastapi_cache.decorator import cache # имеет маленький функционал. я создал свой
-
-
 router = APIRouter()
 
 
