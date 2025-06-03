@@ -4,4 +4,7 @@ if TYPE_CHECKING:
     from .. import CreateEvent, EditEvent, EventCreatedResult
 
 
-class ManagementTicketTypesProtocol(Protocol): ...
+class ManagementTicketTypeProtocol(Protocol):
+    """Протокол ManagementTicketType"""
+
+    ...

@@ -5,6 +5,8 @@ if TYPE_CHECKING:
 
 
 class ManagementEventsProtocol(Protocol):
+    """Протокол ManagementEvents"""
+
     async def create_events(
         self, jwt_token: str, event: "CreateEvent"
     ) -> "EventCreatedResult":

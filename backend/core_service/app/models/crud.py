@@ -91,7 +91,9 @@ async def create_event(
         address (StrEventAddress): Адрес мероприятия.
 
     Returns:
-        EventCreatedResult (TypedDict): `{
+        EventCreatedResult (TypedDict):
+        ```
+        {
             'result': True,
             'event': {
                 'id': id,
@@ -102,7 +104,8 @@ async def create_event(
                 'address': address,
                 'time_create': datetime
             }
-        }`
+        }
+        ```
 
     Raises:
         ValidationError (HTTPException): Неверные входные данные.
@@ -120,7 +123,7 @@ async def create_event(
 
     try:
         new_event = Events(
-            creator_id=creator_id,  # TODO: сделать проверку что такой пользователь существует, если ее нету
+            creator_id=creator_id,
             status=status,
             title=title,
             description=description,

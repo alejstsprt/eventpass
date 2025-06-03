@@ -12,10 +12,13 @@ class TypeForm(str, Enum):
     ECONOM = "Econom"
 
 
-class CreateTicketTypes(BaseModel):
-    id: Annotated[int, Field(description="Айди мероприятия", examples=[1], ge=1)]
+# [CreateTicketType]
+class CreateTicketType(BaseModel):
+    """Модель данных для создания типа мероприятия"""
 
-    type: Annotated[TypeForm, Field(description="Тип мероприятия")]
+    event_id: Annotated[int, Field(description="Айди мероприятия", examples=[1], ge=1)]
+
+    ticket_type: Annotated[TypeForm, Field(description="Тип мероприятия")]
 
     description: Annotated[
         str,
@@ -31,7 +34,7 @@ class CreateTicketTypes(BaseModel):
         int,
         Field(
             description="Цена данного типа мероприятия",
-            examples=[12000],
+            examples=[12_000],
             ge=1,
             le=1_000_000_000,
         ),

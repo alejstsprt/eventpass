@@ -57,3 +57,20 @@ async def list_events(  # type: ignore[no-untyped-def]
     jwt_token: str = Cookie(None),
 ):
     return await service.all_events(jwt_token)
+
+
+@router.delete(
+    "/{event_id}",
+    summary="Удаление мероприятия",
+    description="ИНФО: Ручка для удаления мероприятия по ID.",
+    responses=None,  # TODO: дописать
+)
+@IClearCache(unique_name="event-cache", jwt_token_path="jwt_token")
+async def edit_events(  # type: ignore[no-untyped-def]
+    event_id: int = Path(
+        ..., title="ID мероприятия", ge=1, le=9_223_372_036_854_775_807
+    ),  # иначе будет ошибка бд
+    jwt_token: str = Cookie(None),
+    service: ManagementEventsProtocol = Depends(get_event_service),
+):
+    return None  # TODO: сделать

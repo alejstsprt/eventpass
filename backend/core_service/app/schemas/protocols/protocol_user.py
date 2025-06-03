@@ -7,6 +7,8 @@ if TYPE_CHECKING:
 
 
 class ManagementUsersProtocol(Protocol):
+    """Протокол ManagementUsers"""
+
     async def create_user(
         self, response: Response, user: "CreateUser"
     ) -> "UserRegistrationResult":
