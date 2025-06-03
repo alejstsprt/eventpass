@@ -1,8 +1,8 @@
 from .dicts import EventCreatedResult, LoginUserResult, UserRegistrationResult
+from .protocols.protocol_event import ManagementEventsProtocol
 from .protocols.protocol_user import ManagementUsersProtocol
-from .protocols.protocol_user_tickets import ManagementEventsProtocol
+from .pydantics.event import CreateEvent, EditEvent
 from .pydantics.user import CreateUser, LoginUser
-from .pydantics.user_tickets import CreateEvent, EditEvent
 from .types.types_event import (
     IntEventCreatorId,
     StrEventAddress,
