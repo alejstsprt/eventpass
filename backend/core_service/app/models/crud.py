@@ -54,10 +54,6 @@ async def user_registration(
         LoginAlreadyExistsException (HTTPException): Имя/Логин уже занят.
         InternalServerError (HTTPException): Ошибка сервера.
     """
-    # if not db or not login or not password:
-    #     logger_api.error(f'Неправильно переданы данные. {db = }, {login = }, {password = }')
-    #     raise ValidationError()
-
     try:
         new_user = Accounts(
             name=name,
@@ -83,7 +79,7 @@ async def create_type_ticket_event(
     description: str,
     price: int,
     total_count: int,
-) -> ...:
+) -> ...:  # TODO: доделать
     """
     Функция для создания типа билета для мероприятия.
 
@@ -112,8 +108,9 @@ async def create_type_ticket_event(
         ```
 
     Raises:
-        ValidationError: _description_
-        InternalServerError: _description_
+        ValidationError: Неверные данные.
+        TicketTypeError: Данный тип билета для этого мероприяия уже существует.
+        InternalServerError: Ошибка сервера.
     """
     if ticket_type not in config.TYPE_TICKETS:
         logger_api.error(f"Неправильный тип мероприятия {ticket_type = }")
@@ -127,7 +124,7 @@ async def create_type_ticket_event(
 
     if existing_ticket:
         logger_api.error(
-            f"Данный тип билета для этого мероприятия уже существует {ticket_type = }"
+            f"Данный тип билета для этого мероприяия уже существует {ticket_type = }"
         )
         raise TicketTypeError()
 
@@ -199,10 +196,6 @@ async def create_event(
         ValidationError (HTTPException): Неверные входные данные.
         InternalServerError (HTTPException): Ошибка сервера.
     """
-    # if not db or not creator_id or not status or not title or not description or not address:
-    #     logger_api.error(f'Неправильно переданы данные. {db = }, {creator_id = }, {status = }, {title = }, {description = }, {address = }')
-    #     raise ValidationError()
-
     if status not in config.STATUS_EVENTS:
         logger_api.error(f"Неправильно статус мероприятия {status = }")
         raise ValidationError()

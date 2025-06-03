@@ -1,5 +1,5 @@
 import os
-from typing import Type
+from typing import Final, Type
 
 from dotenv import load_dotenv
 
@@ -19,17 +19,19 @@ class Settings:
 
     # FIXME: в event есть копия с использованием enum. потом сделаю масштабируемое + crud.py
     STATUS_EVENTS: frozenset[str] = frozenset({"опубликовано", "завершено", "черновик"})
-
     # FIXME: в ticket_types есть копия с использованием enum. потом сделаю масштабируемое + crud.py
     TYPE_TICKETS: frozenset[str] = frozenset({"Vip", "Standard", "Econom"})
 
-    # Для удобного взаимодействия c алхимией
+    # Для удобного взаимодействия c алхимией (копия в crud.py)
     GET_TABLE: dict[str, Type[BaseModel]] = {
         "Accounts": Accounts,
         "Events": Events,
         "TicketTypes": TicketTypes,
         "Tickets": Tickets,
-    }  # копия в crud.py
+    }
+
+    # Лимит айди для БД
+    MAX_ID: Final[int] = 9_223_372_036_854_775_807
 
 
 config = Settings()
