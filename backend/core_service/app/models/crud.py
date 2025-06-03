@@ -287,6 +287,14 @@ async def all_info_table(
     return result
 
 
+async def get_types_ticket_event(db: Session, event_id: int):
+    if result := (
+        db.query(TicketTypes).filter(TicketTypes.event_id == event_id).first()
+    ):
+        return result
+    raise ValidationError()
+
+
 async def edit_data(
     db: Session,
     table_name: Literal["Accounts", "Events", "TicketTypes", "Tickets"],

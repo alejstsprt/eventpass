@@ -1,7 +1,9 @@
-from typing import TYPE_CHECKING, Any, Dict, Protocol
+from typing import TYPE_CHECKING, Protocol
 
 if TYPE_CHECKING:
-    from .. import CreateEvent, CreateTicketType, EditEvent, EventCreatedResult
+    from pydantic import BaseModel
+
+    from .. import CreateTicketType, EditTicketType
 
 
 class ManagementTicketTypeProtocol(Protocol):
@@ -25,3 +27,25 @@ class ManagementTicketTypeProtocol(Protocol):
             ValidationError (HTTPException): Неверные данные.
         """
         ...
+
+    async def edit_types_ticket(
+        self, jwt_token: str, types_ticket_id: int, ticket_type_data: "EditTicketType"
+    ) -> "BaseModel":
+        """
+        Обновляет тип билета для мероприятия.
+
+        Args:
+            jwt_token (str): Токен пользователя.
+            types_ticket_id (int): ID редактируемого типа билета.
+            ticket_type_data (EditTicketType): Данные для обновления.
+
+        Returns:
+            BaseModel: Обновленный обьект типа билета.
+
+        Raises:
+            NoTokenError (HTTPException): Отсутствует/неправильный токен.
+            ValidationError (HTTPException): Неверные данные.
+        """
+        ...
+
+    async def search_types_ticket_event(self, jwt_token: str, event_id: int): ...

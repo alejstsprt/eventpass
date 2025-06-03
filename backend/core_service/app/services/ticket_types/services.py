@@ -2,8 +2,8 @@ from typing import TYPE_CHECKING, Any, Dict
 
 from sqlalchemy.orm import Session
 
-from ...core.exceptions import NoTokenError, TokenError, ValidationError
-from ...models.crud import create_type_ticket_event, edit_data
+from ...core.exceptions import NoTokenError, ValidationError
+from ...models.crud import create_type_ticket_event, edit_data, get_types_ticket_event
 from ...schemas import (
     IntEventCreatorId,
     IntUserId,
@@ -55,7 +55,7 @@ class ManagementTicketTypes:
             or not ticket_type_data.price
             or not ticket_type_data.total_count
         ):
-            return ValidationError()
+            raise ValidationError()
 
         return await create_type_ticket_event(
             self.db,
@@ -90,3 +90,9 @@ class ManagementTicketTypes:
         return await edit_data(
             self.db, "TicketTypes", types_ticket_id, ticket_type_data
         )
+
+    async def search_types_ticket_event(self, jwt_token: str, event_id: int):
+        if not await token_verification(jwt_token):
+            raise NoTokenError()
+
+        return await get_types_ticket_event(self.db, event_id)
