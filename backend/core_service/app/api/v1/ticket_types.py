@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING
 from fastapi import APIRouter, Cookie, Depends
 
 from ...infrastructure.cache import ICache, IClearCache
-from ...schemas import CreateEvent, EditEvent, ManagementEventsProtocol
-from ...services import get_event_service
+from ...schemas import ManagementTicketTypesProtocol
+from ...services import get_ticket_types_service
 
 router = APIRouter()
 
@@ -15,10 +15,10 @@ router = APIRouter()
     description="ИНФО: Ручка для создания типа мероприятия. Принимает в себя ...",  # TODO: дописать
     responses=None,  # TODO: дописать
 )
-@IClearCache(unique_name="event-cache", jwt_token_path="jwt_token")
+@IClearCache(unique_name="ticket-types-cache", jwt_token_path="jwt_token")
 async def create_event(  # type: ignore[no-untyped-def]
     event: CreateEvent,
-    service: ManagementEventsProtocol = Depends(get_event_service),
+    service: ManagementTicketTypesProtocol = Depends(get_ticket_types_service),
     jwt_token: str = Cookie(None),
 ):
     return await service.create_events(jwt_token, event)

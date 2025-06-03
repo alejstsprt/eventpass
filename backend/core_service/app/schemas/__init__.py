@@ -1,5 +1,6 @@
 from .dicts import EventCreatedResult, LoginUserResult, UserRegistrationResult
 from .protocols.protocol_event import ManagementEventsProtocol
+from .protocols.protocol_ticket_types import ManagementTicketTypesProtocol
 from .protocols.protocol_user import ManagementUsersProtocol
 from .pydantics.event import CreateEvent, EditEvent
 from .pydantics.user import CreateUser, LoginUser
@@ -29,4 +30,5 @@ __all__ = [
     "StrEventTitle",
     "ManagementEventsProtocol",
     "ManagementUsersProtocol",
+    "ManagementTicketTypesProtocol",
 ]

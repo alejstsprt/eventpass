@@ -1,9 +1,13 @@
-from .event.get_event_service import get_event_service
+from .event.get_service import get_event_service
 from .event.responses import CREATE_EVENT_RESPONSES
-from .event.user_tickets_services import ManagementEvents
-from .user.get_user_service import get_user_service
+from .event.services import ManagementEvents
+from .ticket_types.get_service import get_ticket_types_service
+
+# from .ticket_types.responses import
+from .ticket_types.services import ManagementTicketTypes
+from .user.get_service import get_user_service
 from .user.responses import CREATE_USER_RESPONSES, LOGIN_USER_RESPONSES
-from .user.user_services import ManagementUsers
+from .user.services import ManagementUsers
 
 __all__ = [
     "get_user_service",
@@ -13,4 +17,6 @@ __all__ = [
     "get_event_service",
     "CREATE_EVENT_RESPONSES",
     "ManagementEvents",
+    "get_ticket_types_service",
+    "ManagementTicketTypes",
 ]

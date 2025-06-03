@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from fastapi import Depends
 
 from ...models.session import get_db
-from .user_services import ManagementUsers
+from .services import ManagementUsers
 
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
