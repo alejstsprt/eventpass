@@ -4,7 +4,7 @@ from fastapi import APIRouter, Cookie, Depends, Path, status
 
 from ...core.config import config
 from ...infrastructure.cache import ICache, IClearCache
-from ...schemas import CreateTicketType, ManagementTicketTypeProtocol
+from ...schemas import CreateTicketType, EditTicketType, ManagementTicketTypeProtocol
 from ...services import get_ticket_types_service
 
 router = APIRouter()
@@ -35,11 +35,11 @@ async def create_types_ticket(  # type: ignore[no-untyped-def]
 )
 @IClearCache(unique_name="ticket-types-cache", jwt_token_path="jwt_token")
 async def edit_types_ticket(  # type: ignore[no-untyped-def]
-    # ticket_type_data: CreateTicketType,
+    ticket_type_data: EditTicketType,
     types_ticket_id: int = Path(
         ..., title="ID типа билета мероприятия", ge=1, le=config.MAX_ID
     ),
     service: ManagementTicketTypeProtocol = Depends(get_ticket_types_service),
     jwt_token: str = Cookie(None),
 ):
-    return types_ticket_id
+    return await service.edit_types_ticket(jwt_token, types_ticket_id, ticket_type_data)

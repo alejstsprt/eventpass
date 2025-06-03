@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any, Dict
 from sqlalchemy.orm import Session
 
 from ...core.exceptions import NoTokenError, TokenError, ValidationError
-from ...models.crud import create_type_ticket_event
+from ...models.crud import create_type_ticket_event, edit_data
 from ...schemas import (
     IntEventCreatorId,
     IntUserId,
@@ -15,7 +15,7 @@ from ...security.jwt import token_verification
 
 if TYPE_CHECKING:
     from ...models.session import BaseModel
-    from ...schemas import CreateEvent, CreateTicketType, EditEvent, EventCreatedResult
+    from ...schemas import CreateTicketType, EditTicketType
 
 
 class ManagementTicketTypes:
@@ -34,14 +34,16 @@ class ManagementTicketTypes:
 
         Args:
             jwt_token (str): Токен пользователя.
-            ticket_type_data (CreateTicketType): Пайдемик модель.
+            ticket_type_data (CreateTicketType): Данные для обновления.
 
         Returns:
             CreateTicketType: None
 
         Raises:
-            NoTokenError (Exception): Токен отстуствует/неправильный.
+            NoTokenError (Exception): Отсутствует/неправильный токен.
             ValidationError (HTTPException): Неверные данные.
+            TicketTypeError (HTTPException): Данный тип билета для этого мероприяия уже существует.
+            InternalServerError (HTTPException): Ошибка сервера.
         """
         if not await token_verification(jwt_token):
             raise NoTokenError()
@@ -62,4 +64,29 @@ class ManagementTicketTypes:
             ticket_type_data.description,
             ticket_type_data.price,
             ticket_type_data.total_count,
+        )
+
+    async def edit_types_ticket(
+        self, jwt_token: str, types_ticket_id: int, ticket_type_data: "EditTicketType"
+    ) -> "BaseModel":
+        """
+        Обновляет тип билета для мероприятия.
+
+        Args:
+            jwt_token (str): Токен пользователя.
+            types_ticket_id (int): ID редактируемого типа билета.
+            ticket_type_data (EditTicketType): Данные для обновления.
+
+        Returns:
+            BaseModel: Обновленный обьект типа билета.
+
+        Raises:
+            NoTokenError (HTTPException): Отсутствует/неправильный токен.
+            ValidationError (HTTPException): Неверные данные.
+        """
+        if not await token_verification(jwt_token):
+            raise NoTokenError()
+
+        return await edit_data(
+            self.db, "TicketTypes", types_ticket_id, ticket_type_data
         )

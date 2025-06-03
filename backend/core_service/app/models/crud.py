@@ -2,7 +2,7 @@
 Костыльный модуль взаимодействия с бд без класса. позже нужно сделать как класс и сократить количество функций
 """
 
-from typing import TYPE_CHECKING, Any, Dict, Literal, Optional
+from typing import TYPE_CHECKING, Any, Dict, Literal, Optional, TypeVar
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -16,6 +16,7 @@ from ..core.exceptions import (
 )
 from ..core.logger import logger_api
 from .models import Accounts, Events, Tickets, TicketTypes
+from .session import BaseModel
 
 if TYPE_CHECKING:
     from ..schemas import (
@@ -31,7 +32,8 @@ if TYPE_CHECKING:
         StrUserPassword,
         UserRegistrationResult,
     )
-    from .session import BaseModel
+
+T = TypeVar("T", bound=BaseModel)
 
 
 async def user_registration(
@@ -275,7 +277,7 @@ async def all_info_table(
         (list[str, Any]): Все данные таблицы.
 
     Raises:
-        ValidationError: Неправильные данные.
+        ValidationError (HTTPException): Неправильные данные.
     """
     if table_name not in config.GET_TABLE:
         text_error = f"Неправильно переданы данные. {db = }, {table_name = }"
@@ -285,13 +287,12 @@ async def all_info_table(
     return result
 
 
-# TODO: event_id, EditEvent заменить на другое, ведь функция для всех таблиц
-async def edit_info(
+async def edit_data(
     db: Session,
     table_name: Literal["Accounts", "Events", "TicketTypes", "Tickets"],
-    event_id: int,
-    data: "EditEvent",
-) -> "BaseModel":
+    id: int,
+    data: T,
+) -> T:
     """
     Редактирование информации в таблицах db.
 
@@ -299,29 +300,30 @@ async def edit_info(
         db (Session): Сессия SQLAlchemy для работы с БД.
         table_name (Literal['Accounts', 'Events', 'TicketTypes', 'Tickets']): Название таблицы.
         id (int): Айди мероприятия.
-        data (EditEvent): Данные которые нужно изменить.
+        data (T): Данные которые нужно изменить.
 
     Returns:
-        (list[Dict[str, Any]]): Вся информация об измененном обьекте.
+        T (BaseModel): Вся информация об измененном обьекте.
 
     Raises:
-        ValueError: Неправильноe название таблицы.
-        ValidationError: Неверные данные.
+        ValueError (Exception): Неправильноe название таблицы.
+        ValidationError (HTTPException): Неверные данные.
     """
     if table_name not in config.GET_TABLE:
         text_error = f"Неправильно переданы данные. {db = }, {table_name = }"
         raise ValueError(text_error)
 
-    if not data.model_dump(exclude_unset=True):
+    update_data = data.model_dump(exclude_unset=True)
+    if not update_data:
         raise ValidationError()
 
-    event = db.query(config.GET_TABLE[table_name]).filter_by(id=event_id).first()
-    if not event:
+    obj = db.query(config.GET_TABLE[table_name]).filter_by(id=id).first()
+    if not obj:
         raise ValidationError()
 
-    for field, value in data.model_dump(exclude_unset=True).items():
-        setattr(event, field, value)
+    for field, value in update_data.items():
+        setattr(obj, field, value)
 
     db.commit()
-    db.refresh(event)
-    return event
+    db.refresh(obj)
+    return obj

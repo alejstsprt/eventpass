@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any, Dict
 from sqlalchemy.orm import Session
 
 from ...core.exceptions import NoTokenError, TokenError
-from ...models.crud import all_info_table, create_event, edit_info, search_user
+from ...models.crud import all_info_table, create_event, edit_data, search_user
 from ...schemas import (
     IntEventCreatorId,
     IntUserId,
@@ -99,4 +99,4 @@ class ManagementEvents:
         if not await token_verification(jwt_token):
             raise NoTokenError()  # выбрасываем ошибку чтобы запутать, если попытка подделать токен. фронтенд поймет.
 
-        return await edit_info(self.db, "Events", event_id, event)
+        return await edit_data(self.db, "Events", event_id, event)

@@ -49,3 +49,40 @@ class CreateTicketType(BaseModel):
             le=1_000_000_000,
         ),
     ]
+
+
+# [EditTicketType]
+class EditTicketType(BaseModel):
+    """Модель данных для создания типа мероприятия"""
+
+    ticket_type: Annotated[TypeForm | None, Field(description="Тип мероприятия")] = None
+
+    description: Annotated[
+        str | None,
+        Field(
+            description="Описание типа билета мероприятия",
+            examples=["Это vip билет. Лучшие места."],
+            min_length=10,
+            max_length=10_000,
+        ),
+    ] = None
+
+    price: Annotated[
+        int | None,
+        Field(
+            description="Цена данного типа мероприятия",
+            examples=[12_000],
+            ge=1,
+            le=1_000_000_000,
+        ),
+    ] = None
+
+    total_count: Annotated[
+        int | None,
+        Field(
+            description="Максимальное количество билетов на данный тип",
+            examples=[100],
+            ge=1,
+            le=1_000_000_000,
+        ),
+    ] = None
