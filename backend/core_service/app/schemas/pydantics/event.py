@@ -34,7 +34,7 @@ class CreateEvent(BaseModel):
             description="Описание мероприятия",
             examples=["Ежегодная конференция для разработчиков"],
             min_length=10,
-            max_length=2000,
+            max_length=10_000,
         ),
     ]
 
@@ -71,7 +71,7 @@ class EditEvent(BaseModel):
             description="Описание мероприятия",
             examples=["Ежегодная конференция для разработчиков"],
             min_length=10,
-            max_length=2000,
+            max_length=10_000,
         ),
     ] = None
 

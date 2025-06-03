@@ -21,4 +21,4 @@ async def create_event(  # type: ignore[no-untyped-def]
     service: ManagementTicketTypesProtocol = Depends(get_ticket_types_service),
     jwt_token: str = Cookie(None),
 ):
-    return await service.create_events(jwt_token, event)
+    return None
