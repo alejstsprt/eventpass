@@ -2,7 +2,7 @@
 Костыльный модуль взаимодействия с бд без класса. позже нужно сделать как класс и сократить количество функций
 """
 
-from typing import TYPE_CHECKING, Any, Dict, Literal, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, Dict, Literal, Optional, TypeVar, Union
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -16,7 +16,7 @@ from ..core.exceptions import (
 )
 from ..core.logger import logger_api
 from .models import Accounts, Events, Tickets, TicketTypes
-from .session import BaseModel
+from .session import BaseModel as DBBaseModel
 
 if TYPE_CHECKING:
     from ..schemas import (
@@ -33,7 +33,7 @@ if TYPE_CHECKING:
         UserRegistrationResult,
     )
 
-T = TypeVar("T", bound=BaseModel)
+T = TypeVar("T", bound=DBBaseModel)
 
 
 async def user_registration(
@@ -265,7 +265,7 @@ async def search_user(
 
 async def all_info_table(
     db: Session, table_name: Literal["Accounts", "Events", "TicketTypes", "Tickets"]
-) -> list["BaseModel"]:
+) -> list["DBBaseModel"]:
     """
     Функция для возврата всех данных таблицы.
 
@@ -287,12 +287,18 @@ async def all_info_table(
     return result
 
 
-async def get_types_ticket_event(db: Session, event_id: int):
-    if result := (
-        db.query(TicketTypes).filter(TicketTypes.event_id == event_id).first()
-    ):
-        return result
-    raise ValidationError()
+async def get_types_ticket_event(db: Session, event_id: int) -> list["DBBaseModel"]:
+    """
+    Возвращает типы билета мероприятия.
+
+    Args:
+        db (Session): Сессия SQLAlchemy для работы с БД.
+        event_id (int): ID мероприятия.
+
+    Returns:
+        list[DBBaseModel]: Результат поиска.
+    """
+    return db.query(TicketTypes).filter(TicketTypes.event_id == event_id).all()
 
 
 async def edit_data(

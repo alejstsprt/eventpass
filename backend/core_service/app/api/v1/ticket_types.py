@@ -52,7 +52,7 @@ async def edit_types_ticket(  # type: ignore[no-untyped-def]
     status_code=status.HTTP_200_OK,
     responses=None,  # TODO: дописать
 )
-# @ICache(unique_name="ticket-types-cache", jwt_token_path="jwt_token")
+# @ICache(unique_name="ticket-types-cache", jwt_token_path="jwt_token") # TODO: сделать перехват и других входных данных
 async def get_types_ticket_event(  # type: ignore[no-untyped-def]
     event_id: int = Path(..., title="ID мероприятия", ge=1, le=config.MAX_ID),
     service: ManagementTicketTypeProtocol = Depends(get_ticket_types_service),

@@ -14,7 +14,7 @@ from ...schemas import (
 from ...security.jwt import token_verification
 
 if TYPE_CHECKING:
-    from ...models.session import BaseModel
+    from ...models.session import BaseModel as DBBaseModel
     from ...schemas import CreateTicketType, EditTicketType
 
 
@@ -68,7 +68,7 @@ class ManagementTicketTypes:
 
     async def edit_types_ticket(
         self, jwt_token: str, types_ticket_id: int, ticket_type_data: "EditTicketType"
-    ) -> "BaseModel":
+    ) -> "DBBaseModel":
         """
         Обновляет тип билета для мероприятия.
 
@@ -78,7 +78,7 @@ class ManagementTicketTypes:
             ticket_type_data (EditTicketType): Данные для обновления.
 
         Returns:
-            BaseModel: Обновленный обьект типа билета.
+            DBBaseModel: Обновленный обьект типа билета.
 
         Raises:
             NoTokenError (HTTPException): Отсутствует/неправильный токен.
@@ -91,7 +91,22 @@ class ManagementTicketTypes:
             self.db, "TicketTypes", types_ticket_id, ticket_type_data
         )
 
-    async def search_types_ticket_event(self, jwt_token: str, event_id: int):
+    async def search_types_ticket_event(
+        self, jwt_token: str, event_id: int
+    ) -> "DBBaseModel":
+        """
+        Метод который возвращает все типы билета мероприятия.
+
+        Args:
+            jwt_token (str): Токен пользователя.
+            event_id (int): ID мероприятия.
+
+        Returns:
+            DBBaseModel: Результат поиска.
+
+        Raises:
+            NoTokenError (HTTPException): Отсутствует/неправильный токен.
+        """
         if not await token_verification(jwt_token):
             raise NoTokenError()
 

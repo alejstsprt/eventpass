@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Protocol
 if TYPE_CHECKING:
     from pydantic import BaseModel
 
+    from ...models.session import BaseModel as DBBaseModel
     from .. import CreateTicketType, EditTicketType
 
 
@@ -48,4 +49,20 @@ class ManagementTicketTypeProtocol(Protocol):
         """
         ...
 
-    async def search_types_ticket_event(self, jwt_token: str, event_id: int): ...
+    async def search_types_ticket_event(
+        self, jwt_token: str, event_id: int
+    ) -> "DBBaseModel":
+        """
+        Метод который возвращает все типы билета мероприятия.
+
+        Args:
+            jwt_token (str): Токен пользователя.
+            event_id (int): ID мероприятия.
+
+        Returns:
+            DBBaseModel: Результат поиска.
+
+        Raises:
+            NoTokenError (HTTPException): Отсутствует/неправильный токен.
+        """
+        ...
