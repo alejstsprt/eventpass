@@ -3,6 +3,7 @@ from .protocols.protocol_event import ManagementEventsProtocol
 from .protocols.protocol_ticket_types import ManagementTicketTypesProtocol
 from .protocols.protocol_user import ManagementUsersProtocol
 from .pydantics.event import CreateEvent, EditEvent
+from .pydantics.ticket_types import CreateTicketTypes
 from .pydantics.user import CreateUser, LoginUser
 from .types.types_event import (
     IntEventCreatorId,
@@ -31,4 +32,5 @@ __all__ = [
     "ManagementEventsProtocol",
     "ManagementUsersProtocol",
     "ManagementTicketTypesProtocol",
+    "CreateTicketTypes",
 ]

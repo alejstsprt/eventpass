@@ -120,7 +120,7 @@ async def create_event(
 
     try:
         new_event = Events(
-            creator_id=creator_id,
+            creator_id=creator_id,  # TODO: сделать проверку что такой пользователь существует, если ее нету
             status=status,
             title=title,
             description=description,
