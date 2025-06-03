@@ -55,9 +55,9 @@ class TicketTypes(BaseModel):
         Integer, ForeignKey("events.id"), nullable=False
     )  # Айди мероприятия, к которму относится билет (event.id)
     type = Column(String, nullable=False)  # Тип билета (Vip, Standard, Econom)
+    description = Column(String)  # Описание билета
     price = Column(Integer, nullable=False)  # Цена билета
     total_count = Column(Integer, nullable=False)  # Сколько всего таких билетов будет
-    description = Column(String)  # Описание билета
 
     event = relationship("Events", back_populates="ticket_types")
 

@@ -17,8 +17,11 @@ class Settings:
         os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 10080)
     )
 
-    # FIXME: в user_tickets есть копия с использованием enum. потом сделаю масштабируемое + crud.py
+    # FIXME: в event есть копия с использованием enum. потом сделаю масштабируемое + crud.py
     STATUS_EVENTS: frozenset[str] = frozenset({"опубликовано", "завершено", "черновик"})
+
+    # FIXME: в ticket_types есть копия с использованием enum. потом сделаю масштабируемое + crud.py
+    TYPE_TICKETS: frozenset[str] = frozenset({"Vip", "Standard", "Econom"})
 
     # Для удобного взаимодействия c алхимией
     GET_TABLE: dict[str, Type[BaseModel]] = {

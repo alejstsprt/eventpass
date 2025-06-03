@@ -23,7 +23,7 @@ class CreateTicketType(BaseModel):
     description: Annotated[
         str,
         Field(
-            description="Описание типа мероприятия",
+            description="Описание типа билета мероприятия",
             examples=["Это vip билет. Лучшие места."],
             min_length=10,
             max_length=10_000,

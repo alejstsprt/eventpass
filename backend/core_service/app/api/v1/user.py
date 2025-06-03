@@ -17,7 +17,7 @@ router = APIRouter()
 
 @router.post(
     "/register",
-    summary="Создание аккаунта.",
+    summary="Создание аккаунта",
     description="ИНФО: Ручка для создания аккаунта. Принимает в себя name, login, password.",
     responses=CREATE_USER_RESPONSES,
 )

@@ -66,31 +66,37 @@ class ValidationError(HTTPException):
 
 
 class LoginError(ValidationError):
-    """[NotAll] Ошибка Неверный логин"""
+    """[ValidationError] Ошибка Неверный логин"""
 
     def __init__(self) -> None:
         super().__init__(detail="Неверный логин")
 
 
 class PasswordError(ValidationError):
-    """[NotAll] Ошибка Неверный пароль"""
+    """[ValidationError] Ошибка Неверный пароль"""
 
     def __init__(self) -> None:
         super().__init__(detail="Неверный пароль")
 
 
 class TokenError(ValidationError):
-    """[NotAll] Ошибка Неверный токен"""
+    """[ValidationError] Ошибка Неверный токен"""
 
     def __init__(self) -> None:
         super().__init__(detail="Неверный токен")
 
 
 class NoTokenError(ValidationError):
-    """[NotAll] Ошибка Токен отсутствует"""
+    """[ValidationError] Ошибка Токен отсутствует"""
 
     def __init__(self) -> None:
         super().__init__(detail="Токен отсутствует")
 
 
-# HTTP_401_UNAUTHORIZED
+class TicketTypeError(ValidationError):
+    """[ValidationError] Ошибка Тип билета уже существует"""
+
+    def __init__(self) -> None:
+        super().__init__(
+            detail="Данный тип билета для этого мероприятия уже существует"
+        )

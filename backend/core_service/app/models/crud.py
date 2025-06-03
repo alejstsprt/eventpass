@@ -1,3 +1,7 @@
+"""
+Костыльный модуль взаимодействия с бд без класса. позже нужно сделать как класс и сократить количество функций
+"""
+
 from typing import TYPE_CHECKING, Any, Dict, Literal, Optional
 
 from sqlalchemy.exc import IntegrityError
@@ -7,6 +11,7 @@ from ..core.config import config
 from ..core.exceptions import (
     InternalServerError,
     LoginAlreadyExistsException,
+    TicketTypeError,
     ValidationError,
 )
 from ..core.logger import logger_api
@@ -71,6 +76,89 @@ async def user_registration(
         raise InternalServerError()
 
 
+async def create_type_ticket_event(
+    db: Session,
+    event_id: int,
+    ticket_type: Literal["Vip", "Standard", "Econom"],
+    description: str,
+    price: int,
+    total_count: int,
+) -> ...:
+    """
+    Функция для создания типа билета для мероприятия.
+
+    Args:
+        db (Session): Сессия SQLAlchemy для работы с БД.
+        event_id (int): ID мероприятия для которого создаем тип билета.
+        ticket_type (Literal["Vip", "Standard", "Econom"]): Тип билета.
+        description (str): Описание типа билета мероприятия.
+        price (int): Цена данного типа билета мероприятия.
+        total_count (int): Стоимость данного типа белета мероприятия.
+
+    Returns:
+        ... (TypedDict):
+        ```
+        {
+        "result": True,
+            "event": {
+                "id": new_type_ticket_event.id,
+                "event_id": new_type_ticket_event.event_id,
+                "ticket_type": new_type_ticket_event.type,
+                "description": new_type_ticket_event.description,
+                "price": new_type_ticket_event.price,
+                "total_count": new_type_ticket_event.total_count
+            },
+        }
+        ```
+
+    Raises:
+        ValidationError: _description_
+        InternalServerError: _description_
+    """
+    if ticket_type not in config.TYPE_TICKETS:
+        logger_api.error(f"Неправильный тип мероприятия {ticket_type = }")
+        raise ValidationError()
+
+    existing_ticket = (
+        db.query(TicketTypes)
+        .filter(TicketTypes.event_id == event_id, TicketTypes.type == ticket_type)
+        .first()
+    )
+
+    if existing_ticket:
+        logger_api.error(
+            f"Данный тип билета для этого мероприятия уже существует {ticket_type = }"
+        )
+        raise TicketTypeError()
+
+    try:
+        new_type_ticket_event = TicketTypes(
+            event_id=event_id,
+            type=ticket_type,
+            description=description,
+            price=price,
+            total_count=total_count,
+        )
+        db.add(new_type_ticket_event)
+        db.commit()
+        db.refresh(new_type_ticket_event)
+
+        return {
+            "result": True,
+            "event": {
+                "id": new_type_ticket_event.id,
+                "event_id": new_type_ticket_event.event_id,
+                "ticket_type": new_type_ticket_event.type,
+                "description": new_type_ticket_event.description,
+                "price": new_type_ticket_event.price,
+                "total_count": new_type_ticket_event.total_count,
+            },
+        }
+    except Exception as e:
+        logger_api.exception(f"Внутренняя ошибка сервера. Проблемы с сейвом БД: {e}")
+        raise InternalServerError()
+
+
 async def create_event(
     db: Session,
     creator_id: "IntEventCreatorId",
@@ -116,9 +204,7 @@ async def create_event(
     #     raise ValidationError()
 
     if status not in config.STATUS_EVENTS:
-        logger_api.error(
-            f'Неправильно передан статус. Должен быть "опубликовано"/"завершено"/"черновик", а на деле {status = }'
-        )
+        logger_api.error(f"Неправильно статус мероприятия {status = }")
         raise ValidationError()
 
     try:

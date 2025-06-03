@@ -14,7 +14,7 @@ router = APIRouter()
 
 @router.post(
     "",
-    summary="Создание мероприятия.",
+    summary="Создание мероприятия",
     description="ИНФО: Ручка для создания мероприятия. Принимает в себя status, title, description, address.",
     responses=CREATE_EVENT_RESPONSES,
 )
@@ -29,7 +29,7 @@ async def create_event(  # type: ignore[no-untyped-def]
 
 @router.patch(
     "/{event_id}",
-    summary="Изменение мероприятия.",
+    summary="Изменение мероприятия",
     description="ИНФО: Ручка для изменения мероприятия. Принимает в себя status | None, title | None, description | None, address | None.",
     responses=None,  # TODO: дописать
 )
@@ -47,7 +47,7 @@ async def edit_events(  # type: ignore[no-untyped-def]
 
 @router.get(
     "",
-    summary="Список всех мероприятий.",
+    summary="Список всех мероприятий",
     description="ИНФО: Ручка для получения списка всех мероприятий.",
     responses=None,  # TODO: дописать
 )

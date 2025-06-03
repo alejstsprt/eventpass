@@ -11,8 +11,8 @@ router = APIRouter()
 
 @router.post(
     "",
-    summary="Создание типа мероприятия",
-    description="ИНФО: Ручка для создания типа мероприятия. Принимает в себя event_id, ticket_type, description, price, total_count.",
+    summary="Создание типа билета для мероприятия",
+    description="ИНФО: Ручка для создания типа билета для мероприятия. Принимает в себя event_id, ticket_type, description, price, total_count.",
     responses=None,  # TODO: дописать
 )
 @IClearCache(unique_name="ticket-types-cache", jwt_token_path="jwt_token")
