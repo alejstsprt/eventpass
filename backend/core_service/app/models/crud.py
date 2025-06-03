@@ -19,6 +19,8 @@ from .models import Accounts, Events, Tickets, TicketTypes
 from .session import BaseModel as DBBaseModel
 
 if TYPE_CHECKING:
+    from pydantic import BaseModel
+
     from ..schemas import (
         EditEvent,
         EventCreatedResult,
@@ -287,7 +289,7 @@ async def all_info_table(
     return result
 
 
-async def get_types_ticket_event(db: Session, event_id: int) -> list["DBBaseModel"]:
+async def get_types_ticket_event(db: Session, event_id: int) -> list["TicketTypes"]:
     """
     Возвращает типы билета мероприятия.
 
@@ -305,8 +307,8 @@ async def edit_data(
     db: Session,
     table_name: Literal["Accounts", "Events", "TicketTypes", "Tickets"],
     id: int,
-    data: T,
-) -> T:
+    data: "BaseModel",
+) -> "DBBaseModel":
     """
     Редактирование информации в таблицах db.
 

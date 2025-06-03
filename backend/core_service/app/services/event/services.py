@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, Dict
+from typing import TYPE_CHECKING
 
 from sqlalchemy.orm import Session
 
@@ -14,7 +14,7 @@ from ...schemas import (
 from ...security.jwt import token_verification
 
 if TYPE_CHECKING:
-    from ...models.session import BaseModel
+    from ...models.session import BaseModel as DBBaseModel
     from ...schemas import CreateEvent, EditEvent, EventCreatedResult
 
 
@@ -61,7 +61,7 @@ class ManagementEvents:
             StrEventAddress(event.address),
         )
 
-    async def all_events(self, jwt_token: str) -> list["BaseModel"]:
+    async def all_events(self, jwt_token: str) -> list["DBBaseModel"]:
         """
         Метод для вывода всех мероприятий (не оптимизирован для больших данных)
 
@@ -81,7 +81,7 @@ class ManagementEvents:
 
     async def edit_events(
         self, jwt_token: str, event_id: int, event: "EditEvent"
-    ) -> "BaseModel":
+    ) -> "DBBaseModel":
         """
         Редактирование данных мероприятия.
 

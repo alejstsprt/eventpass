@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, Dict
+from typing import TYPE_CHECKING
 
 from sqlalchemy.orm import Session
 
@@ -14,6 +14,7 @@ from ...schemas import (
 from ...security.jwt import token_verification
 
 if TYPE_CHECKING:
+    from ...models.models import TicketTypes
     from ...models.session import BaseModel as DBBaseModel
     from ...schemas import CreateTicketType, EditTicketType
 
@@ -60,7 +61,7 @@ class ManagementTicketTypes:
         return await create_type_ticket_event(
             self.db,
             ticket_type_data.event_id,
-            ticket_type_data.ticket_type,
+            ticket_type_data.ticket_type.value,
             ticket_type_data.description,
             ticket_type_data.price,
             ticket_type_data.total_count,
@@ -93,7 +94,7 @@ class ManagementTicketTypes:
 
     async def search_types_ticket_event(
         self, jwt_token: str, event_id: int
-    ) -> "DBBaseModel":
+    ) -> list["TicketTypes"]:
         """
         Метод который возвращает все типы билета мероприятия.
 
