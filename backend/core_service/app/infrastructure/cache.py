@@ -11,6 +11,7 @@ from typing import (
     Final,
     Literal,
     ParamSpec,
+    Protocol,
     Self,
     Tuple,
     TypeVar,
@@ -72,7 +73,7 @@ async def valid_token_and_user_in_db(
             raise NoTokenError()
     except KeyError:
         error = f"Неверный путь к токену ({jwt_token_path} not in {func.__name__})"
-        raise ValueError(error)
+        raise ValueError(error) from None
 
     if (result_search_user_id := await token_verification(result_search_token)) is None:
         raise TokenError()
@@ -117,6 +118,17 @@ class SettingsRedis:
     )
 
 
+class LoggerProtocol(Protocol):
+    def iprint(self, text: str) -> Literal[True]:
+        """
+        Вывод логов в консоль.
+
+        Args:
+            text (str): Текст для вывода.
+        """
+        ...
+
+
 class LogInfo:
     """Красивый вывод логов в консоль"""
 
@@ -158,10 +170,15 @@ class RedisService:
     __instance: ClassVar[Self | None] = None
     redis: Redis
 
-    def __new__(cls, *args: object, **kwargs: object) -> Self:
+    def __new__(cls, logger: LoggerProtocol, *args: object, **kwargs: object) -> Self:
+        if not hasattr(logger, "iprint") or not callable(logger.iprint):
+            raise AttributeError('Логгер не имеет метода "iprint(text: str)') from None
+
         if cls.__instance is None:
             cls.__instance = super().__new__(cls)
+            logger.iprint("Подключение к Redis...")
             cls.__connect_redis()
+            logger.iprint("Подключено")
             return cls.__instance
         return cls.__instance
 
@@ -177,7 +194,7 @@ class RedisService:
             Literal[True]: Соединение установлено.
         """
         if cls.__instance is None:
-            raise RuntimeError("Экземпляр RedisService не был создан")
+            raise RuntimeError("Экземпляр RedisService не был создан") from None
         try:
             cls.__instance.redis = Redis(
                 host=SettingsRedis.HOST,
@@ -188,7 +205,7 @@ class RedisService:
             cls.__instance.redis.ping()
             return True
         except Exception as e:
-            raise ConnectionError("Ошибка подключения к Redis")
+            raise ConnectionError("Ошибка подключения к Redis") from None
 
     def search_key(self, cache: str) -> Any:
         """
@@ -270,7 +287,7 @@ class IClearCache:
         for key, value in check_data.items():
             if not isinstance(key, value):  # type: ignore[arg-type]
                 text_error = f"Ошибка. {key = } должно быть {value}"
-                raise ValueError(text_error)
+                raise ValueError(text_error) from None
 
         self.unique_name = unique_name
         self.jwt_token_path = jwt_token_path
@@ -280,7 +297,7 @@ class IClearCache:
 
         # устанавливаем сессию логера и редис
         self.log = self.loger_name(unique_name)
-        self.redis = self.redis_name()
+        self.redis = self.redis_name(self.log)
 
     def __call__(self, func: Callable[P, Awaitable[R]]) -> Callable[P, Awaitable[R]]:
         @wraps(func)
@@ -288,7 +305,7 @@ class IClearCache:
             if self.jwt_token_path is None and (
                 self.add_jwt_token or self.add_jwt_user_id
             ):
-                raise ValueError("Вы не указали путь к токену")
+                raise ValueError("Вы не указали путь к токену") from None
 
             parameters: dict[str, Any] = {}
 
@@ -308,7 +325,7 @@ class IClearCache:
                     result_search_pydantic_model := kwargs.get(self.add_pydantic_model)
                 ) is None:
                     error = f"Неверный путь к pydantic модели ({self.add_pydantic_model} not in {func.__name__})"
-                    raise ValueError(error)
+                    raise ValueError(error) from None
                 parameters.update(jsonable_encoder(result_search_pydantic_model))
 
             key_redis = create_cache_key(self.unique_name, parameters)
@@ -367,7 +384,7 @@ class ICache:
         for key, value in check_data.items():
             if not isinstance(key, value):  # type: ignore[arg-type]
                 text_error = f"Ошибка. {key = } должно быть {value}"
-                raise ValueError(text_error)
+                raise ValueError(text_error) from None
 
         self.unique_name = unique_name
         self.jwt_token_path = jwt_token_path
@@ -384,7 +401,7 @@ class ICache:
 
         # устанавливаем сессию логера и редис
         self.log = self.loger_name(unique_name)
-        self.redis = self.redis_name()
+        self.redis = self.redis_name(self.log)
 
     def __call__(self, func: Callable[P, Awaitable[R]]) -> Callable[P, Awaitable[R]]:
         @wraps(func)
@@ -392,7 +409,7 @@ class ICache:
             if self.jwt_token_path is None and (
                 self.add_jwt_token or self.add_jwt_user_id
             ):
-                raise ValueError("Вы не указали путь к токену")
+                raise ValueError("Вы не указали путь к токену") from None
 
             parameters: dict[str, Any] = {}
 
@@ -412,7 +429,7 @@ class ICache:
                     result_search_pydantic_model := kwargs.get(self.add_pydantic_model)
                 ) is None:
                     error = f"Неверный путь к pydantic модели ({self.add_pydantic_model} not in {func.__name__})"
-                    raise ValueError(error)
+                    raise ValueError(error) from None
                 parameters.update(jsonable_encoder(result_search_pydantic_model))
 
             key_redis: str = create_cache_key(self.unique_name, parameters)
