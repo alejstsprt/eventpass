@@ -53,9 +53,7 @@ class CreateTicketType(BaseModel):
 
 # [EditTicketType]
 class EditTicketType(BaseModel):
-    """Модель данных для создания типа мероприятия"""
-
-    ticket_type: Annotated[TypeForm | None, Field(description="Тип мероприятия")] = None
+    """Модель данных для редактирования типа билета мероприятия"""
 
     description: Annotated[
         str | None,
