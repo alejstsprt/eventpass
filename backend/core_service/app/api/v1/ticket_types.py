@@ -69,11 +69,11 @@ async def edit_types_ticket(  # type: ignore[no-untyped-def]
     responses=None,  # TODO: дописать
 )
 @IClearCache(unique_name="ticket-types-cache", jwt_token_path="jwt_token")
-async def edit_types_ticket(  # type: ignore[no-untyped-def]
+async def delete_types_ticket(
     types_ticket_id: int = Path(
         ..., title="ID типа билета мероприятия", ge=1, le=config.MAX_ID
     ),
     service: ManagementTicketTypeProtocol = Depends(get_ticket_types_service),
     jwt_token: str = Cookie(None),
-):
+) -> None:
     return  # TODO: реализовать

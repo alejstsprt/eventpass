@@ -29,7 +29,7 @@ class ManagementTicketTypes:
 
     async def create_types_ticket_event(
         self, jwt_token: str, ticket_type_data: "CreateTicketType"
-    ):
+    ) -> "TicketTypes":
         """
         Метод для создания типа билета для мероприятия.
 
