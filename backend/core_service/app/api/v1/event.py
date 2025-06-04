@@ -78,4 +78,4 @@ async def delete_events(  # type: ignore[no-untyped-def]
     jwt_token: str = Cookie(None),
     service: ManagementEventsProtocol = Depends(get_event_service),
 ):
-    return None  # TODO: сделать
+    return None  # TODO: реализовать

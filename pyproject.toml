@@ -17,3 +17,6 @@ line_length = 88
 multi_line_output = 3
 include_trailing_comma = true
 combine_as_imports = true
+
+[tool.alembic]
+file_template = "%%(year)d-%%(month).2d-%%(day).2d_%%(slug)s"

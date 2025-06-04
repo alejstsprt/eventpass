@@ -76,4 +76,4 @@ async def edit_types_ticket(  # type: ignore[no-untyped-def]
     service: ManagementTicketTypeProtocol = Depends(get_ticket_types_service),
     jwt_token: str = Cookie(None),
 ):
-    return
+    return  # TODO: реализовать
