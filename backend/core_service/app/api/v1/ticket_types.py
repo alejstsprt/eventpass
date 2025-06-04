@@ -45,7 +45,7 @@ async def get_types_ticket_event(  # type: ignore[no-untyped-def]
 @router.patch(
     "/{types_ticket_id}",
     summary="Изменение деталей типа билета мероприятия",
-    description="ИНФО: Ручка для создания типа билета для мероприятия. Принимает в себя event_id, ticket_type, description, price, total_count.",
+    description="ИНФО: Ручка для создания типа билета для мероприятия. Принимает в себя event_id, description, price, total_count.",
     status_code=status.HTTP_200_OK,
     responses=None,  # TODO: дописать
 )
