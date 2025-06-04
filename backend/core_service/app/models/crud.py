@@ -2,7 +2,7 @@
 Костыльный модуль взаимодействия с бд без класса. позже нужно сделать как класс и сократить количество функций
 """
 
-from typing import TYPE_CHECKING, Any, Dict, Literal, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Literal, Optional, TypeVar
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -22,8 +22,6 @@ if TYPE_CHECKING:
     from pydantic import BaseModel
 
     from ..schemas import (
-        EditEvent,
-        EventCreatedResult,
         IntEventCreatorId,
         IntUserId,
         StrEventAddress,
@@ -83,7 +81,7 @@ async def create_type_ticket_event(
     description: str,
     price: int,
     total_count: int,
-) -> ...:  # TODO: доделать
+) -> "TicketTypes":
     """
     Функция для создания типа билета для мероприятия.
 
@@ -96,20 +94,7 @@ async def create_type_ticket_event(
         total_count (int): Стоимость данного типа белета мероприятия.
 
     Returns:
-        ... (TypedDict):
-        ```
-        {
-        "result": True,
-            "event": {
-                "id": new_type_ticket_event.id,
-                "event_id": new_type_ticket_event.event_id,
-                "ticket_type": new_type_ticket_event.type,
-                "description": new_type_ticket_event.description,
-                "price": new_type_ticket_event.price,
-                "total_count": new_type_ticket_event.total_count
-            },
-        }
-        ```
+        TicketTypes (DBBaseModel): Всю информацию о созданном типе билета мероприятия.
 
     Raises:
         ValidationError: Неверные данные.
@@ -144,17 +129,7 @@ async def create_type_ticket_event(
         db.commit()
         db.refresh(new_type_ticket_event)
 
-        return {
-            "result": True,
-            "event": {
-                "id": new_type_ticket_event.id,
-                "event_id": new_type_ticket_event.event_id,
-                "ticket_type": new_type_ticket_event.type,
-                "description": new_type_ticket_event.description,
-                "price": new_type_ticket_event.price,
-                "total_count": new_type_ticket_event.total_count,
-            },
-        }
+        return new_type_ticket_event
     except Exception as e:
         logger_api.exception(f"Внутренняя ошибка сервера. Проблемы с сейвом БД: {e}")
         raise InternalServerError()
@@ -165,36 +140,26 @@ async def create_event(
     creator_id: "IntEventCreatorId",
     status: Literal["опубликовано", "завершено", "черновик"],
     title: "StrEventTitle",
+    category: Literal[
+        "Концерт", "Фестиваль", "Конференция", "Выставка", "Спорт", "Театр", "Другое"
+    ],
     description: "StrEventDescription",
     address: "StrEventAddress",
-) -> "EventCreatedResult":
+) -> "Events":
     """
     Функция для создания мероприятия
 
     Args:
         db (Session): Сессия SQLAlchemy для работы с БД.
         creator_id (IntEventCreatorId): ID создателя мероприятия.
-        status (Literal['опубликовано', 'завершено', 'черновик']): Статус мероприятия.
+        status (Literal[...]): Статус мероприятия.
         title (StrEventTitle): Название мероприятия.
+        category (Literal[...]): Категория мероприятия.
         description (StrEventDescription): Описание мероприятия.
         address (StrEventAddress): Адрес мероприятия.
 
     Returns:
-        EventCreatedResult (TypedDict):
-        ```
-        {
-            'result': True,
-            'event': {
-                'id': id,
-                'status': status,
-                'creator_id': creator_id,
-                'title': title,
-                'description': description,
-                'address': address,
-                'time_create': datetime
-            }
-        }
-        ```
+        Events (DBBaseModel): Всю информацию о созданном мероприятии.
 
     Raises:
         ValidationError (HTTPException): Неверные входные данные.
@@ -204,11 +169,16 @@ async def create_event(
         logger_api.error(f"Неправильно статус мероприятия {status = }")
         raise ValidationError()
 
+    if category not in config.CATEGORY_EVENTS:
+        logger_api.error(f"Неправильно статус мероприятия {status = }")
+        raise ValidationError()
+
     try:
         new_event = Events(
             creator_id=creator_id,
             status=status,
             title=title,
+            category=category,
             description=description,
             address=address,
         )
@@ -216,18 +186,7 @@ async def create_event(
         db.commit()
         db.refresh(new_event)
 
-        return {
-            "result": True,
-            "event": {
-                "id": new_event.id,
-                "status": new_event.status,
-                "creator_id": new_event.creator_id,
-                "title": new_event.title,
-                "description": new_event.description,
-                "address": new_event.address,
-                "time_create": new_event.datetime,
-            },
-        }
+        return new_event
     except Exception as e:
         logger_api.exception(f"Внутренняя ошибка сервера. Проблемы с сейвом БД: {e}")
         raise InternalServerError()

@@ -5,11 +5,23 @@ from pydantic import BaseModel, Field
 
 
 class StatusForm(str, Enum):
-    """Параметры статуса"""
+    """Статусы мероприятия"""
 
     PUBLISHED = "опубликовано"
     COMPLETED = "завершено"
     DRAFT = "черновик"
+
+
+class CategoriesForm(str, Enum):
+    """Категории мероприятия"""
+
+    CONCERT = "Концерт"
+    FESTIVAL = "Фестиваль"
+    CONFERENCE = "Конференция"
+    EXHIBITION = "Выставка"
+    SPORT = "Спорт"
+    THEATRE = "Театр"
+    OTHER = "Другое"
 
 
 # [CreateEvent]
@@ -27,6 +39,8 @@ class CreateEvent(BaseModel):
             max_length=50,
         ),
     ]
+
+    category: Annotated[CategoriesForm, Field(description="Категория мероприятия")]
 
     description: Annotated[
         str,

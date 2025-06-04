@@ -19,6 +19,10 @@ class Settings:
 
     # FIXME: в event есть копия с использованием enum. потом сделаю масштабируемое + crud.py
     STATUS_EVENTS: frozenset[str] = frozenset({"опубликовано", "завершено", "черновик"})
+    # FIXME: в event есть копия с использованием enum. потом сделаю масштабируемое + crud.py
+    CATEGORY_EVENTS: frozenset[str] = frozenset(
+        {"Концерт", "Фестиваль", "Конференция", "Выставка", "Спорт", "Театр", "Другое"}
+    )
     # FIXME: в ticket_types есть копия с использованием enum. потом сделаю масштабируемое + crud.py
     TYPE_TICKETS: frozenset[str] = frozenset({"Vip", "Standard", "Econom"})
 
