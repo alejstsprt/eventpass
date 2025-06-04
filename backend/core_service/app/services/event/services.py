@@ -57,6 +57,7 @@ class ManagementEvents:
             IntEventCreatorId(user_id),
             event.status.value,
             StrEventTitle(event.title),
+            event.category.value,
             StrEventDescription(event.description),
             StrEventAddress(event.address),
         )
