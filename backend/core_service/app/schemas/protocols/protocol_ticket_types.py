@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Protocol
 if TYPE_CHECKING:
     from pydantic import BaseModel
 
+    from ...models.models import TicketTypes
     from ...models.session import BaseModel as DBBaseModel
     from .. import CreateTicketType, EditTicketType
 
@@ -12,7 +13,7 @@ class ManagementTicketTypeProtocol(Protocol):
 
     async def create_types_ticket_event(
         self, jwt_token: str, ticket_type_data: "CreateTicketType"
-    ):
+    ) -> "TicketTypes":
         """
         Метод для создания типа билета для мероприятия.
 
@@ -31,7 +32,7 @@ class ManagementTicketTypeProtocol(Protocol):
 
     async def edit_types_ticket(
         self, jwt_token: str, types_ticket_id: int, ticket_type_data: "EditTicketType"
-    ) -> "BaseModel":
+    ) -> "DBBaseModel":
         """
         Обновляет тип билета для мероприятия.
 
@@ -51,7 +52,7 @@ class ManagementTicketTypeProtocol(Protocol):
 
     async def search_types_ticket_event(
         self, jwt_token: str, event_id: int
-    ) -> "DBBaseModel":
+    ) -> list["TicketTypes"]:
         """
         Метод который возвращает все типы билета мероприятия.
 

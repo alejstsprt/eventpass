@@ -14,8 +14,9 @@ from ...schemas import (
 from ...security.jwt import token_verification
 
 if TYPE_CHECKING:
+    from ...models.models import Events
     from ...models.session import BaseModel as DBBaseModel
-    from ...schemas import CreateEvent, EditEvent, EventCreatedResult
+    from ...schemas import CreateEvent, EditEvent
 
 
 class ManagementEvents:
@@ -26,9 +27,7 @@ class ManagementEvents:
     def __init__(self, db: Session):
         self.db = db
 
-    async def create_events(
-        self, jwt_token: str, event: "CreateEvent"
-    ) -> "EventCreatedResult":
+    async def create_events(self, jwt_token: str, event: "CreateEvent") -> "Events":
         """
         Метод для создания мероприятия.
 
@@ -37,7 +36,7 @@ class ManagementEvents:
             event (CreateEvent): Название, описание и адрес мероприятия.
 
         Returns:
-            EventCreatedResult (TypedDict): Возвращает всю информацию о мероприятии, используя `create_event()`.
+            Events (DBBaseModel): Возвращает всю информацию о мероприятии, используя `create_event()`.
 
         Raises:
             NoTokenError (HTTPException): Токен отсутствует.
