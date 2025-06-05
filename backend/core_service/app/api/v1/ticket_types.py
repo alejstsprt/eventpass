@@ -45,7 +45,7 @@ async def get_types_ticket_event(  # type: ignore[no-untyped-def]
 @router.patch(
     "/{ticket_type_id}",
     summary="Изменение деталей типа билета мероприятия",
-    description="ИНФО: Ручка для создания типа билета для мероприятия. Принимает в себя event_id, description, price, total_count.",
+    description="ИНФО: Ручка для создания типа билета для мероприятия. Принимает в себя event_id | None, description | None, price | None, total_count | None.",
     status_code=status.HTTP_200_OK,
     responses=None,  # TODO: дописать
 )
@@ -65,7 +65,7 @@ async def edit_types_ticket(  # type: ignore[no-untyped-def]
     "/{ticket_type_id}",
     summary="Удаление типа билета мероприятия",
     description="ИНФО: Ручка для удаления типа билета мероприятия.",
-    status_code=status.HTTP_200_OK,
+    status_code=status.HTTP_204_NO_CONTENT,
     responses=None,  # TODO: дописать
 )
 @IClearCache(unique_name="ticket-types-cache", jwt_token_path="jwt_token")

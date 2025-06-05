@@ -85,3 +85,33 @@ sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) NOT NULL constraint fail
 [SQL: INSERT INTO events (creator_id, status, category, title, description, address) VALUES (?, ?, ?, ?, ?, ?) RETURNING id, datetime]
 [parameters: (4, 'опубликовано', None, 'Конференция по Python', 'Ежегодная конференция для разработчиков', 'Ул. Штурманская, д. 30')]
 (Background on this error at: https://sqlalche.me/e/20/gkpj)
+[2025-06-05 16:27:01,040] [ERROR] api_logger: Данный тип билета для этого мероприяия уже существует ticket_type = 'Vip'
+[2025-06-05 18:07:36,262] [ERROR] api_logger: Внутренняя ошибка сервера. Проблемы с сейвом БД: Neither 'InstrumentedAttribute' object nor 'Comparator' object associated with Tickets.event has an attribute 'ticket_types'
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\sqlalchemy\orm\attributes.py", line 472, in __getattr__
+    return getattr(self.comparator, key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\sqlalchemy\util\langhelpers.py", line 1335, in __getattr__
+    return self._fallback_getattr(key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\sqlalchemy\util\langhelpers.py", line 1304, in _fallback_getattr
+    raise AttributeError(key)
+AttributeError: ticket_types
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\work\eventpass\backend\core_service\app\models\crud.py", line 95, in create_ticket_event
+    joinedload(Tickets.event.ticket_types),  # если надо все типы билетов
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\sqlalchemy\orm\attributes.py", line 474, in __getattr__
+    raise AttributeError(
+AttributeError: Neither 'InstrumentedAttribute' object nor 'Comparator' object associated with Tickets.event has an attribute 'ticket_types'
+[2025-06-05 18:10:44,013] [ERROR] api_logger: Имя/Логин уже занят
+[2025-06-05 18:10:49,119] [ERROR] api_logger: Имя/Логин уже занят
+[2025-06-05 18:14:24,115] [ERROR] api_logger: Внутренняя ошибка сервера. Проблемы с сейвом БД: type object 'Tickets' has no attribute 'ticket_types'
+Traceback (most recent call last):
+  File "C:\work\eventpass\backend\core_service\app\models\crud.py", line 94, in create_ticket_event
+    joinedload(Tickets.ticket_types),
+               ^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'Tickets' has no attribute 'ticket_types'

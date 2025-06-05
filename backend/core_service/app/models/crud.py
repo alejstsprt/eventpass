@@ -5,7 +5,7 @@
 from typing import TYPE_CHECKING, Literal, Optional, TypeVar
 
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from ..core.config import config
 from ..core.exceptions import (
@@ -69,6 +69,36 @@ async def user_registration(
     except IntegrityError:
         logger_api.error("Имя/Логин уже занят")
         raise LoginAlreadyExistsException()
+    except Exception as e:
+        logger_api.exception(f"Внутренняя ошибка сервера. Проблемы с сейвом БД: {e}")
+        raise InternalServerError()
+
+
+async def create_ticket_event(
+    db: Session, event_id: int, user_id: int, ticket_type_id: int, unique_code: str
+):
+    try:
+        new_ticket = Tickets(
+            event_id=event_id,
+            user_id=user_id,
+            ticket_type_id=ticket_type_id,
+            unique_code=unique_code,
+        )
+        db.add(new_ticket)
+        db.commit()
+        db.refresh(new_ticket)
+
+        ticket_with_details = (
+            db.query(Tickets)
+            .options(
+                joinedload(Tickets.event),
+                joinedload(Tickets.user),
+                joinedload(Tickets.ticket_type),
+            )
+            .filter(Tickets.id == new_ticket.id)
+            .first()
+        )
+        return ticket_with_details
     except Exception as e:
         logger_api.exception(f"Внутренняя ошибка сервера. Проблемы с сейвом БД: {e}")
         raise InternalServerError()

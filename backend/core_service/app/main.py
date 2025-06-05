@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .api.v1 import event, ticket_types, user
+from .api.v1 import event, ticket_types, tickets, user
 from .models.session import BaseModel, engine
 
 BaseModel.metadata.create_all(bind=engine)
@@ -37,6 +37,9 @@ app.include_router(
     ticket_types.router,
     prefix="/api/v1/ticket-types",
     tags=["Ручки для управления типом мероприятий"],
+)
+app.include_router(
+    tickets.router, prefix="/api/v1/ticket", tags=["Ручки для управления билетами"]
 )
 
 

@@ -61,6 +61,7 @@ class TicketTypes(BaseModel):
     total_count = Column(Integer, nullable=False)  # Сколько всего таких билетов будет
 
     event = relationship("Events", back_populates="ticket_types")
+    ticket = relationship("Tickets", back_populates="ticket_type")
 
 
 class Tickets(BaseModel):
@@ -87,3 +88,4 @@ class Tickets(BaseModel):
 
     event = relationship("Events", back_populates="tickets")
     user = relationship("Accounts", back_populates="tickets")
+    ticket_type = relationship("TicketTypes", back_populates="ticket")
