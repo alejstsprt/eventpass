@@ -37,5 +37,10 @@ class Settings:
     # Лимит айди для БД
     MAX_ID: Final[int] = 9_223_372_036_854_775_807
 
+    # для генерации уникального кода билета
+    SECRET_KEY_HMAC: str = os.getenv(
+        "SECRET_KEY_HMAC", "ewgewgwgew22222222fee"
+    ).encode()
+
 
 config = Settings()

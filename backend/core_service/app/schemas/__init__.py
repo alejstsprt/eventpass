@@ -2,9 +2,10 @@ from .dicts import EventCreatedResult, LoginUserResult, UserRegistrationResult
 from .protocols.protocol_event import ManagementEventsProtocol
 from .protocols.protocol_ticket_types import ManagementTicketTypeProtocol
 from .protocols.protocol_user import ManagementUsersProtocol
-from .pydantics.event import CreateEvent, EditEvent
-from .pydantics.ticket_types import CreateTicketType, EditTicketType
-from .pydantics.user import CreateUser, LoginUser
+from .pydantics.routers.event import CreateEvent, EditEvent
+from .pydantics.routers.ticket_types import CreateTicketType, EditTicketType
+from .pydantics.routers.tickets import TicketCreateDTO, TicketCreateResponseDTO
+from .pydantics.routers.user import CreateUser, LoginUser
 from .types.types_event import (
     IntEventCreatorId,
     StrEventAddress,
@@ -34,4 +35,6 @@ __all__ = [
     "ManagementTicketTypeProtocol",
     "CreateTicketType",
     "EditTicketType",
+    "TicketCreateDTO",
+    "TicketCreateResponseDTO",
 ]

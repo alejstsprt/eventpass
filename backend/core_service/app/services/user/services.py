@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from fastapi import Response
 from sqlalchemy.orm import Session
 
-from ...core.exceptions import LoginError, PasswordError, ValidationError
+from ...core.exceptions import LoginError, PasswordError
 from ...models.crud import search_user, user_registration
 from ...schemas import StrUserLogin, StrUserName, StrUserPassword
 from ...security.hashing import hash_password, verify_password
@@ -46,9 +46,6 @@ class ManagementUsers:
             ValidationError (HTTPException): Неверные входные данные.
             InternalServerError (HTTPException): Ошибка сервера.
         """
-        if not user.name or not user.login or not user.password:
-            raise ValidationError()
-
         hash_pass = hash_password(user.password)
         result = await user_registration(
             self.db,
@@ -79,9 +76,6 @@ class ManagementUsers:
             LoginError (HTTPException): Неверный логин.
             PasswordError (HTTPException): Неверный пароль.
         """
-        if not self.db or not user.login or not user.password:
-            raise ValidationError()
-
         user_data = await search_user(self.db, login=StrUserLogin(user.login))
         db_user = user_data["login"]
         if not db_user:
