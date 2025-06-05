@@ -235,3 +235,9 @@ Traceback (most recent call last):
                ^^^^^^^^^^^^^^^^^^^^
 AttributeError: type object 'Tickets' has no attribute 'ticket_types'
 >>>>>>> div
+[2025-06-05 20:02:16,362] [ERROR] api_logger: Данного типа билета c ticket_type_id = 11111111 не существует
+[2025-06-05 20:02:19,537] [ERROR] api_logger: Данного типа билета c ticket_type_id = 11 не существует
+[2025-06-05 20:02:47,162] [ERROR] api_logger: Данного типа билета c ticket_type_id = 6 не существует
+[2025-06-05 20:03:02,427] [ERROR] api_logger: Данного мероприятия c event_id = 333 не существует
+[2025-06-05 20:03:06,878] [ERROR] api_logger: Данного мероприятия c event_id = 311 не существует
+[2025-06-05 20:03:11,810] [ERROR] api_logger: Данного мероприятия c event_id = 300 не существует
