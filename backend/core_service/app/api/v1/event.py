@@ -1,6 +1,4 @@
-from typing import TYPE_CHECKING
-
-from fastapi import APIRouter, Body, Cookie, Depends, Path, status
+from fastapi import APIRouter, Cookie, Depends, Path, status
 
 from ...core.config import config
 from ...infrastructure.cache import ICache, IClearCache
@@ -8,7 +6,6 @@ from ...schemas import CreateEvent, EditEvent, ManagementEventsProtocol
 from ...services import CREATE_EVENT_RESPONSES, get_event_service
 
 # from fastapi_cache.decorator import cache # имеет маленький функционал. я создал свой
-
 
 router = APIRouter()
 
@@ -77,5 +74,5 @@ async def delete_events(  # type: ignore[no-untyped-def]
     ),  # иначе будет ошибка бд
     jwt_token: str = Cookie(None),
     service: ManagementEventsProtocol = Depends(get_event_service),
-):
-    return None  # TODO: реализовать
+) -> None:
+    return  # TODO: реализовать

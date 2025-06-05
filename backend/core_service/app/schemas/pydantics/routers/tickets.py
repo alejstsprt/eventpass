@@ -8,13 +8,10 @@ from ..table_db import AccountResponseDTO, EventResponseDTO, TicketTypeResponseD
 
 
 class TicketCreateDTO(BaseModel):
+    """Модель для входных данных пользователя"""
+
     event_id: Annotated[
         int, Field(description="ID мероприятия", examples=[1], ge=1, le=config.MAX_ID)
-    ]
-
-    user_id: Annotated[
-        int,
-        Field(description="ID купившего билет", examples=[1], ge=1, le=config.MAX_ID),
     ]
 
     ticket_type_id: Annotated[
@@ -23,6 +20,8 @@ class TicketCreateDTO(BaseModel):
 
 
 class TicketCreateResponseDTO(ConfigBaseModelResponseDTO):
+    """Модель для возврата данных при создании билета"""
+
     id: int
     event_id: int
     user_id: int
