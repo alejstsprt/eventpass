@@ -4,7 +4,7 @@ from typing import Final, Type
 from dotenv import load_dotenv
 
 from ..models.models import Accounts, Events, Tickets, TicketTypes
-from ..models.session import BaseModel
+from ..models.session import DBBaseModel
 
 # Загружаем переменные из .env
 load_dotenv()
@@ -27,7 +27,7 @@ class Settings:
     TYPE_TICKETS: frozenset[str] = frozenset({"Vip", "Standard", "Econom"})
 
     # Для удобного взаимодействия c алхимией (копия в crud.py)
-    GET_TABLE: dict[str, Type[BaseModel]] = {
+    GET_TABLE: dict[str, Type[DBBaseModel]] = {
         "Accounts": Accounts,
         "Events": Events,
         "TicketTypes": TicketTypes,

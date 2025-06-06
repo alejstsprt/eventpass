@@ -16,7 +16,7 @@ from ..core.exceptions import (
 )
 from ..core.logger import logger_api
 from .models import Accounts, Events, Tickets, TicketTypes
-from .session import BaseModel as DBBaseModel
+from .session import DBBaseModel
 
 if TYPE_CHECKING:
     from pydantic import BaseModel

@@ -3,9 +3,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .api.v1 import event, ticket_types, tickets, user
-from .models.session import BaseModel, engine
+from .models.session import DBBaseModel, engine
 
-BaseModel.metadata.create_all(bind=engine)
+DBBaseModel.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
