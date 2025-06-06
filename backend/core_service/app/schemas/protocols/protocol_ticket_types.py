@@ -4,7 +4,7 @@ if TYPE_CHECKING:
     from pydantic import BaseModel
 
     from ...models.models import TicketTypes
-    from ...models.session import BaseModel as DBBaseModel
+    from ...models.session import DBBaseModel
     from .. import CreateTicketType, EditTicketType
 
 

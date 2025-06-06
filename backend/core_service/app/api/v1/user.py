@@ -1,15 +1,6 @@
-from typing import TYPE_CHECKING
-
 from fastapi import APIRouter, Depends, Response, status
-from fastapi_cache.decorator import cache
 
-from ...schemas import (
-    CreateUser,
-    LoginUser,
-    LoginUserResult,
-    ManagementUsersProtocol,
-    UserRegistrationResult,
-)
+from ...schemas import CreateUser, LoginUser, ManagementUsersProtocol
 from ...services import CREATE_USER_RESPONSES, LOGIN_USER_RESPONSES, get_user_service
 
 router = APIRouter()
@@ -33,6 +24,5 @@ async def create_user(response: Response, user: CreateUser, service: ManagementU
     status_code=status.HTTP_200_OK,
     responses=LOGIN_USER_RESPONSES,
 )
-# @cache(expire=80)
 async def login_user(response: Response, user: LoginUser, service: ManagementUsersProtocol = Depends(get_user_service)):  # type: ignore[no-untyped-def]
     return await service.login_user(response, user)

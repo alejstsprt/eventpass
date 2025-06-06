@@ -16,6 +16,7 @@ from typing import (
     ClassVar,
     Dict,
     Final,
+    List,
     Literal,
     Optional,
     ParamSpec,
@@ -23,10 +24,13 @@ from typing import (
     Self,
     Tuple,
     TypeVar,
+    Union,
+    runtime_checkable,
 )
 
 import redis
 from fastapi.encoders import jsonable_encoder
+from pydantic import BaseModel
 from redis import Redis
 
 # from ..core.exceptions import NoTokenError, TokenError
@@ -57,15 +61,19 @@ def _create_cache_key(name: str, data: Dict[str, Any]) -> str:
     return f"name:{name}:cache:{key_hash}"
 
 
-def _pydantic_transformations(element):
+def _pydantic_transformations(
+    element: Union[BaseModel, dict[str, Any], list[Any], Any]
+) -> Union[dict[str, Any], list[Any], Any]:
     """Пайдемик в json"""
     try:
         return jsonable_encoder(element)
-    except:
+    except Exception:
         return element
 
 
-async def _substitution_data(param: list[Any], replacement: dict[Any]) -> list[Any]:
+async def _substitution_data(
+    param: list[Any], replacement: dict[Any, Any]
+) -> list[Any]:
     """
     Подмена данных.
     >>> _substitution_data(["JWT_TOKEN"], {"JWT_TOKEN": "eyJhbGciOiJIUzI1..."})
@@ -74,6 +82,9 @@ async def _substitution_data(param: list[Any], replacement: dict[Any]) -> list[A
     Args:
         param (list[Any]): Лист с данными, которые нужно заменить.
         replacement (dict[Any]): Словарь с данными для замены.
+
+    Returns:
+        list[Any]: Лист с замененными данными.
     """
     for index, elem in enumerate(param):
         if not isinstance(elem, str):
@@ -84,10 +95,48 @@ async def _substitution_data(param: list[Any], replacement: dict[Any]) -> list[A
     return param
 
 
+@runtime_checkable
+class ICacheWriterProtocol(Protocol):
+    """
+    Класс-протокол
+    """
+
+    async def __call__(self, **kwargs: object) -> Any:
+        """Вызов функции"""
+        ...
+
+    def __repr__(self) -> str: ...
+
+
+@runtime_checkable
+class IParamProtocol(Protocol):
+    """
+    Класс-протокол
+    """
+
+    async def __call__(self, **injections: object) -> Any:
+        """Вызов функции"""
+        ...
+
+    @staticmethod
+    async def __process_args(
+        param: list[Any], replacement: dict[Any, Any]
+    ) -> list[Any]:
+        """Функция просто делегирует"""
+        ...
+
+    @staticmethod
+    async def __process_kwargs(
+        param: dict[Any, Any], replacement: dict[Any, Any]
+    ) -> dict[Any, Any]:
+        """Подстановка данных"""
+        ...
+
+    def __repr__(self) -> str: ...
+
+
 async def _launch_operation(
     functions: list[Callable[..., Any]],
-    cache_writer: object,
-    param_obj: object,
     **kwargs: object,
 ) -> list[Any]:
     """
@@ -103,16 +152,17 @@ async def _launch_operation(
     """
     # Логика такая:
     # _launch_operation -> ICacheWriter -> IParam
-    result = []
+    result: List[Any] = []
 
     for operation in functions:
-        if isinstance(operation, cache_writer):
+        if isinstance(operation, ICacheWriterProtocol):
             result.append(await operation(**kwargs))
+        elif isinstance(operation, IParamProtocol):
+            await operation()
+        elif iscoroutinefunction(operation):
+            await operation()
         else:
-            if iscoroutinefunction(operation) or isinstance(operation, param_obj):
-                await operation()
-            else:
-                operation()
+            operation()
 
     return result
 
@@ -248,16 +298,14 @@ class IParam:
             kwargs = deepcopy(self.__kwargs)
 
             if iscoroutinefunction(self.__func):
-                processed_args = await self.__process_args([*args], injections)
-                processed_kwargs = await self.__process_kwargs(kwargs, injections)
-
-                return await self.__func(
-                    *processed_args,
-                    **processed_kwargs,
+                return self.__func(
+                    *await self.__process_args([*args], injections),
+                    **await self.__process_kwargs(kwargs, injections),
                 )
+
             return self.__func(
-                *self.__process_args([*args], injections),
-                **self.__process_kwargs(kwargs, injections),
+                *await self.__process_args([*args], injections),
+                **await self.__process_kwargs(kwargs, injections),
             )
 
         if iscoroutinefunction(self.__func):
@@ -265,12 +313,16 @@ class IParam:
         return self.__func(*self.__args, **self.__kwargs)
 
     @staticmethod
-    async def __process_args(param: list[Any], replacement: dict[Any]):
+    async def __process_args(
+        param: list[Any], replacement: dict[Any, Any]
+    ) -> list[Any]:
         """Функция просто делегирует"""
         return await _substitution_data(param, replacement)
 
     @staticmethod
-    async def __process_kwargs(param: dict[Any], replacement: dict[Any]) -> dict[Any]:
+    async def __process_kwargs(
+        param: dict[Any, Any], replacement: dict[Any, Any]
+    ) -> dict[Any, Any]:
         """Подстановка данных"""
         for kay, value in param.items():
             if not isinstance(value, str):
@@ -280,7 +332,7 @@ class IParam:
                 param[kay] = replacement[value]
         return param
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{self.__class__.__name__}(func={self.__func}, args={self.__args}, kwargs={self.__kwargs})"
 
 
@@ -321,7 +373,7 @@ class ICacheWriter:
             return await self.__func()
         return self.__func()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{self.__class__.__name__}(func={self.__func})"
 
 
@@ -414,8 +466,6 @@ class IClearCache:
 
     __loger_name = _LogInfo
     __redis_name = _RedisService
-    __param = IParam
-    __cache_writer = ICacheWriter
 
     def __init__(
         self,
@@ -458,14 +508,12 @@ class IClearCache:
 
         @wraps(func)
         async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-            parameters: dict = {}
+            parameters: dict[str, Any] = {}
 
             if self.functions:
                 functions = deepcopy(self.functions)
 
-                if func_result := await _launch_operation(
-                    functions, self.__cache_writer, self.__param, **kwargs
-                ):
+                if func_result := await _launch_operation(functions, **kwargs):
                     parameters["__ifunc__"] = func_result
 
             if self.data:
@@ -482,8 +530,12 @@ class IClearCache:
         return wrapper
 
     async def __interaction_redis(
-        self, key_redis: str, func: Callable[..., Any], *args: object, **kwargs: object
-    ) -> Callable[..., Any]:
+        self,
+        key_redis: str,
+        func: Callable[..., Any],
+        *args: P.args,
+        **kwargs: P.kwargs,
+    ) -> R:
         """Работа с редис"""
         try:
             if self.redis.search_key(key_redis) is not None:
@@ -500,8 +552,6 @@ class ICache:
 
     __loger_name = _LogInfo
     __redis_name = _RedisService
-    __param = IParam
-    __cache_writer = ICacheWriter
 
     def __init__(
         self,
@@ -545,14 +595,12 @@ class ICache:
 
         @wraps(func)
         async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-            parameters: dict = {}
+            parameters: dict[str, Any] = {}
 
             if self.functions:
                 functions = deepcopy(self.functions)
 
-                if func_result := await _launch_operation(
-                    functions, self.__cache_writer, self.__param, **kwargs
-                ):
+                if func_result := await _launch_operation(functions, **kwargs):
                     parameters["__ifunc__"] = func_result
 
             if self.data:
@@ -569,7 +617,11 @@ class ICache:
         return wrapper
 
     async def __interaction_redis(
-        self, key_redis: str, func: Callable[..., Any], *args: object, **kwargs: object
+        self,
+        key_redis: str,
+        func: Callable[..., Any],
+        *args: P.args,
+        **kwargs: P.kwargs,
     ) -> Callable[..., Any]:
         """Работа с редис"""
         try:

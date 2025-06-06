@@ -1,10 +1,10 @@
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, func
 from sqlalchemy.orm import relationship
 
-from .session import BaseModel
+from .session import DBBaseModel
 
 
-class Accounts(BaseModel):
+class Accounts(DBBaseModel):
     __tablename__ = "users"
 
     id = Column(
@@ -20,7 +20,7 @@ class Accounts(BaseModel):
     tickets = relationship("Tickets", back_populates="user")
 
 
-class Events(BaseModel):
+class Events(DBBaseModel):
     __tablename__ = "events"
 
     id = Column(Integer, primary_key=True, index=True)  # Айди мероприятия
@@ -44,7 +44,7 @@ class Events(BaseModel):
     tickets = relationship("Tickets", back_populates="event")
 
 
-class TicketTypes(BaseModel):
+class TicketTypes(DBBaseModel):
     """Это тип билета (вип и тд)"""
 
     __tablename__ = "ticket_types"
@@ -64,7 +64,7 @@ class TicketTypes(BaseModel):
     ticket = relationship("Tickets", back_populates="ticket_type")
 
 
-class Tickets(BaseModel):
+class Tickets(DBBaseModel):
     """Сами билеты"""
 
     __tablename__ = "tickets"

@@ -16,7 +16,7 @@ from ..core.exceptions import (
 )
 from ..core.logger import logger_api
 from .models import Accounts, Events, Tickets, TicketTypes
-from .session import BaseModel as DBBaseModel
+from .session import DBBaseModel
 
 if TYPE_CHECKING:
     from pydantic import BaseModel
@@ -76,7 +76,31 @@ async def user_registration(
 
 async def create_ticket_event(
     db: Session, event_id: int, user_id: int, ticket_type_id: int, unique_code: str
-):
+) -> Tickets | None:
+    """
+    Создание билета на мероприятие.
+
+    Args:
+        db (Session): Сессия SQLAlchemy для работы с БД.
+        event_id (int): ID мероприятия.
+        user_id (int): ID создателя.
+        ticket_type_id (int): ID типа билета.
+        unique_code (str): hmac код билета.
+
+    Returns:
+        Tickets: Информацию о билете, пользователе, типе билета и мероприятии.
+
+    Raises:
+        InternalServerError: Ошибка сервера.
+    """
+    if not (db.query(Events).filter(Events.id == event_id).first()):
+        logger_api.error(f"Данного мероприятия c {event_id = } не существует")
+        raise ValidationError()
+
+    if not (db.query(TicketTypes).filter(TicketTypes.id == ticket_type_id).first()):
+        logger_api.error(f"Данного типа билета c {ticket_type_id = } не существует")
+        raise ValidationError()
+
     try:
         new_ticket = Tickets(
             event_id=event_id,

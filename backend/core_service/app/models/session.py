@@ -9,7 +9,7 @@ engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-class BaseModel(DeclarativeBase):
+class DBBaseModel(DeclarativeBase):
     """Класс-основа для создания моделей бд"""
 
     pass
