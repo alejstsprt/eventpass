@@ -34,10 +34,10 @@ async def create_types_ticket(  # type: ignore[no-untyped-def]
     status_code=status.HTTP_200_OK,
     responses=None,  # TODO: дописать
 )
-@ICache(
-    unique_name="ticket-types-cache",
-    functions=[IParam(token_verification, "jwt_token")],
-)
+# @ICache(
+#     unique_name="ticket-types-cache",
+#     functions=[IParam(token_verification, "jwt_token")],
+# )
 async def get_types_ticket_event(  # type: ignore[no-untyped-def]
     event_id: int = Path(..., title="ID мероприятия", ge=1, le=config.MAX_ID),
     service: ManagementTicketTypeProtocol = Depends(get_ticket_types_service),
@@ -53,9 +53,9 @@ async def get_types_ticket_event(  # type: ignore[no-untyped-def]
     status_code=status.HTTP_200_OK,
     responses=None,  # TODO: дописать
 )
-@IClearCache(
-    unique_name="ticket-types-cache",
-)
+# @IClearCache(
+#     unique_name="ticket-types-cache",
+# )
 async def edit_types_ticket(  # type: ignore[no-untyped-def]
     ticket_type_data: EditTicketType,
     ticket_type_id: int = Path(

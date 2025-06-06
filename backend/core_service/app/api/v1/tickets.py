@@ -18,7 +18,7 @@ router = APIRouter()
     status_code=status.HTTP_201_CREATED,
     responses=None,  # TODO: дописать
 )
-async def create_types_ticket(  # type: ignore[no-untyped-def]
+async def create_types_ticket(
     ticket_data: TicketCreateDTO,
     service: ManagementTicketsProtocol = Depends(get_tickets_service),
     jwt_token: str = Cookie(None),
@@ -33,7 +33,7 @@ async def create_types_ticket(  # type: ignore[no-untyped-def]
     status_code=status.HTTP_204_NO_CONTENT,
     responses=None,  # TODO: дописать
 )
-async def create_types_ticket(  # type: ignore[no-untyped-def]
+async def delete_types_ticket(
     ticket_id: int = Path(..., title="ID билета", ge=1, le=config.MAX_ID),
     service: ManagementTicketsProtocol = Depends(get_tickets_service),
     jwt_token: str = Cookie(None),

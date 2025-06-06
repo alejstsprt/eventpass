@@ -68,7 +68,7 @@ async def list_events(  # type: ignore[no-untyped-def]
     responses=None,  # TODO: дописать
 )
 @IClearCache(unique_name="event-cache", jwt_token_path="jwt_token")
-async def delete_events(  # type: ignore[no-untyped-def]
+async def delete_events(
     event_id: int = Path(
         ..., title="ID мероприятия", ge=1, le=config.MAX_ID
     ),  # иначе будет ошибка бд

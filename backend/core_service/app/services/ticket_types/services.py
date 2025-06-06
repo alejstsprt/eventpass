@@ -15,7 +15,7 @@ from ...security.jwt import token_verification
 
 if TYPE_CHECKING:
     from ...models.models import TicketTypes
-    from ...models.session import BaseModel as DBBaseModel
+    from ...models.session import DBBaseModel
     from ...schemas import CreateTicketType, EditTicketType
 
 

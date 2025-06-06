@@ -76,7 +76,7 @@ async def user_registration(
 
 async def create_ticket_event(
     db: Session, event_id: int, user_id: int, ticket_type_id: int, unique_code: str
-) -> Tickets:
+) -> Tickets | None:
     """
     Создание билета на мероприятие.
 
