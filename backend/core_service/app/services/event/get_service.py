@@ -1,8 +1,7 @@
 from fastapi import Depends
+from models.session import get_db
+from services.event.services import ManagementEvents
 from sqlalchemy.orm import Session
-
-from ...models.session import get_db
-from .services import ManagementEvents
 
 
 def get_event_service(db: Session = Depends(get_db)) -> ManagementEvents:

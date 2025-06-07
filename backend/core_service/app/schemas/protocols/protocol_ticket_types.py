@@ -1,11 +1,9 @@
 from typing import TYPE_CHECKING, Protocol
 
 if TYPE_CHECKING:
-    from pydantic import BaseModel
-
-    from ...models.models import TicketTypes
-    from ...models.session import DBBaseModel
-    from .. import CreateTicketType, EditTicketType
+    from models.models import TicketTypes
+    from models.session import DBBaseModel
+    from schemas import CreateTicketType, EditTicketType
 
 
 class ManagementTicketTypeProtocol(Protocol):

@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, Protocol
 
 if TYPE_CHECKING:
-    from .. import TicketCreateDTO, TicketCreateResponseDTO
+    from schemas import TicketCreateDTO, TicketCreateResponseDTO
 
 
 class ManagementTicketsProtocol(Protocol):

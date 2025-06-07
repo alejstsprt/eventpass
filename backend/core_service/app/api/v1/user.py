@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, Response, status
-
-from ...schemas import CreateUser, LoginUser, ManagementUsersProtocol
-from ...services import CREATE_USER_RESPONSES, LOGIN_USER_RESPONSES, get_user_service
+from schemas import CreateUser, LoginUser, ManagementUsersProtocol
+from services import CREATE_USER_RESPONSES, LOGIN_USER_RESPONSES, get_user_service
 
 router = APIRouter()
 

@@ -1,22 +1,14 @@
 from typing import TYPE_CHECKING
 
+from core.exceptions import NoTokenError, ValidationError
+from models.crud import create_type_ticket_event, edit_data, get_types_ticket_event
+from security.jwt import token_verification
 from sqlalchemy.orm import Session
 
-from ...core.exceptions import NoTokenError, ValidationError
-from ...models.crud import create_type_ticket_event, edit_data, get_types_ticket_event
-from ...schemas import (
-    IntEventCreatorId,
-    IntUserId,
-    StrEventAddress,
-    StrEventDescription,
-    StrEventTitle,
-)
-from ...security.jwt import token_verification
-
 if TYPE_CHECKING:
-    from ...models.models import TicketTypes
-    from ...models.session import DBBaseModel
-    from ...schemas import CreateTicketType, EditTicketType
+    from models.models import TicketTypes
+    from models.session import DBBaseModel
+    from schemas import CreateTicketType, EditTicketType
 
 
 class ManagementTicketTypes:

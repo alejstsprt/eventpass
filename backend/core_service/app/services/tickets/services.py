@@ -1,15 +1,14 @@
 from typing import TYPE_CHECKING
 
+from core.exceptions import NoTokenError
+from models.crud import create_ticket_event
+from schemas import TicketCreateResponseDTO
+from security.hmac import generate_code_hmac_ticket
+from security.jwt import token_verification
 from sqlalchemy.orm import Session
 
-from ...core.exceptions import NoTokenError
-from ...models.crud import create_ticket_event
-from ...schemas import TicketCreateResponseDTO
-from ...security.hmac import generate_code_hmac_ticket
-from ...security.jwt import token_verification
-
 if TYPE_CHECKING:
-    from ...schemas import TicketCreateDTO
+    from schemas import TicketCreateDTO
 
 
 class ManagementTickets:
