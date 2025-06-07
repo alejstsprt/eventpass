@@ -1,7 +1,6 @@
+from models.session import DBBaseModel
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, func
 from sqlalchemy.orm import relationship
-
-from .session import DBBaseModel
 
 
 class Accounts(DBBaseModel):

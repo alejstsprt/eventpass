@@ -1,27 +1,21 @@
+import os
+import sys
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .api.v1 import event, ticket_types, tickets, user
-from .models.session import DBBaseModel, engine
+from backend.core_service.app.api.v1 import event, ticket_types, tickets, user
+from backend.core_service.app.middleware.cors import setup_cors
+from backend.core_service.app.models.session import DBBaseModel, engine
 
 DBBaseModel.metadata.create_all(bind=engine)
 
 app = FastAPI()
+setup_cors(app)
 
-# Разрешаем запросы с вашего фронтенда
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost",
-        "http://localhost:8000",
-        "http://192.168.0.104",  # Добавьте ваш IP-адрес
-        "http://192.168.0.104:8000",  # И порт, если используется
-    ],  # И адреса
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 app.include_router(
     user.router,

@@ -3,7 +3,7 @@ import hashlib
 import hmac
 import secrets
 
-from ..core.config import config
+from core.config import config
 
 
 def generate_code_hmac_ticket(user_id: int, event_id: int, ticket_type_id: int) -> str:

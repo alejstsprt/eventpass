@@ -18,14 +18,13 @@ from typing import (
 )
 
 import redis
+from core.exceptions import NoTokenError, TokenError
 from fastapi.encoders import jsonable_encoder
+from models.crud import search_user
+from models.session import get_db
 from redis import Redis
-
-from ..core.exceptions import NoTokenError, TokenError
-from ..models.crud import search_user
-from ..models.session import get_db
-from ..schemas import IntUserId
-from ..security.jwt import token_verification
+from schemas import IntUserId
+from security.jwt import token_verification
 
 P = ParamSpec("P")
 R = TypeVar("R")

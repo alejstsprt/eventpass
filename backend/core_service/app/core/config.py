@@ -2,9 +2,8 @@ import os
 from typing import Final, Type
 
 from dotenv import load_dotenv
-
-from ..models.models import Accounts, Events, Tickets, TicketTypes
-from ..models.session import DBBaseModel
+from models.models import Accounts, Events, Tickets, TicketTypes
+from models.session import DBBaseModel
 
 # Загружаем переменные из .env
 load_dotenv()

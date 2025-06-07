@@ -5,9 +5,7 @@
 from datetime import datetime
 from enum import Enum
 
-from pydantic import BaseModel, ConfigDict
-
-from .cfg_base_model import ConfigBaseModelResponseDTO
+from schemas.pydantics.cfg_base_model import ConfigBaseModelResponseDTO
 
 
 class StatusForm(str, Enum):

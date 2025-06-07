@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Protocol
 from fastapi import Response
 
 if TYPE_CHECKING:
-    from .. import CreateUser, LoginUser, LoginUserResult, UserRegistrationResult
+    from schemas import CreateUser, LoginUser, LoginUserResult, UserRegistrationResult
 
 
 class ManagementUsersProtocol(Protocol):

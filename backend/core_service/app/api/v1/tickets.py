@@ -1,12 +1,7 @@
+from core.config import config
 from fastapi import APIRouter, Cookie, Depends, Path, status
-
-from ...core.config import config
-from ...schemas import (
-    ManagementTicketsProtocol,
-    TicketCreateDTO,
-    TicketCreateResponseDTO,
-)
-from ...services import get_tickets_service
+from schemas import ManagementTicketsProtocol, TicketCreateDTO, TicketCreateResponseDTO
+from services import get_tickets_service
 
 router = APIRouter()
 
