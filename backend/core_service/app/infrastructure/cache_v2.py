@@ -5,13 +5,12 @@ v: v2.0
 
 import asyncio
 import hashlib
-import inspect
 import json
 import logging
 from copy import deepcopy
 from dataclasses import dataclass
-from functools import wraps
-from inspect import iscoroutinefunction
+from functools import lru_cache, wraps
+from inspect import getmembers, iscoroutinefunction, isfunction, signature
 from typing import (
     Any,
     Awaitable,
@@ -353,7 +352,7 @@ class _RedisService:
     def __new__(cls, logger: LoggerProtocol, *args: object, **kwargs: object) -> Self:
         if not isinstance(logger, LoggerProtocol):
             raise TypeError(
-                f"Класс должен иметь методы: {[name for name, _ in inspect.getmembers(LoggerProtocol, inspect.isfunction) if name != '__subclasshook__']}"
+                f"Класс должен иметь методы: {[name for name, _ in getmembers(LoggerProtocol, isfunction) if name != '__subclasshook__']}"
             )
 
         if cls.__instance is None:
@@ -520,9 +519,8 @@ class _RedisService:
             return await func(*args, **kwargs)
         return func(*args, **kwargs)
 
-    # TODO: кешировать
-    @staticmethod
-    def create_cache_key(name: str, data: Dict[str, Any]) -> str:
+    @classmethod
+    def create_cache_key(cls, name: str, data: Dict[str, Any]) -> str:
         """
         Возвращает ключ для Redis.
 
@@ -585,7 +583,7 @@ class _CacheCommonMixin:
         func: Callable[..., Any], *args: object, **kwargs: object
     ) -> dict[str, Any]:
         """Метод для парсинга аргументов функции"""
-        sig = inspect.signature(func)
+        sig = signature(func)
         bound = sig.bind(*args, **kwargs)
         bound.apply_defaults()
         return dict(bound.arguments)
@@ -616,7 +614,7 @@ class _CacheCommonMixin:
         """
         if not isinstance(redis, RedisProtocol):
             raise TypeError(
-                f"Класс должен иметь методы: {[name for name, _ in inspect.getmembers(RedisProtocol, inspect.isfunction) if name != '__subclasshook__']}"
+                f"Класс должен иметь методы: {[name for name, _ in getmembers(RedisProtocol, isfunction) if name != '__subclasshook__']}"
             )
 
         parameters: dict[str, Any] = {}

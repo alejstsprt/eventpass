@@ -16,7 +16,7 @@ IStatsCache.all(is_print=True)
 
 def test_func(*args, **kwargs):
     print("Была вызвана доп функция. входные:", args, kwargs)
-    return "False"
+    return args
 
 
 @ICache(
