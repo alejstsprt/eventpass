@@ -41,6 +41,17 @@ IPREFIX: Final[str] = "[ICache]"
 LIMIT_TIME_REDIS: Final[int] = 2_147_483_647
 
 
+def add_class_marker(**afttrs):
+    """Добавление атрибутов в класс"""
+
+    def wrapper(cls):
+        for key, value in afttrs.items():
+            setattr(cls, key, value)
+        return cls
+
+    return wrapper
+
+
 def _pydantic_transformations(
     element: Union[BaseModel, dict[str, Any], list[Any], Any]
 ) -> Union[dict[str, Any], list[Any], Any]:
@@ -51,9 +62,7 @@ def _pydantic_transformations(
         return element
 
 
-async def _substitution_data(
-    param: list[Any], replacement: dict[Any, Any]
-) -> list[Any]:
+def _substitution_data(param: list[Any], replacement: dict[Any, Any]) -> list[Any]:
     """
     Подмена данных.
     >>> _substitution_data(["JWT_TOKEN"], {"JWT_TOKEN": "eyJhbGciOiJIUzI1..."})
@@ -70,7 +79,7 @@ async def _substitution_data(
         if not isinstance(elem, str):
             continue
 
-        if elem in replacement.keys():
+        if elem in replacement:
             param[index] = _pydantic_transformations(replacement[elem])
     return param
 
@@ -189,6 +198,7 @@ class _LogInfo:
         return True
 
 
+@add_class_marker(_class_marker="__iparam__")
 class IParam:
     """
     Передаёт **аргументы** в функцию при вызове (но не результат!).
@@ -235,8 +245,6 @@ class IParam:
     - Всегда указывайте точное имя переменной (например `"auth_token"`)
     """
 
-    _class_marker = "__iparam__"
-
     def __init__(
         self, func: Callable[..., Any], *args: object, **kwargs: object
     ) -> None:
@@ -252,13 +260,13 @@ class IParam:
 
             if iscoroutinefunction(self.__func):
                 return self.__func(
-                    *await self.__process_args([*args], injections),
-                    **await self.__process_kwargs(kwargs, injections),
+                    *self.__process_args([*args], injections),
+                    **self.__process_kwargs(kwargs, injections),
                 )
 
             return self.__func(
-                *await self.__process_args([*args], injections),
-                **await self.__process_kwargs(kwargs, injections),
+                *self.__process_args([*args], injections),
+                **self.__process_kwargs(kwargs, injections),
             )
 
         if iscoroutinefunction(self.__func):
@@ -266,14 +274,12 @@ class IParam:
         return self.__func(*self.__args, **self.__kwargs)
 
     @staticmethod
-    async def __process_args(
-        param: list[Any], replacement: dict[Any, Any]
-    ) -> list[Any]:
+    def __process_args(param: list[Any], replacement: dict[Any, Any]) -> list[Any]:
         """Функция просто делегирует"""
-        return await _substitution_data(param, replacement)
+        return _substitution_data(param, replacement)
 
     @staticmethod
-    async def __process_kwargs(
+    def __process_kwargs(
         param: dict[Any, Any], replacement: dict[Any, Any]
     ) -> dict[Any, Any]:
         """Подстановка данных"""
@@ -281,7 +287,7 @@ class IParam:
             if not isinstance(value, str):
                 continue
 
-            if value in replacement.keys():
+            if value in replacement:
                 param[kay] = replacement[value]
         return param
 
@@ -289,6 +295,7 @@ class IParam:
         return f"{self.__class__.__name__}(func={self.__func}, args={self.__args}, kwargs={self.__kwargs})"
 
 
+@add_class_marker(_class_marker="__icachewriter__")
 class ICacheWriter:
     """
     Обёртка для функций, результат которых должен стать частью ключа кеша.
@@ -310,7 +317,6 @@ class ICacheWriter:
     Ключ будет сгенерирован с учетом результата функции `get_user_id`. В данном случае ID пользователя.
     """
 
-    _class_marker = "__icachewriter__"
     __param = IParam
 
     def __init__(self, func: Callable[..., Any]) -> None:
@@ -628,7 +634,7 @@ class _CacheCommonMixin:
         if data:
             data = deepcopy(data)
 
-            if data_result := await _substitution_data(data, arguments):
+            if data_result := _substitution_data(data, arguments):
                 parameters["__idata__"] = data_result
 
         key_redis: str = redis.create_cache_key(unique_name, parameters)
