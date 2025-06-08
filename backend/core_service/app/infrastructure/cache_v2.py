@@ -41,11 +41,11 @@ IPREFIX: Final[str] = "[ICache]"
 LIMIT_TIME_REDIS: Final[int] = 2_147_483_647
 
 
-def add_class_marker(**afttrs):
+def add_class_marker(**attrs):
     """Добавление атрибутов в класс"""
 
     def wrapper(cls):
-        for key, value in afttrs.items():
+        for key, value in attrs.items():
             setattr(cls, key, value)
         return cls
 
