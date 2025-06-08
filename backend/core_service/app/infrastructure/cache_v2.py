@@ -3,12 +3,14 @@ name: ICache
 v: v2.0
 """
 
+import asyncio
 import hashlib
 import json
+import logging
 from copy import deepcopy
 from dataclasses import dataclass
-from functools import wraps
-from inspect import iscoroutinefunction
+from functools import lru_cache, wraps
+from inspect import getmembers, iscoroutinefunction, isfunction, signature
 from typing import (
     Any,
     Awaitable,
@@ -22,7 +24,6 @@ from typing import (
     ParamSpec,
     Protocol,
     Self,
-    Tuple,
     TypeVar,
     Union,
     runtime_checkable,
@@ -36,23 +37,8 @@ from redis import Redis
 P = ParamSpec("P")
 R = TypeVar("R")
 
-IPREFIX = "[ICache]"
-
-
-def _create_cache_key(name: str, data: Dict[str, Any]) -> str:
-    """
-    Возвращает ключ для Redis.
-
-    Args:
-        name (str): Уникальное имя сессии.
-        data (Dict[str, Any]): json запрос пользователя.
-
-    Returns:
-        str: Готовый ключ для Redis.
-    """
-    serialized_data = json.dumps(data, sort_keys=True).encode("utf-8")
-    key_hash = hashlib.sha256(serialized_data).hexdigest()
-    return f"name:{name}:cache:{key_hash}"
+IPREFIX: Final[str] = "[ICache]"
+LIMIT_TIME_REDIS: Final[int] = 2_147_483_647
 
 
 def _pydantic_transformations(
@@ -89,70 +75,39 @@ async def _substitution_data(
     return param
 
 
-@runtime_checkable
-class ICacheWriterProtocol(Protocol):
-    """
-    Класс-протокол
-    """
-
-    async def __call__(self, **kwargs: object) -> Any:
-        """Вызов функции"""
-        ...
-
-    def __repr__(self) -> str: ...
-
-
-@runtime_checkable
-class IParamProtocol(Protocol):
-    """
-    Класс-протокол
-    """
-
-    async def __call__(self, **injections: object) -> Any:
-        """Вызов функции"""
-        ...
-
-    @staticmethod
-    async def __process_args(
-        param: list[Any], replacement: dict[Any, Any]
-    ) -> list[Any]:
-        """Функция просто делегирует"""
-        ...
-
-    @staticmethod
-    async def __process_kwargs(
-        param: dict[Any, Any], replacement: dict[Any, Any]
-    ) -> dict[Any, Any]:
-        """Подстановка данных"""
-        ...
-
-    def __repr__(self) -> str: ...
-
-
 async def _launch_operation(
     functions: list[Callable[..., Any]],
-    **kwargs: object,
+    injections: dict[Any, Any],
 ) -> list[Any]:
     """
-    Функция для запуска списка функций.
+    Запускает список операций с автоматическим определением их типа.
 
     Args:
-        functions (object): Функции.
-        cache_writer (object): Класс для понимания что если он есть - данные нужно кешировать.
-        kwargs (object): тело оригинальной функции.
+        functions: Список операций (функции, корутины или маркированные объекты).
+        injections: Аргументы для дальнейшей обработки менеджерами.
 
     Returns:
-        list[Any]: Список результатов функций, который можно сгенерировать для ключа.
+        Список результатов выполнения операций.
+
+    Raises:
+        TypeError: Если передан невызываемый объект.
     """
-    # Логика такая:
-    # _launch_operation -> ICacheWriter -> IParam
+    # WORK:
+    # _launch_operation (обработчик и активатор)
+    #   -> ICacheWriter (менеджер добавления в кеш данных)
+    #   -> IParam (менеджер запуска объекта с входными данными)
     result: List[Any] = []
 
     for operation in functions:
-        if isinstance(operation, ICacheWriterProtocol):
-            result.append(await operation(**kwargs))
-        elif isinstance(operation, IParamProtocol):
-            await operation()
+        if not callable(operation):
+            raise TypeError(f"объект '{operation!r}' не является вызываемым")
+
+        class_marker = getattr(operation, "_class_marker", None)
+
+        if class_marker == "__icachewriter__":
+            result.append(await operation(injections))
+        elif class_marker == "__iparam__":
+            await operation(injections)
         elif iscoroutinefunction(operation):
             await operation()
         else:
@@ -162,7 +117,7 @@ async def _launch_operation(
 
 
 @dataclass(frozen=True)
-class Colors:
+class _Colors:
     """Цвета для консоли"""
 
     RED: Final[str] = "\033[91m"
@@ -174,7 +129,7 @@ class Colors:
 
 
 @dataclass(frozen=True)
-class SettingsRedis:
+class _SettingsRedis:
     """Настройки Redis"""
 
     HOST: Final[str] = "localhost"
@@ -186,24 +141,26 @@ class SettingsRedis:
     )
 
 
-class LoggerProtocol(Protocol):
-    def iprint(self, text: str) -> Literal[True]:
-        """
-        Вывод логов в консоль.
-
-        Args:
-            text (str): Текст для вывода.
-        """
-        ...
-
-
 class _LogInfo:
-    """Красивый вывод логов в консоль"""
+    """Система логов"""
 
     def __init__(self, session_name: str) -> None:
         self.name = f"[{session_name}]"
+        self.logger = logging.getLogger(session_name)
+        self.logger.setLevel(logging.DEBUG)
 
-    def iprint(self, text: str) -> Literal[True]:
+        formatter = logging.Formatter(
+            # f"{_Colors.BLUE}%(asctime)s{_Colors.RESET} "
+            # f"{_Colors.BLUE}{IPREFIX}{_Colors.RESET} {_Colors.CYAN}{self.name}{_Colors.RESET} "
+            f"{_Colors.GREEN}%(levelname)s{_Colors.RESET} - %(message)s",
+            # datefmt="%H:%M:%S"
+        )
+
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(formatter)
+        self.logger.addHandler(console_handler)
+
+    def iprint(self, text: str, prefix: bool = False) -> Literal[True]:
         """
         Вывод логов в консоль.
 
@@ -213,8 +170,8 @@ class _LogInfo:
         Returns:
             bool: Произошел ли вывод.
         """
-        output = f"{Colors.BLUE}{IPREFIX}{Colors.RESET} {Colors.CYAN}{self.name}{Colors.RESET} {text}"
-        print(output)
+        # output = f"{_Colors.BLUE}{IPREFIX}{_Colors.RESET} {_Colors.CYAN}{self.name}{_Colors.RESET} {text}"
+        self.logger.info(text)
         return True
 
     def ierror(self, text: str) -> Literal[True]:
@@ -227,8 +184,8 @@ class _LogInfo:
         Returns:
             bool: Произошел ли вывод.
         """
-        output = f"{Colors.BLUE}{IPREFIX}{Colors.RESET} {Colors.CYAN}{self.name}{Colors.RESET} {Colors.RED}{text}{Colors.RESET}"
-        print(output)
+        # output = f"{_Colors.BLUE}{IPREFIX}{_Colors.RESET} {_Colors.CYAN}{self.name}{_Colors.RESET} {_Colors.RED}{text}{_Colors.RESET}"
+        self.logger.info(text)
         return True
 
 
@@ -262,7 +219,7 @@ class IParam:
     )
     async def get_ticket_types(
         event_id: int = Path(..., title="ID мероприятия"),
-        auth_token: str = Cookie(alias="jwt_token"),  # Сюда подставится значение
+        auth_token: str = Cookie(None),
         service: TicketService = Depends(get_ticket_service),
     ) -> list[TicketType]:
         return await service.get_types(event_id, auth_token)
@@ -275,8 +232,10 @@ class IParam:
     2. Указанная функция будет вызвана с подставленными аргументами
 
     **ВАЖНО:**
-    - Всегда указывайте точное имя переменной в строке (например `"auth_token"`)
+    - Всегда указывайте точное имя переменной (например `"auth_token"`)
     """
+
+    _class_marker = "__iparam__"
 
     def __init__(
         self, func: Callable[..., Any], *args: object, **kwargs: object
@@ -285,7 +244,7 @@ class IParam:
         self.__args = args
         self.__kwargs = kwargs
 
-    async def __call__(self, **injections: object) -> Any:
+    async def __call__(self, injections: object) -> Any:
         """Вызов функции"""
         if injections:
             args = deepcopy(self.__args)
@@ -351,17 +310,18 @@ class ICacheWriter:
     Ключ будет сгенерирован с учетом результата функции `get_user_id`. В данном случае ID пользователя.
     """
 
+    _class_marker = "__icachewriter__"
     __param = IParam
 
     def __init__(self, func: Callable[..., Any]) -> None:
         self.__func = func
 
-    async def __call__(self, **kwargs: object) -> Any:
+    async def __call__(self, kwargs: object) -> Any:
         """Вызов функции"""
         # Вызов функции ICacheWriter(func)
         # Если это IParam, то вызываем и передаем туда тело оригинальной функции, чтобы заменить строки на реальные данные
         if isinstance(self.__func, self.__param):
-            return await self.__func(**kwargs)
+            return await self.__func(kwargs)
 
         if iscoroutinefunction(self.__func):
             return await self.__func()
@@ -371,6 +331,18 @@ class ICacheWriter:
         return f"{self.__class__.__name__}(func={self.__func})"
 
 
+@runtime_checkable
+class LoggerProtocol(Protocol):
+    def iprint(self, text: str) -> Literal[True]:
+        """
+        Вывод логов в консоль.
+
+        Args:
+            text (str): Текст для вывода.
+        """
+        ...
+
+
 class _RedisService:
     """Управление редисом"""
 
@@ -378,8 +350,10 @@ class _RedisService:
     redis: Redis
 
     def __new__(cls, logger: LoggerProtocol, *args: object, **kwargs: object) -> Self:
-        if not hasattr(logger, "iprint") or not callable(logger.iprint):
-            raise AttributeError('Логгер не имеет метода "iprint(text: str)') from None
+        if not isinstance(logger, LoggerProtocol):
+            raise TypeError(
+                f"Класс должен иметь методы: {[name for name, _ in getmembers(LoggerProtocol, isfunction) if name != '__subclasshook__']}"
+            )
 
         if cls.__instance is None:
             cls.__instance = super().__new__(cls)
@@ -404,17 +378,18 @@ class _RedisService:
             raise RuntimeError("Экземпляр RedisService не был создан") from None
         try:
             cls.__instance.redis = Redis(
-                host=SettingsRedis.HOST,
-                port=SettingsRedis.PORT,
-                db=SettingsRedis.DB,
-                decode_responses=SettingsRedis.DECODE_RESPONSES,
+                host=_SettingsRedis.HOST,
+                port=_SettingsRedis.PORT,
+                db=_SettingsRedis.DB,
+                decode_responses=_SettingsRedis.DECODE_RESPONSES,
             )
             cls.__instance.redis.ping()
             return True
         except Exception as e:
             raise ConnectionError("Ошибка подключения к Redis") from None
 
-    def search_key(self, cache: str) -> Any:
+    @classmethod
+    def search_key(cls, cache: str) -> Any:
         """
         Метод для поиска кеша в Redis.
 
@@ -424,9 +399,14 @@ class _RedisService:
         Returns:
             Any: Результат поиска.
         """
-        return self.redis.get(cache)
+        return cls.__instance.redis.get(cache)
 
-    def save_key(self, cache: str, value: Dict[str, Any], time: int) -> Any:
+    @classmethod
+    def all_keys(cls) -> list[Any, Any]:
+        return cls.__instance.redis.keys()
+
+    @classmethod
+    def save_key(cls, cache: str, value: Dict[str, Any], time: int) -> Any:
         """
         Метод для сохранения кеша в Redis.
 
@@ -438,11 +418,12 @@ class _RedisService:
         Returns:
             Any: Результат сохранения.
         """
-        if time:
-            return self.redis.setex(cache, time, str(value))
-        return self.redis.set(cache, str(value))
+        if time != -1:
+            return cls.__instance.redis.setex(cache, time, str(value))
+        return cls.__instance.redis.set(cache, str(value))
 
-    def delete_key(self, cache: str) -> Any:
+    @classmethod
+    def delete_key(cls, cache: str) -> Any:
         """
         Метод для удаления кеша Redis.
 
@@ -452,10 +433,210 @@ class _RedisService:
         Returns:
             Any: Результат удаления.
         """
-        return self.redis.delete(cache)
+        return cls.__instance.redis.delete(cache)
+
+    @classmethod
+    async def clear_cache(
+        cls,
+        logger: LoggerProtocol,
+        key_redis: str,
+        func: Callable[P, R],
+        *args: P.args,
+        **kwargs: P.kwargs,
+    ) -> Callable[P, R]:
+        """
+        Чистка кеша.
+
+        Args:
+            logger (LoggerProtocol): Класс для работы с логгером.
+            key_redis (str): Ключ для поиска в Redis.
+            func (Callable[..., Any]): Оригинальная функция для запуска.
+
+        Returns:
+            R: результат функции.
+        """
+        try:
+            if cls.search_key(key_redis) is not None:
+                cls.delete_key(key_redis)
+                logger.iprint("Кеш удален")
+        except redis.ConnectionError as e:
+            logger.ierror(f"Не удалось удалить кеш. {e}")
+
+        return await cls.launch_function(func, *args, **kwargs)
+
+    @classmethod
+    async def using_cache(
+        cls,
+        logger: LoggerProtocol,
+        key_redis: str,
+        func: Callable[P, R],
+        time_ttl: int,
+        *args: P.args,
+        **kwargs: P.kwargs,
+    ) -> Callable[P, R]:
+        """
+        Использование/сохранение кеша.
+
+        Args:
+            logger (LoggerProtocol): Класс для работы с логгером.
+            key_redis (str): Ключ для поиска в Redis.
+            func (Callable[..., Any]): Оригинальная функция для запуска.
+            time_ttl (int): Время жизни кеша. `-1` - бесконечно
+
+        Returns:
+            Callable[..., Any]: Кеш/результат функции.
+        """
+        try:
+            if (value_redis := cls.search_key(key_redis)) is None:
+                result = await cls.launch_function(func, *args, **kwargs)
+                json_value = jsonable_encoder(result)
+
+                cls.save_key(key_redis, json_value, time_ttl)
+
+                logger.iprint("Кеш сохранен")
+                return result
+            else:
+                fixed_json = value_redis.replace("'", '"')
+                json_result: R = json.loads(fixed_json)
+
+                logger.iprint("Кеш использован")
+                return json_result
+        except redis.ConnectionError as e:
+            logger.ierror(f"Не удалось использовать кеш. {e}")
+            return await cls.launch_function(func, *args, **kwargs)
+        except json.decoder.JSONDecodeError:
+            logger.ierror(
+                f"[Json error] Не удалось использовать кеш. Произошло аварийное удаление ключа."
+            )
+            cls.delete_key(key_redis)
+            return await cls.launch_function(func, *args, **kwargs)
+
+    @staticmethod
+    async def launch_function(
+        func: Callable[P, Any], *args: P.args, **kwargs: P.kwargs
+    ) -> Callable[P, Any]:
+        if iscoroutinefunction(func):
+            return await func(*args, **kwargs)
+        return func(*args, **kwargs)
+
+    @classmethod
+    def create_cache_key(cls, name: str, data: Dict[str, Any]) -> str:
+        """
+        Возвращает ключ для Redis.
+
+        Args:
+            name (str): Уникальное имя сессии.
+            data (Dict[str, Any]): json запрос пользователя.
+
+        Returns:
+            str: Готовый ключ для Redis.
+        """
+        serialized_data = json.dumps(data, sort_keys=True).encode("utf-8")
+        key_hash = hashlib.sha256(serialized_data).hexdigest()
+        return f"icache:{name}:cache:{key_hash}"
 
 
-class IClearCache:
+class IStatsCache(_RedisService):
+    __loger_name = _LogInfo
+    __redis_name = _RedisService
+    __redis_instance = None
+    __log = None
+
+    @classmethod
+    def connect_redis_servise(cls):
+        if cls.__redis_instance is None:
+            cls.__log = cls.__loger_name("stats_cache")
+            cls.__redis_instance = cls.__redis_name(cls.__log)
+
+        return cls.__redis_instance
+
+    @classmethod
+    def all(cls, *, is_print=False):
+        _redis = cls.connect_redis_servise()
+        all_keys = _redis.all_keys()
+
+        result: dict[str, str] = {}
+
+        for index, key in enumerate(all_keys, start=1):
+            result[index] = {"key": key, "value": _redis.search_key(key)}
+
+        if is_print:
+            text_print: list[str] = []
+            text_print = [
+                f"{index}) {elems['key']} | {elems['value']}"
+                for index, elems in result.items()
+            ]
+            if not text_print:
+                text_print.append("Redis пуст")
+            cls.__log.iprint("\n".join(text_print))
+        return result
+
+
+@runtime_checkable
+class RedisProtocol(Protocol):
+    def create_cache_key(): ...
+
+
+class _CacheCommonMixin:
+    @staticmethod
+    def creating_dict_arguments(
+        func: Callable[..., Any], *args: object, **kwargs: object
+    ) -> dict[str, Any]:
+        """Метод для парсинга аргументов функции"""
+        sig = signature(func)
+        bound = sig.bind(*args, **kwargs)
+        bound.apply_defaults()
+        return dict(bound.arguments)
+
+    @staticmethod
+    async def generate_cache_key(
+        unique_name: str,
+        arguments: dict[str, Any],
+        functions: Optional[list[Callable[..., Any]]],
+        data: Optional[list[Any]],
+        redis: RedisProtocol,
+    ) -> str:
+        """
+        Генерация ключа для кеша.
+
+        Args:
+            unique_name (str): Уникальное имя сессии.
+            arguments (dict[str, Any]): Все переменные оригинальной функции.
+            functions (Optional[list[Callable[..., Any]]]): Все функции переданные в декоратор.
+            data (Optional[list[Any]]): Все данные переданные в функцию для кеша.
+            redis (RedisProtocol): Класс для работы с редис.
+
+        Raises:
+            TypeError: Неверный класс для работы с редис.
+
+        Returns:
+            str: Готовый кеш.
+        """
+        if not isinstance(redis, RedisProtocol):
+            raise TypeError(
+                f"Класс должен иметь методы: {[name for name, _ in getmembers(RedisProtocol, isfunction) if name != '__subclasshook__']}"
+            )
+
+        parameters: dict[str, Any] = {}
+
+        if functions:
+            functions = deepcopy(functions)
+
+            if func_result := await _launch_operation(functions, arguments):
+                parameters["__ifunc__"] = func_result
+
+        if data:
+            data = deepcopy(data)
+
+            if data_result := await _substitution_data(data, arguments):
+                parameters["__idata__"] = data_result
+
+        key_redis: str = redis.create_cache_key(unique_name, parameters)
+        print(f"{parameters} | {key_redis}")
+        return key_redis
+
+
+class IClearCache(_CacheCommonMixin):
     """Декоратор для чистки кеша"""
 
     __loger_name = _LogInfo
@@ -467,7 +648,7 @@ class IClearCache:
         unique_name: str,
         functions: Optional[list[Callable[..., Any]]] = None,
         data: Optional[list[Any]] = None,
-        time_ttl: int = 0,
+        time_ttl: int = -1,
     ) -> None:
         """
         Декоратор для очистки кеша. Полезен, чтобы не выдавало старых данных.
@@ -486,11 +667,11 @@ class IClearCache:
         self.functions = functions
         self.data = data
 
-        if 2_147_483_647 > time_ttl > -1:
+        if LIMIT_TIME_REDIS > time_ttl >= -1:
             self.time_ttl = time_ttl
         else:
             raise ValueError(
-                "Время должно быть в пределах 2_147_483_647 > time_ttl > -1"
+                f"Время должно быть в пределах {LIMIT_TIME_REDIS!r} > time_ttl > -1"
             )
 
         # устанавливаем сессию логера и редис
@@ -502,46 +683,22 @@ class IClearCache:
 
         @wraps(func)
         async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-            parameters: dict[str, Any] = {}
+            all_arguments: dict[str, Any] = self.creating_dict_arguments(
+                func, *args, **kwargs
+            )
 
-            if self.functions:
-                functions = deepcopy(self.functions)
+            key_redis = await self.generate_cache_key(
+                self.unique_name, all_arguments, self.functions, self.data, self.redis
+            )
 
-                if func_result := await _launch_operation(functions, **kwargs):
-                    parameters["__ifunc__"] = func_result
-
-            if self.data:
-                data = deepcopy(self.data)
-
-                if data_result := await _substitution_data(data, kwargs):
-                    parameters["__idata__"] = data_result
-
-            key_redis: str = _create_cache_key(self.unique_name, parameters)
-            self.log.iprint(f"{parameters} | {key_redis}")
-
-            return await self.__interaction_redis(key_redis, func, *args, **kwargs)
+            return await self.redis.clear_cache(
+                self.log, key_redis, func, *args, **kwargs
+            )
 
         return wrapper
 
-    async def __interaction_redis(
-        self,
-        key_redis: str,
-        func: Callable[..., Any],
-        *args: P.args,
-        **kwargs: P.kwargs,
-    ) -> R:
-        """Работа с редис"""
-        try:
-            if self.redis.search_key(key_redis) is not None:
-                self.redis.delete_key(key_redis)
-                self.log.iprint("Кеш удален")
-        except redis.ConnectionError as e:
-            self.log.ierror(f"Не удалось удалить кеш. {e}")
 
-        return await func(*args, **kwargs)
-
-
-class ICache:
+class ICache(_CacheCommonMixin):
     """Декоратор для использования кеша"""
 
     __loger_name = _LogInfo
@@ -553,7 +710,7 @@ class ICache:
         unique_name: str,
         functions: Optional[list[Callable[..., Any]]] = None,
         data: Optional[list[Any]] = None,
-        time_ttl: int = 0,
+        time_ttl: int = -1,
     ) -> None:
         """
         Декоратор для использования кеша. Полностью сохраняет результат и переиспользует.
@@ -573,11 +730,11 @@ class ICache:
         self.functions = functions
         self.data = data
 
-        if 2_147_483_647 > time_ttl > -1:
+        if LIMIT_TIME_REDIS > time_ttl >= -1:
             self.time_ttl = time_ttl
         else:
             raise ValueError(
-                "Время должно быть в пределах 2_147_483_647 > time_ttl > -1"
+                f"Время должно быть в пределах {LIMIT_TIME_REDIS!r} > time_ttl > -1"
             )
 
         # устанавливаем сессию логера и редис
@@ -589,51 +746,16 @@ class ICache:
 
         @wraps(func)
         async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-            parameters: dict[str, Any] = {}
+            all_arguments: dict[str, Any] = self.creating_dict_arguments(
+                func, *args, **kwargs
+            )
 
-            if self.functions:
-                functions = deepcopy(self.functions)
+            key_redis = await self.generate_cache_key(
+                self.unique_name, all_arguments, self.functions, self.data, self.redis
+            )
 
-                if func_result := await _launch_operation(functions, **kwargs):
-                    parameters["__ifunc__"] = func_result
-
-            if self.data:
-                data = deepcopy(self.data)
-
-                if data_result := await _substitution_data(data, kwargs):
-                    parameters["__idata__"] = data_result
-
-            key_redis: str = _create_cache_key(self.unique_name, parameters)
-            self.log.iprint(f"{parameters} | {key_redis}")
-
-            return await self.__interaction_redis(key_redis, func, *args, **kwargs)
+            return await self.redis.using_cache(
+                self.log, key_redis, func, self.time_ttl, *args, **kwargs
+            )
 
         return wrapper
-
-    async def __interaction_redis(
-        self,
-        key_redis: str,
-        func: Callable[..., Any],
-        *args: P.args,
-        **kwargs: P.kwargs,
-    ) -> Callable[..., Any]:
-        """Работа с редис"""
-        try:
-            if self.redis.search_key(key_redis) is None:
-                result = await func(*args, **kwargs)
-                json_value = jsonable_encoder(result)
-
-                self.redis.save_key(key_redis, json_value, self.time_ttl)
-
-                self.log.iprint("Кеш сохранен")
-                return result
-            else:
-                json_str = self.redis.search_key(key_redis)
-                fixed_json = json_str.replace("'", '"')
-                json_result: R = json.loads(fixed_json)
-
-                self.log.iprint("Кеш использован")
-                return json_result
-        except redis.ConnectionError as e:
-            self.log.ierror(f"Не удалось использовать кеш. {e}")
-            return await func(*args, **kwargs)
