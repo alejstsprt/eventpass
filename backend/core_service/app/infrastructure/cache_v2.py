@@ -252,8 +252,25 @@ class IParam:
         self.__args = args
         self.__kwargs = kwargs
 
-    async def __call__(self, injections: object) -> Any:
+    async def __call__(
+        self, injections: object = None, *, recursion: list[Any] | None = None
+    ) -> Any:
         """Вызов функции"""
+        # print('>>>', self.__args)
+        for arg in self.__args:
+            print("ПРОБЕЖКА:", arg)
+            if not getattr(arg, "_class_marker", None) == "__iparam__":
+                continue
+
+            if not recursion:
+                massiv_func = []
+                massiv_func = await arg(recursion=massiv_func)
+                print("=========", massiv_func)
+            else:
+                result = await arg(recursion=massiv_func)
+                massiv_func.append(result)
+                return massiv_func
+
         if injections:
             args = deepcopy(self.__args)
             kwargs = deepcopy(self.__kwargs)

@@ -11,7 +11,7 @@ from backend.core_service.app.infrastructure.cache_v2 import (
     IStatsCache,
 )
 
-IStatsCache.all(is_print=True)
+# IStatsCache.all(is_print=True)
 
 
 def test_func(*args, **kwargs):
@@ -32,7 +32,20 @@ def test_func(*args, **kwargs):
         IParam(test_func),
         IParam(test_func),
         IParam(
-            test_func, IParam(test_func, IParam(test_func, IParam(test_func, "3t")))
+            test_func,
+            "Этап 1",
+            IParam(
+                test_func,
+                "Этап 2",
+                IParam(
+                    test_func,
+                    "Этап 3",
+                    IParam(
+                        test_func,
+                        "Этап 4",
+                    ),
+                ),
+            ),
         ),
     ],
 )
