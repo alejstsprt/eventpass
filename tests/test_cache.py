@@ -17,7 +17,7 @@ from backend.core_service.app.infrastructure.cache_v2 import (
     istats,
 )
 
-istats.all_cache(is_print=True)
+# istats.all_cache(is_print=True)
 
 
 # ========== MOCK DATA ==========

@@ -1,6 +1,8 @@
 """
 name: ICache
 v: v2.0
+
+# условия + дефолт изменяемое
 """
 
 import asyncio
@@ -9,7 +11,7 @@ import json
 import logging
 import threading
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import lru_cache, wraps
 from inspect import getmembers, iscoroutinefunction, isfunction, signature
 from typing import (
@@ -41,6 +43,96 @@ R = TypeVar("R")
 
 IPREFIX: Final[str] = "[ICache]"
 LIMIT_TIME_REDIS: Final[int] = 2_147_483_647
+logging_level: Final[int] = logging.DEBUG
+
+
+@dataclass(frozen=True)
+class _Colors:
+    """Цвета для консоли"""
+
+    WHITE = "\033[97m"
+    RED: Final[str] = "\033[91m"
+    GREEN: Final[str] = "\033[92m"
+    BLUE: Final[str] = "\033[94m"
+    YELLOW = "\033[93m"
+    MAGENTA: Final[str] = "\033[35m"
+    CYAN: Final[str] = "\033[36m"
+    RESET: Final[str] = "\033[0m"
+
+    # Цвета для уровней логирования (классовая переменная)
+    LEVEL_COLORS: ClassVar[Dict[int, str]] = {
+        "DEBUG": "\033[94m",  # BLUE
+        "INFO": "\033[92m",  # GREEN
+        "WARNING": "\033[93m",  # YELLOW
+        "ERROR": "\033[91m",  # RED
+        "CRITICAL": "\033[95m",  # MAGENTA
+    }
+
+    @classmethod
+    def get_level_color(cls, level: int) -> str:
+        """Возвращает цвет для указанного уровня логирования"""
+        return cls.LEVEL_COLORS.get(level, cls.WHITE)
+
+
+@runtime_checkable
+class LoggerProtocol(Protocol):
+    def info() -> None: ...
+    def debug() -> None: ...
+    def warning() -> None: ...
+    def error() -> None: ...
+    def critical() -> None: ...
+
+
+class _LogInfo:
+    """Система логов с цветами в стиле: LEVEL [PREFIX] сообщение"""
+
+    def __init__(self, session_name: str, level: int = logging_level) -> None:
+        self.name = f"[{session_name}]"
+        self.logger = logging.getLogger(session_name)
+        self.logger.setLevel(level)
+
+        if not self.logger.handlers:
+            formatter = logging.Formatter("%(message)s")  # логика внутри format-функций
+            console_handler = logging.StreamHandler()
+            console_handler.setFormatter(formatter)
+            self.logger.addHandler(console_handler)
+
+    def _build_output(
+        self, level: str, message: str, session_name: bool, prefix: bool
+    ) -> str:
+        color_level = _Colors.get_level_color(level.upper())
+
+        parts = [
+            f"{color_level}{level.upper()}{_Colors.RESET} ",
+            f"{_Colors.BLUE}{IPREFIX}{_Colors.RESET} " if prefix else "",
+            f"{_Colors.CYAN}{self.name}{_Colors.RESET} " if session_name else "",
+            f"{message}",
+        ]
+        return "".join(parts)
+
+    def info(self, text: str, session_name: bool = True, prefix: bool = True) -> None:
+        self.logger.info(self._build_output("INFO", text, session_name, prefix))
+        return True
+
+    def debug(self, text: str, session_name: bool = True, prefix: bool = True) -> None:
+        self.logger.debug(self._build_output("DEBUG", text, session_name, prefix))
+        return True
+
+    def warning(
+        self, text: str, session_name: bool = True, prefix: bool = True
+    ) -> None:
+        self.logger.warning(self._build_output("WARNING", text, session_name, prefix))
+        return True
+
+    def error(self, text: str, session_name: bool = True, prefix: bool = True) -> None:
+        self.logger.error(self._build_output("ERROR", text, session_name, prefix))
+        return True
+
+    def critical(
+        self, text: str, session_name: bool = True, prefix: bool = True
+    ) -> None:
+        self.logger.critical(self._build_output("CRITICAL", text, session_name, prefix))
+        return True
 
 
 def add_class_marker(**attrs):
@@ -64,7 +156,9 @@ def _pydantic_transformations(
         return element
 
 
-def _substitution_data(param: list[Any], replacement: dict[Any, Any]) -> list[Any]:
+def _substitution_data(
+    logger: LoggerProtocol, param: list[Any], replacement: dict[Any, Any]
+) -> list[Any]:
     """
     Подмена данных.
     >>> _substitution_data(["JWT_TOKEN"], {"JWT_TOKEN": "eyJhbGciOiJIUzI1..."})
@@ -77,6 +171,12 @@ def _substitution_data(param: list[Any], replacement: dict[Any, Any]) -> list[An
     Returns:
         list[Any]: Лист с замененными данными.
     """
+    if not isinstance(logger, LoggerProtocol):
+        raise TypeError(
+            f"Класс должен иметь методы: {[name for name, _ in getmembers(LoggerProtocol, isfunction) if name != '__subclasshook__']}"
+        )
+    logger.debug("Динамическая подмена данных №1..")
+
     for index, elem in enumerate(param):
         if not isinstance(elem, str):
             continue
@@ -87,6 +187,7 @@ def _substitution_data(param: list[Any], replacement: dict[Any, Any]) -> list[An
 
 
 async def _launch_operation(
+    logger: LoggerProtocol,
     functions: list[Callable[..., Any]],
     injections: dict[Any, Any],
 ) -> list[Any]:
@@ -103,6 +204,12 @@ async def _launch_operation(
     Raises:
         TypeError: Если передан невызываемый объект.
     """
+    if not isinstance(logger, LoggerProtocol):
+        raise TypeError(
+            f"Класс должен иметь методы: {[name for name, _ in getmembers(LoggerProtocol, isfunction) if name != '__subclasshook__']}"
+        )
+    logger.debug("Активация обработчика и запуск менеджеров..")
+
     # WORK:
     # _launch_operation (обработчик и активатор)
     #   -> ICacheWriter (менеджер добавления в кеш данных)
@@ -118,25 +225,13 @@ async def _launch_operation(
         if class_marker == "__icachewriter__":
             result.append(await operation(injections))
         elif class_marker == "__iparam__":
-            await operation(injections)
+            await operation(logger, injections)
         elif iscoroutinefunction(operation):
             await operation()
         else:
             operation()
 
     return result
-
-
-@dataclass(frozen=True)
-class _Colors:
-    """Цвета для консоли"""
-
-    RED: Final[str] = "\033[91m"
-    GREEN: Final[str] = "\033[92m"
-    BLUE: Final[str] = "\033[94m"
-    MAGENTA: Final[str] = "\033[35m"
-    CYAN: Final[str] = "\033[36m"
-    RESET: Final[str] = "\033[0m"
 
 
 @dataclass(frozen=True)
@@ -150,54 +245,6 @@ class _SettingsRedis:
     TIME_SAVE_NO_CONNECTING: Final[int] = (
         10  # TODO: сделать умный обход подключеня к редис если он упал
     )
-
-
-class _LogInfo:
-    """Система логов"""
-
-    def __init__(self, session_name: str) -> None:
-        self.name = f"[{session_name}]"
-        self.logger = logging.getLogger(session_name)
-        self.logger.setLevel(logging.DEBUG)
-
-        formatter = logging.Formatter(
-            # f"{_Colors.BLUE}%(asctime)s{_Colors.RESET} "
-            # f"{_Colors.BLUE}{IPREFIX}{_Colors.RESET} {_Colors.CYAN}{self.name}{_Colors.RESET} "
-            f"{_Colors.GREEN}%(levelname)s{_Colors.RESET} - %(message)s",
-            # datefmt="%H:%M:%S"
-        )
-
-        console_handler = logging.StreamHandler()
-        console_handler.setFormatter(formatter)
-        self.logger.addHandler(console_handler)
-
-    def iprint(self, text: str, prefix: bool = False) -> Literal[True]:
-        """
-        Вывод логов в консоль.
-
-        Args:
-            text (str): Текст для вывода.
-
-        Returns:
-            bool: Произошел ли вывод.
-        """
-        # output = f"{_Colors.BLUE}{IPREFIX}{_Colors.RESET} {_Colors.CYAN}{self.name}{_Colors.RESET} {text}"
-        self.logger.info(text)
-        return True
-
-    def ierror(self, text: str) -> Literal[True]:
-        """
-        Вывод логов в консоль.
-
-        Args:
-            text (str): Текст для вывода.
-
-        Returns:
-            bool: Произошел ли вывод.
-        """
-        # output = f"{_Colors.BLUE}{IPREFIX}{_Colors.RESET} {_Colors.CYAN}{self.name}{_Colors.RESET} {_Colors.RED}{text}{_Colors.RESET}"
-        self.logger.info(text)
-        return True
 
 
 @add_class_marker(_class_marker="__iparam__")
@@ -255,9 +302,18 @@ class IParam:
         self.__kwargs = kwargs
 
     async def __call__(
-        self, injections: object = None, *, recursion: list[Any] | None = None
+        self,
+        logger: LoggerProtocol,
+        injections: object = None,
+        *,
+        recursion: list[Any] | None = None,
     ) -> Any:
         """Вызов функции"""
+
+        if not isinstance(logger, LoggerProtocol):
+            raise TypeError(
+                f"Класс должен иметь методы: {[name for name, _ in getmembers(LoggerProtocol, isfunction) if name != '__subclasshook__']}"
+            )
         # print('>>>', self.__args)
         # for arg in self.__args:
         #     print("ПРОБЕЖКА:", arg)
@@ -279,13 +335,13 @@ class IParam:
 
             if iscoroutinefunction(self.__func):
                 return self.__func(
-                    *self.__process_args([*args], injections),
-                    **self.__process_kwargs(kwargs, injections),
+                    *self.__process_args(logger, [*args], injections),
+                    **self.__process_kwargs(logger, kwargs, injections),
                 )
 
             return self.__func(
-                *self.__process_args([*args], injections),
-                **self.__process_kwargs(kwargs, injections),
+                *self.__process_args(logger, [*args], injections),
+                **self.__process_kwargs(logger, kwargs, injections),
             )
 
         if iscoroutinefunction(self.__func):
@@ -293,15 +349,24 @@ class IParam:
         return self.__func(*self.__args, **self.__kwargs)
 
     @staticmethod
-    def __process_args(param: list[Any], replacement: dict[Any, Any]) -> list[Any]:
+    def __process_args(
+        logger: LoggerProtocol, param: list[Any], replacement: dict[Any, Any]
+    ) -> list[Any]:
         """Функция просто делегирует"""
-        return _substitution_data(param, replacement)
+        return _substitution_data(logger, param, replacement)
 
     @staticmethod
     def __process_kwargs(
-        param: dict[Any, Any], replacement: dict[Any, Any]
+        logger: LoggerProtocol, param: dict[Any, Any], replacement: dict[Any, Any]
     ) -> dict[Any, Any]:
         """Подстановка данных"""
+
+        if not isinstance(logger, LoggerProtocol):
+            raise TypeError(
+                f"Класс должен иметь методы: {[name for name, _ in getmembers(LoggerProtocol, isfunction) if name != '__subclasshook__']}"
+            )
+        logger.debug("Динамическая подмена данных №2..")
+
         for kay, value in param.items():
             if not isinstance(value, str):
                 continue
@@ -356,18 +421,6 @@ class ICacheWriter:
         return f"{self.__class__.__name__}(func={self.__func})"
 
 
-@runtime_checkable
-class LoggerProtocol(Protocol):
-    def iprint(self, text: str) -> Literal[True]:
-        """
-        Вывод логов в консоль.
-
-        Args:
-            text (str): Текст для вывода.
-        """
-        ...
-
-
 class _RedisService:
     """Управление редисом"""
 
@@ -382,9 +435,9 @@ class _RedisService:
 
         if cls.__instance is None:
             cls.__instance = super().__new__(cls)
-            logger.iprint("Подключение к Redis...")
+            logger.info("Подключение к Redis...", False)
             cls.__connect_redis()
-            logger.iprint("Подключено")
+            logger.info("Подключено", False)
             return cls.__instance
         return cls.__instance
 
@@ -446,7 +499,6 @@ class _RedisService:
         Returns:
             Any: Результат сохранения.
         """
-        print(f"key='{key}', value='{value}'")
         if time != -1:
             result_create = cls.__instance.redis.setex(key, time, str(value))
         else:
@@ -521,9 +573,9 @@ class _RedisService:
 
             if cls.search_key(key_redis) is not None:
                 cls.delete_key(key_redis)
-                logger.iprint("Кеш удален")
+                logger.info("Кеш удален")
         except redis.ConnectionError as e:
-            logger.ierror(f"Не удалось удалить кеш. {e}")
+            logger.error(f"Не удалось удалить кеш/тег. Отсутствует подключение к Redis")
 
         return await cls.launch_function(func, *args, **kwargs)
 
@@ -558,23 +610,31 @@ class _RedisService:
 
                 cls.save_key(key_redis, json_value, tags, time_ttl)
 
-                logger.iprint("Кеш сохранен")
+                logger.info("Кеш сохранен")
                 return result
             else:
                 fixed_json = value_redis.replace("'", '"')
                 json_result: R = json.loads(fixed_json)
 
-                logger.iprint("Кеш использован")
+                logger.info("Кеш использован")
                 return json_result
+
         except redis.ConnectionError as e:
-            logger.ierror(f"Не удалось использовать кеш. {e}")
-            return await cls.launch_function(func, *args, **kwargs)
+            logger.error(f"Не удалось удалить кеш/тег. Отсутствует подключение к Redis")
+
         except json.decoder.JSONDecodeError:
-            logger.ierror(
-                f"[Json error] Не удалось использовать кеш. Произошло аварийное удаление ключа."
-            )
-            cls.delete_key(key_redis)
-            return await cls.launch_function(func, *args, **kwargs)
+            try:
+                cls.delete_key(key_redis)
+                logger.error(
+                    f"[Json error] Не удалось использовать кеш. Произошло аварийное удаление ключа."
+                )
+
+            except json.decoder.JSONDecodeError:
+                logger.error(
+                    f"Не удалось удалить кеш/тег. Отсутствует подключение к Redis"
+                )
+
+        return await cls.launch_function(func, *args, **kwargs)
 
     @staticmethod
     async def launch_function(
@@ -625,18 +685,18 @@ class _IStatsCache(_RedisService):
                 result[index] = {"tag": key, "count": count}
 
         if is_print:
-            text_print: list[str] = []
-            text_print = [
+            text_print: list[str] = ["Ключи Redis: "]
+            text_print += [
                 f"{index}) {elems.get('key', elems.get('tag', 'ERROR: is not found'))} | {elems.get('value', elems.get('count', 'ERROR: is not found'))}"
                 for index, elems in result.items()
             ]
             if not text_print:
                 text_print.append("Redis пуст")
-            self.__log.iprint("\n".join(text_print))
+            self.__log.info("\n".join(text_print))
         return result
 
 
-istats = _IStatsCache("_stats_cache")
+istats = _IStatsCache("STATS")
 
 
 @runtime_checkable
@@ -647,9 +707,20 @@ class RedisProtocol(Protocol):
 class _CacheCommonMixin:
     @staticmethod
     def creating_dict_arguments(
-        func: Callable[..., Any], *args: object, **kwargs: object
+        logger: LoggerProtocol,
+        func: Callable[..., Any],
+        *args: object,
+        **kwargs: object,
     ) -> dict[str, Any]:
         """Метод для парсинга аргументов функции"""
+
+        if not isinstance(logger, LoggerProtocol):
+            raise TypeError(
+                f"Класс должен иметь методы: {[name for name, _ in getmembers(LoggerProtocol, isfunction) if name != '__subclasshook__']}"
+            )
+
+        logger.debug("Парсинг аргументов функции..")
+
         sig = signature(func)
         bound = sig.bind(*args, **kwargs)
         bound.apply_defaults()
@@ -657,6 +728,7 @@ class _CacheCommonMixin:
 
     @staticmethod
     async def generate_cache_key(
+        logger: LoggerProtocol,
         unique_name: str,
         arguments: dict[str, Any],
         functions: Optional[list[Callable[..., Any]]],
@@ -673,6 +745,7 @@ class _CacheCommonMixin:
             data (Optional[list[Any]]): Все данные переданные в функцию для кеша.
             redis (RedisProtocol): Класс для работы с редис.
 
+
         Raises:
             TypeError: Неверный класс для работы с редис.
 
@@ -683,19 +756,25 @@ class _CacheCommonMixin:
             raise TypeError(
                 f"Класс должен иметь методы: {[name for name, _ in getmembers(RedisProtocol, isfunction) if name != '__subclasshook__']}"
             )
+        if not isinstance(logger, LoggerProtocol):
+            raise TypeError(
+                f"Класс должен иметь методы: {[name for name, _ in getmembers(LoggerProtocol, isfunction) if name != '__subclasshook__']}"
+            )
+
+        logger.debug("Генерация ключа..")
 
         parameters: dict[str, Any] = {}
 
         if functions:
             functions = deepcopy(functions)
 
-            if func_result := await _launch_operation(functions, arguments):
+            if func_result := await _launch_operation(logger, functions, arguments):
                 parameters["__ifunc__"] = func_result
 
         if data:
             data = deepcopy(data)
 
-            if data_result := _substitution_data(data, arguments):
+            if data_result := _substitution_data(logger, data, arguments):
                 parameters["__idata__"] = data_result
 
         key_redis: str = redis.create_cache_key(unique_name, parameters)
@@ -743,12 +822,19 @@ class IClearCache(_CacheCommonMixin):
 
         @wraps(func)
         async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+            self.log.debug("Вызван декоратор чистки кеша..")
+
             all_arguments: dict[str, Any] = self.creating_dict_arguments(
-                func, *args, **kwargs
+                self.log, func, *args, **kwargs
             )
 
             key_redis = await self.generate_cache_key(
-                self.unique_name, all_arguments, self.functions, self.data, self.redis
+                self.log,
+                self.unique_name,
+                all_arguments,
+                self.functions,
+                self.data,
+                self.redis,
             )
 
             return await self.redis.clear_cache(
@@ -803,15 +889,24 @@ class ICache(_CacheCommonMixin):
         self.redis = self.__redis_name(self.log)
 
     def __call__(self, func: Callable[P, Awaitable[R]]) -> Callable[P, Awaitable[R]]:
+        """Вызов функции"""
 
         @wraps(func)
         async def async_wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
             """Декоратор для синхронных и асинхронных функций"""
+            self.log.debug("Вызван декоратор создания/использования кеша..")
 
-            all_arguments = self.creating_dict_arguments(func, *args, **kwargs)
+            all_arguments: dict[str, Any] = self.creating_dict_arguments(
+                self.log, func, *args, **kwargs
+            )
 
             key_redis = await self.generate_cache_key(
-                self.unique_name, all_arguments, self.functions, self.data, self.redis
+                self.log,
+                self.unique_name,
+                all_arguments,
+                self.functions,
+                self.data,
+                self.redis,
             )
 
             return await self.redis.using_cache(
