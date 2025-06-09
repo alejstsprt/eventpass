@@ -821,7 +821,7 @@ class IClearCache(_CacheCommonMixin):
         """Вызов функции"""
 
         @wraps(func)
-        async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        async def async_wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
             self.log.debug("Вызван декоратор чистки кеша..")
 
             all_arguments: dict[str, Any] = self.creating_dict_arguments(
@@ -841,7 +841,29 @@ class IClearCache(_CacheCommonMixin):
                 self.log, key_redis, self.tags_delete, func, *args, **kwargs
             )
 
-        return wrapper
+        @wraps(func)
+        def sync_wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+            async def async_part():
+                return await async_wrapper(*args, **kwargs)
+
+            try:
+                loop = asyncio.get_running_loop()
+                if loop.is_running():
+                    result = []
+
+                    def thread_target():
+                        result.append(anyio.run(async_part))
+
+                    thread = threading.Thread(target=thread_target)
+                    thread.start()
+                    thread.join()
+                    return result[0]
+                else:
+                    return anyio.run(async_part)
+            except RuntimeError:
+                return anyio.run(async_part)
+
+        return async_wrapper if iscoroutinefunction(func) else sync_wrapper
 
 
 class ICache(_CacheCommonMixin):
