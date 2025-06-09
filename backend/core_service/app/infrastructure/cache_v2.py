@@ -7,6 +7,7 @@ import asyncio
 import hashlib
 import json
 import logging
+import threading
 from copy import deepcopy
 from dataclasses import dataclass
 from functools import lru_cache, wraps
@@ -29,6 +30,7 @@ from typing import (
     runtime_checkable,
 )
 
+import anyio
 import redis
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
@@ -257,19 +259,19 @@ class IParam:
     ) -> Any:
         """Вызов функции"""
         # print('>>>', self.__args)
-        for arg in self.__args:
-            print("ПРОБЕЖКА:", arg)
-            if not getattr(arg, "_class_marker", None) == "__iparam__":
-                continue
+        # for arg in self.__args:
+        #     print("ПРОБЕЖКА:", arg)
+        #     if not getattr(arg, "_class_marker", None) == "__iparam__":
+        #         continue
 
-            if not recursion:
-                massiv_func = []
-                massiv_func = await arg(recursion=massiv_func)
-                print("=========", massiv_func)
-            else:
-                result = await arg(recursion=massiv_func)
-                massiv_func.append(result)
-                return massiv_func
+        #     if not recursion:
+        #         massiv_func = []
+        #         massiv_func = await arg(recursion=massiv_func)
+        #         print("=========", massiv_func)
+        #     else:
+        #         result = await arg(recursion=massiv_func)
+        #         massiv_func.append(result)
+        #         return massiv_func
 
         if injections:
             args = deepcopy(self.__args)
@@ -412,57 +414,91 @@ class _RedisService:
             raise ConnectionError("Ошибка подключения к Redis") from None
 
     @classmethod
-    def search_key(cls, cache: str) -> Any:
+    def search_key(cls, key: str) -> Any:
         """
         Метод для поиска кеша в Redis.
 
         Args:
-            cache (str): Кеш-ключ.
+            key (str): Кеш-ключ.
 
         Returns:
             Any: Результат поиска.
         """
-        return cls.__instance.redis.get(cache)
+        return cls.__instance.redis.get(key) or None
 
     @classmethod
     def all_keys(cls) -> list[Any, Any]:
         return cls.__instance.redis.keys()
 
     @classmethod
-    def save_key(cls, cache: str, value: Dict[str, Any], time: int) -> Any:
+    def save_key(
+        cls, key: str, value: Dict[str, Any], tags: list[str], time: int
+    ) -> Any:
         """
         Метод для сохранения кеша в Redis.
 
         Args:
-            cache (str): Кеш-ключ.
+            key (str): Кеш-ключ.
             value (Dict[str, Any]): Данные-значение.
-            time (int): Время жизни кеша. `time=0` - бесконечно.
+            tags (list[str]): Теги ключа.
+            time (int): Время жизни кеша. `time=-1` - бесконечно.
 
         Returns:
             Any: Результат сохранения.
         """
+        print(f"key='{key}', value='{value}'")
         if time != -1:
-            return cls.__instance.redis.setex(cache, time, str(value))
-        return cls.__instance.redis.set(cache, str(value))
+            result_create = cls.__instance.redis.setex(key, time, str(value))
+        else:
+            result_create = cls.__instance.redis.set(key, str(value))
+
+        for tag in tags:
+            cls.__instance.redis.sadd(f"tag:{tag}", key)
+
+        return result_create
 
     @classmethod
-    def delete_key(cls, cache: str) -> Any:
+    def delete_key(cls, key: str) -> Any:
         """
         Метод для удаления кеша Redis.
 
         Args:
-            cache (str): Кеш-ключ.
+            key (str): Кеш-ключ.
 
         Returns:
             Any: Результат удаления.
         """
-        return cls.__instance.redis.delete(cache)
+        return cls.__instance.redis.delete(key)
+
+    @classmethod
+    def delete_tags(cls, tags: list[str]) -> Literal[True]:
+        """
+        Удаление элементов тегов.
+
+        Args:
+            tags (list[str]): Теги.
+
+        Returns:
+            Literal[True]: Результат удаления.
+        """
+        for tag in tags:
+            tag_name = f"tag:{tag}"
+            keys = cls.__instance.redis.smembers(tag_name)
+            if keys:
+                cls.__instance.redis.delete(*keys)
+            cls.__instance.redis.delete(tag_name)
+        return True
+
+    @classmethod
+    def count_tag(cls, tag: str) -> int:
+        return cls.__instance.redis.scard(tag)
 
     @classmethod
     async def clear_cache(
         cls,
         logger: LoggerProtocol,
         key_redis: str,
+        tags_delete: list[str],
         func: Callable[P, R],
         *args: P.args,
         **kwargs: P.kwargs,
@@ -473,12 +509,16 @@ class _RedisService:
         Args:
             logger (LoggerProtocol): Класс для работы с логгером.
             key_redis (str): Ключ для поиска в Redis.
+            tags_delete (list[str]): Теги для удаления всех элементов с этими тегами.
             func (Callable[..., Any]): Оригинальная функция для запуска.
 
         Returns:
-            R: результат функции.
+            Callable[P, R]: Результат функции.
         """
         try:
+            if tags_delete:
+                cls.delete_tags(tags_delete)
+
             if cls.search_key(key_redis) is not None:
                 cls.delete_key(key_redis)
                 logger.iprint("Кеш удален")
@@ -493,6 +533,7 @@ class _RedisService:
         logger: LoggerProtocol,
         key_redis: str,
         func: Callable[P, R],
+        tags: list[str],
         time_ttl: int,
         *args: P.args,
         **kwargs: P.kwargs,
@@ -504,6 +545,7 @@ class _RedisService:
             logger (LoggerProtocol): Класс для работы с логгером.
             key_redis (str): Ключ для поиска в Redis.
             func (Callable[..., Any]): Оригинальная функция для запуска.
+            tags (list[str]): Теги, для удаления всех элементов с этими тегами.
             time_ttl (int): Время жизни кеша. `-1` - бесконечно
 
         Returns:
@@ -514,7 +556,7 @@ class _RedisService:
                 result = await cls.launch_function(func, *args, **kwargs)
                 json_value = jsonable_encoder(result)
 
-                cls.save_key(key_redis, json_value, time_ttl)
+                cls.save_key(key_redis, json_value, tags, time_ttl)
 
                 logger.iprint("Кеш сохранен")
                 return result
@@ -559,40 +601,42 @@ class _RedisService:
         return f"icache:{name}:cache:{key_hash}"
 
 
-class IStatsCache(_RedisService):
+class _IStatsCache(_RedisService):
     __loger_name = _LogInfo
     __redis_name = _RedisService
-    __redis_instance = None
-    __log = None
 
-    @classmethod
-    def connect_redis_servise(cls):
-        if cls.__redis_instance is None:
-            cls.__log = cls.__loger_name("stats_cache")
-            cls.__redis_instance = cls.__redis_name(cls.__log)
+    def __init__(self, logger: str):
+        self.__log = self.__loger_name(logger)
+        self.__redis = self.__redis_name(self.__log)
 
-        return cls.__redis_instance
+    def __new__(cls, *args, **kwargs):
+        return object.__new__(cls)
 
-    @classmethod
-    def all(cls, *, is_print=False):
-        _redis = cls.connect_redis_servise()
-        all_keys = _redis.all_keys()
+    def all_cache(self, *, is_print=False):
+        all_keys = self.__redis.all_keys()
 
         result: dict[str, str] = {}
 
         for index, key in enumerate(all_keys, start=1):
-            result[index] = {"key": key, "value": _redis.search_key(key)}
+            if key.startswith("icache"):
+                result[index] = {"key": key, "value": self.__redis.search_key(key)}
+            elif key.startswith("tag:"):
+                count = self.__redis.count_tag(key)
+                result[index] = {"tag": key, "count": count}
 
         if is_print:
             text_print: list[str] = []
             text_print = [
-                f"{index}) {elems['key']} | {elems['value']}"
+                f"{index}) {elems.get('key', elems.get('tag', 'ERROR: is not found'))} | {elems.get('value', elems.get('count', 'ERROR: is not found'))}"
                 for index, elems in result.items()
             ]
             if not text_print:
                 text_print.append("Redis пуст")
-            cls.__log.iprint("\n".join(text_print))
+            self.__log.iprint("\n".join(text_print))
         return result
+
+
+istats = _IStatsCache("_stats_cache")
 
 
 @runtime_checkable
@@ -655,7 +699,7 @@ class _CacheCommonMixin:
                 parameters["__idata__"] = data_result
 
         key_redis: str = redis.create_cache_key(unique_name, parameters)
-        print(f"{parameters} | {key_redis}")
+        # print(f"{parameters} | {key_redis}")
         return key_redis
 
 
@@ -669,33 +713,26 @@ class IClearCache(_CacheCommonMixin):
         self,
         *,
         unique_name: str,
+        tags_delete: list[str] = [],
         functions: Optional[list[Callable[..., Any]]] = None,
         data: Optional[list[Any]] = None,
-        time_ttl: int = -1,
     ) -> None:
         """
         Декоратор для очистки кеша. Полезен, чтобы не выдавало старых данных.
 
         Args:
             unique_name (str): Уникальное имя сессии кеша.
-            jwt_token_path (str | None, optional): Путь к токену. `Декоратор сам проверяет токен и есть ли user в db`. Defaults to None.
-            add_pydantic_model (str | None, optional): Путь к pydantic модели. Defaults to None.
-            add_jwt_token (bool, optional): Добавить ли токен в кеш. Defaults to False.
-            add_jwt_user_id (bool, optional): Добавить ли айди из токена в кеш. Defaults to False.
+            tags_delete (list[str], optional): Теги для удаления всех элементов с этими тегами. Defaults to ["icache"].
+            functions (Optional[list[Callable[..., Any]]], optional): Функции для запуска. Defaults to None.
+            data (Optional[list[Any]], optional): Данные, которые влияют на итоговый сгенерированный кеш. Defaults to None.
 
         Raises:
             ValueError: Неверные входные данные.
         """
         self.unique_name = unique_name
+        self.tags_delete = tags_delete
         self.functions = functions
         self.data = data
-
-        if LIMIT_TIME_REDIS > time_ttl >= -1:
-            self.time_ttl = time_ttl
-        else:
-            raise ValueError(
-                f"Время должно быть в пределах {LIMIT_TIME_REDIS!r} > time_ttl > -1"
-            )
 
         # устанавливаем сессию логера и редис
         self.log = self.__loger_name(unique_name)
@@ -715,7 +752,7 @@ class IClearCache(_CacheCommonMixin):
             )
 
             return await self.redis.clear_cache(
-                self.log, key_redis, func, *args, **kwargs
+                self.log, key_redis, self.tags_delete, func, *args, **kwargs
             )
 
         return wrapper
@@ -731,6 +768,7 @@ class ICache(_CacheCommonMixin):
         self,
         *,
         unique_name: str,
+        tags: list[str] = ["icache"],
         functions: Optional[list[Callable[..., Any]]] = None,
         data: Optional[list[Any]] = None,
         time_ttl: int = -1,
@@ -740,24 +778,24 @@ class ICache(_CacheCommonMixin):
 
         Args:
             unique_name (str): Уникальное имя сессии кеша.
-            jwt_token_path (str | None, optional): Путь к токену. `Декоратор сам проверяет токен и есть ли user в db`. Defaults to None.
-            add_pydantic_model (str | None, optional): Путь к pydantic модели. Defaults to None.
-            add_jwt_token (bool, optional): Добавить ли токен в кеш. Defaults to False.
-            add_jwt_user_id (bool, optional): Добавить ли айди из токена в кеш. Defaults to False.
-            time_ttl (int, optional): Время жизни кеша. По умолчанию бесконечное. Defaults to 0.
+            tags (list[str], optional): Теги, в которые кеш будет добавлен. Defaults to ["icache"].
+            functions (Optional[list[Callable[..., Any]]], optional): Функции для запуска. Defaults to None.
+            data (Optional[list[Any]], optional): Данные, которые влияют на итоговый сгенерированный кеш. Defaults to None.
+            key_ttl (int, optional): Время жизни кеша. По умолчанию бесконечное. Defaults to -1.
 
         Raises:
             ValueError: Неверные входные данные.
         """
         self.unique_name = unique_name
+        self.tags = tags
         self.functions = functions
         self.data = data
 
         if LIMIT_TIME_REDIS > time_ttl >= -1:
-            self.time_ttl = time_ttl
+            self.key_ttl = time_ttl
         else:
             raise ValueError(
-                f"Время должно быть в пределах {LIMIT_TIME_REDIS!r} > time_ttl > -1"
+                f"Время должно быть в пределах {LIMIT_TIME_REDIS!r} > key_ttl > -1"
             )
 
         # устанавливаем сессию логера и редис
@@ -765,20 +803,41 @@ class ICache(_CacheCommonMixin):
         self.redis = self.__redis_name(self.log)
 
     def __call__(self, func: Callable[P, Awaitable[R]]) -> Callable[P, Awaitable[R]]:
-        """Вызов функции"""
 
         @wraps(func)
-        async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-            all_arguments: dict[str, Any] = self.creating_dict_arguments(
-                func, *args, **kwargs
-            )
+        async def async_wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+            """Декоратор для синхронных и асинхронных функций"""
+
+            all_arguments = self.creating_dict_arguments(func, *args, **kwargs)
 
             key_redis = await self.generate_cache_key(
                 self.unique_name, all_arguments, self.functions, self.data, self.redis
             )
 
             return await self.redis.using_cache(
-                self.log, key_redis, func, self.time_ttl, *args, **kwargs
+                self.log, key_redis, func, self.tags, self.key_ttl, *args, **kwargs
             )
 
-        return wrapper
+        @wraps(func)
+        def sync_wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+            async def async_part():
+                return await async_wrapper(*args, **kwargs)
+
+            try:
+                loop = asyncio.get_running_loop()
+                if loop.is_running():
+                    result = []
+
+                    def thread_target():
+                        result.append(anyio.run(async_part))
+
+                    thread = threading.Thread(target=thread_target)
+                    thread.start()
+                    thread.join()
+                    return result[0]
+                else:
+                    return anyio.run(async_part)
+            except RuntimeError:
+                return anyio.run(async_part)
+
+        return async_wrapper if iscoroutinefunction(func) else sync_wrapper
