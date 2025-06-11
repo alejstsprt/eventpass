@@ -10,6 +10,7 @@ import hashlib
 import json
 import logging
 import threading
+import warnings
 from copy import deepcopy
 from dataclasses import dataclass, field
 from functools import lru_cache, wraps
@@ -27,8 +28,11 @@ from typing import (
     ParamSpec,
     Protocol,
     Self,
+    TypeAlias,
     TypeVar,
     Union,
+    final,
+    overload,
     runtime_checkable,
 )
 
@@ -41,9 +45,17 @@ from redis import Redis
 P = ParamSpec("P")
 R = TypeVar("R")
 
+K = TypeVar("K")
+K2 = TypeVar("K2")
+V = TypeVar("V")
+V2 = TypeVar("V2")
+
+ElementDTO: TypeAlias = Union[BaseModel, dict[str, Any], list[Any], Any]
+ElementReplaceDTO: TypeAlias = Union[dict[str, Any], list[Any], Any]
+
 IPREFIX: Final[str] = "[ICache]"
 LIMIT_TIME_REDIS: Final[int] = 2_147_483_647
-logging_level: Final[int] = logging.DEBUG
+logging_level: Final[int] = logging.INFO
 
 
 @dataclass(frozen=True)
@@ -59,13 +71,12 @@ class _Colors:
     CYAN: Final[str] = "\033[36m"
     RESET: Final[str] = "\033[0m"
 
-    # Цвета для уровней логирования (классовая переменная)
     LEVEL_COLORS: ClassVar[Dict[int, str]] = {
-        "DEBUG": "\033[94m",  # BLUE
-        "INFO": "\033[92m",  # GREEN
-        "WARNING": "\033[93m",  # YELLOW
-        "ERROR": "\033[91m",  # RED
-        "CRITICAL": "\033[95m",  # MAGENTA
+        "DEBUG": "\033[94m",
+        "INFO": "\033[92m",
+        "WARNING": "\033[93m",
+        "ERROR": "\033[91m",
+        "CRITICAL": "\033[95m",
     }
 
     @classmethod
@@ -76,11 +87,21 @@ class _Colors:
 
 @runtime_checkable
 class LoggerProtocol(Protocol):
-    def info() -> None: ...
-    def debug() -> None: ...
-    def warning() -> None: ...
-    def error() -> None: ...
-    def critical() -> None: ...
+    def info(
+        self, text: str, session_name: bool = True, prefix: bool = True
+    ) -> None: ...
+    def debug(
+        self, text: str, session_name: bool = True, prefix: bool = True
+    ) -> None: ...
+    def warning(
+        self, text: str, session_name: bool = True, prefix: bool = True
+    ) -> None: ...
+    def error(
+        self, text: str, session_name: bool = True, prefix: bool = True
+    ) -> None: ...
+    def critical(
+        self, text: str, session_name: bool = True, prefix: bool = True
+    ) -> None: ...
 
 
 class _LogInfo:
@@ -112,30 +133,25 @@ class _LogInfo:
 
     def info(self, text: str, session_name: bool = True, prefix: bool = True) -> None:
         self.logger.info(self._build_output("INFO", text, session_name, prefix))
-        return True
 
     def debug(self, text: str, session_name: bool = True, prefix: bool = True) -> None:
         self.logger.debug(self._build_output("DEBUG", text, session_name, prefix))
-        return True
 
     def warning(
         self, text: str, session_name: bool = True, prefix: bool = True
     ) -> None:
         self.logger.warning(self._build_output("WARNING", text, session_name, prefix))
-        return True
 
     def error(self, text: str, session_name: bool = True, prefix: bool = True) -> None:
         self.logger.error(self._build_output("ERROR", text, session_name, prefix))
-        return True
 
     def critical(
         self, text: str, session_name: bool = True, prefix: bool = True
     ) -> None:
         self.logger.critical(self._build_output("CRITICAL", text, session_name, prefix))
-        return True
 
 
-def add_class_marker(**attrs):
+def add_class_marker(**attrs) -> Any:
     """Добавление атрибутов в класс"""
 
     def wrapper(cls):
@@ -146,9 +162,7 @@ def add_class_marker(**attrs):
     return wrapper
 
 
-def _pydantic_transformations(
-    element: Union[BaseModel, dict[str, Any], list[Any], Any]
-) -> Union[dict[str, Any], list[Any], Any]:
+def _pydantic_transformations(element: ElementDTO) -> ElementReplaceDTO:
     """Пайдемик в json"""
     try:
         return jsonable_encoder(element)
@@ -156,9 +170,19 @@ def _pydantic_transformations(
         return element
 
 
+@overload
 def _substitution_data(
-    logger: LoggerProtocol, param: list[Any], replacement: dict[Any, Any]
-) -> list[Any]:
+    logger: LoggerProtocol, param: list[Any], replacement: Dict[str, Any]
+) -> list[Any]: ...
+
+
+@overload
+def _substitution_data(
+    logger: LoggerProtocol, param: Dict[K, V], replacement: Dict[K2, V2]
+) -> Dict[K, V | V2]: ...
+
+
+def _substitution_data(logger: LoggerProtocol, param, replacement):  # TODO: соединить
     """
     Подмена данных.
     >>> _substitution_data(["JWT_TOKEN"], {"JWT_TOKEN": "eyJhbGciOiJIUzI1..."})
@@ -189,7 +213,7 @@ def _substitution_data(
 async def _launch_operation(
     logger: LoggerProtocol,
     functions: list[Callable[..., Any]],
-    injections: dict[Any, Any],
+    injections: Dict[Any, Any],
 ) -> list[Any]:
     """
     Запускает список операций с автоматическим определением их типа.
@@ -247,6 +271,7 @@ class _SettingsRedis:
     )
 
 
+@final
 @add_class_marker(_class_marker="__iparam__")
 class IParam:
     """
@@ -350,15 +375,15 @@ class IParam:
 
     @staticmethod
     def __process_args(
-        logger: LoggerProtocol, param: list[Any], replacement: dict[Any, Any]
+        logger: LoggerProtocol, param: list[Any], replacement: Dict[Any, Any]
     ) -> list[Any]:
         """Функция просто делегирует"""
         return _substitution_data(logger, param, replacement)
 
     @staticmethod
     def __process_kwargs(
-        logger: LoggerProtocol, param: dict[Any, Any], replacement: dict[Any, Any]
-    ) -> dict[Any, Any]:
+        logger: LoggerProtocol, param: Dict[Any, Any], replacement: Dict[Any, Any]
+    ) -> Dict[Any, Any]:
         """Подстановка данных"""
 
         if not isinstance(logger, LoggerProtocol):
@@ -379,6 +404,7 @@ class IParam:
         return f"{self.__class__.__name__}(func={self.__func}, args={self.__args}, kwargs={self.__kwargs})"
 
 
+@final
 @add_class_marker(_class_marker="__icachewriter__")
 class ICacheWriter:
     """
@@ -550,7 +576,7 @@ class _RedisService:
         cls,
         logger: LoggerProtocol,
         key_redis: str,
-        tags_delete: list[str],
+        tags_delete: list[str] | None,
         func: Callable[P, R],
         *args: P.args,
         **kwargs: P.kwargs,
@@ -661,6 +687,7 @@ class _RedisService:
         return f"icache:{name}:cache:{key_hash}"
 
 
+@final
 class _IStatsCache(_RedisService):
     __loger_name = _LogInfo
     __redis_name = _RedisService
@@ -675,7 +702,7 @@ class _IStatsCache(_RedisService):
     def all_cache(self, *, is_print=False):
         all_keys = self.__redis.all_keys()
 
-        result: dict[str, str] = {}
+        result: Dict[str, str] = {}
 
         for index, key in enumerate(all_keys, start=1):
             if key.startswith("icache"):
@@ -683,6 +710,8 @@ class _IStatsCache(_RedisService):
             elif key.startswith("tag:"):
                 count = self.__redis.count_tag(key)
                 result[index] = {"tag": key, "count": count}
+            else:
+                warnings.warn(f"Ключ {key} не был распознан")
 
         if is_print:
             text_print: list[str] = ["Ключи Redis: "]
@@ -690,7 +719,7 @@ class _IStatsCache(_RedisService):
                 f"{index}) {elems.get('key', elems.get('tag', 'ERROR: is not found'))} | {elems.get('value', elems.get('count', 'ERROR: is not found'))}"
                 for index, elems in result.items()
             ]
-            if not text_print:
+            if len(text_print) <= 1:
                 text_print.append("Redis пуст")
             self.__log.info("\n".join(text_print))
         return result
@@ -711,8 +740,10 @@ class _CacheCommonMixin:
         func: Callable[..., Any],
         *args: object,
         **kwargs: object,
-    ) -> dict[str, Any]:
+    ) -> Dict[str, Any]:
         """Метод для парсинга аргументов функции"""
+        if not isinstance(func, Callable):
+            raise TypeError(f"Передаваемый объект {func} должен быть вызываемый")
 
         if not isinstance(logger, LoggerProtocol):
             raise TypeError(
@@ -730,7 +761,7 @@ class _CacheCommonMixin:
     async def generate_cache_key(
         logger: LoggerProtocol,
         unique_name: str,
-        arguments: dict[str, Any],
+        arguments: Dict[str, Any],
         functions: Optional[list[Callable[..., Any]]],
         data: Optional[list[Any]],
         redis: RedisProtocol,
@@ -763,7 +794,7 @@ class _CacheCommonMixin:
 
         logger.debug("Генерация ключа..")
 
-        parameters: dict[str, Any] = {}
+        parameters: Dict[str, Any] = {}
 
         if functions:
             functions = deepcopy(functions)
@@ -782,6 +813,7 @@ class _CacheCommonMixin:
         return key_redis
 
 
+@final
 class IClearCache(_CacheCommonMixin):
     """Декоратор для чистки кеша"""
 
@@ -792,7 +824,7 @@ class IClearCache(_CacheCommonMixin):
         self,
         *,
         unique_name: str,
-        tags_delete: list[str] = [],
+        tags_delete: list[str] | None = None,
         functions: Optional[list[Callable[..., Any]]] = None,
         data: Optional[list[Any]] = None,
     ) -> None:
@@ -824,7 +856,7 @@ class IClearCache(_CacheCommonMixin):
         async def async_wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
             self.log.debug("Вызван декоратор чистки кеша..")
 
-            all_arguments: dict[str, Any] = self.creating_dict_arguments(
+            all_arguments: Dict[str, Any] = self.creating_dict_arguments(
                 self.log, func, *args, **kwargs
             )
 
@@ -866,6 +898,7 @@ class IClearCache(_CacheCommonMixin):
         return async_wrapper if iscoroutinefunction(func) else sync_wrapper
 
 
+@final
 class ICache(_CacheCommonMixin):
     """Декоратор для использования кеша"""
 
@@ -918,7 +951,7 @@ class ICache(_CacheCommonMixin):
             """Декоратор для синхронных и асинхронных функций"""
             self.log.debug("Вызван декоратор создания/использования кеша..")
 
-            all_arguments: dict[str, Any] = self.creating_dict_arguments(
+            all_arguments: Dict[str, Any] = self.creating_dict_arguments(
                 self.log, func, *args, **kwargs
             )
 
