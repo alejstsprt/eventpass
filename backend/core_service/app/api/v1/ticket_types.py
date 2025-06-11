@@ -41,6 +41,10 @@ async def create_types_ticket(  # type: ignore[no-untyped-def]
 #         ICacheWriter(IParam(token_verification, "jwt_token")), # можно совмещать
 #         test_func
 #     ],
+#     data=[
+#         "event_id"
+#     ],
+#     time_ttl=100
 # )
 async def get_types_ticket_event(  # type: ignore[no-untyped-def]
     event_id: int = Path(..., title="ID мероприятия", ge=1, le=config.MAX_ID),
