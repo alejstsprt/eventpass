@@ -3,7 +3,7 @@ repos:
     rev: 5.13.2
     hooks:
       - id: isort
-        args: ["--profile", "black", "--known-first-party=core,infrastructure,schemas,services"]
+        args: ["--profile", "black"]
 
   - repo: https://github.com/psf/black
     rev: 24.3.0
