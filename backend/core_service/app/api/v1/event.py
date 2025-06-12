@@ -1,5 +1,6 @@
-from core.config import config
 from fastapi import APIRouter, Cookie, Depends, Path, status
+
+from core.config import config
 from infrastructure.cache import ICache, IClearCache
 from schemas import CreateEvent, EditEvent, ManagementEventsProtocol
 from services import CREATE_EVENT_RESPONSES, get_event_service

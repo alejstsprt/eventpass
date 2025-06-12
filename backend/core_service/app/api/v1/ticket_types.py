@@ -1,10 +1,11 @@
 from typing import TYPE_CHECKING
 
-from core.config import config
 from fastapi import APIRouter, Cookie, Depends, Path, status
+from security.jwt import token_verification
+
+from core.config import config
 from infrastructure.cache_v2 import ICache, ICacheWriter, IClearCache, IParam
 from schemas import CreateTicketType, EditTicketType, ManagementTicketTypeProtocol
-from security.jwt import token_verification
 from services import get_ticket_types_service
 
 router = APIRouter()
