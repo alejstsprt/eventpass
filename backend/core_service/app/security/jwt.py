@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-from core.config import config
 from fastapi import Response
 from jose import JWTError, jwt
 from sqlalchemy import Column
+
+from core.config import config
 
 
 async def set_jwt_cookie(response: Response, token: str) -> None:

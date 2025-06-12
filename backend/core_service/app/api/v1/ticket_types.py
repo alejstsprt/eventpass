@@ -1,29 +1,14 @@
 from typing import TYPE_CHECKING
 
-from core.config import config
 from fastapi import APIRouter, Cookie, Depends, Path, status
+
+from core.config import config
 from infrastructure.cache_v2 import ICache, ICacheWriter, IClearCache, IParam
 from schemas import CreateTicketType, EditTicketType, ManagementTicketTypeProtocol
 from security.jwt import token_verification
 from services import get_ticket_types_service
 
 router = APIRouter()
-
-
-@router.post(
-    "",
-    summary="Создание типа билета для мероприятия",
-    description="ИНФО: Ручка для создания типа билета для мероприятия. Принимает в себя event_id, ticket_type, description, price, total_count.",
-    status_code=status.HTTP_201_CREATED,
-    responses=None,  # TODO: дописать
-)
-# @IClearCache(unique_name="ticket-types-cache", jwt_token_path="jwt_token")
-async def create_types_ticket(  # type: ignore[no-untyped-def]
-    ticket_type_data: CreateTicketType,
-    service: ManagementTicketTypeProtocol = Depends(get_ticket_types_service),
-    jwt_token: str = Cookie(None),
-):
-    return await service.create_types_ticket_event(jwt_token, ticket_type_data)
 
 
 @router.get(
@@ -33,25 +18,39 @@ async def create_types_ticket(  # type: ignore[no-untyped-def]
     status_code=status.HTTP_200_OK,
     responses=None,  # TODO: дописать
 )
-# @ICache(
-#     unique_name="ticket-types-cache",
-#     functions=[
-#         IParam(token_verification, "jwt_token"), # "jwt_token" заменится на реальный токен
-#         ICacheWriter(test_func), # результат функции примется для генерации ключа для редиса
-#         ICacheWriter(IParam(token_verification, "jwt_token")), # можно совмещать
-#         test_func
-#     ],
-#     data=[
-#         "event_id"
-#     ],
-#     time_ttl=100
-# )
+@ICache(
+    unique_name="ticket-types",
+    tags=["ticket-types-1"],
+    functions=[
+        IParam(token_verification, "jwt_token"),
+    ],
+    data=["event_id"],
+)
 async def get_types_ticket_event(  # type: ignore[no-untyped-def]
     event_id: int = Path(..., title="ID мероприятия", ge=1, le=config.MAX_ID),
     service: ManagementTicketTypeProtocol = Depends(get_ticket_types_service),
     jwt_token: str = Cookie(None),
 ):
     return await service.search_types_ticket_event(jwt_token, event_id)
+
+
+@router.post(
+    "",
+    summary="Создание типа билета для мероприятия",
+    description="ИНФО: Ручка для создания типа билета для мероприятия. Принимает в себя event_id, ticket_type, description, price, total_count.",
+    status_code=status.HTTP_201_CREATED,
+    responses=None,  # TODO: дописать
+)
+@IClearCache(
+    unique_name="ticket-types",
+    tags_delete=["ticket-types-1"],
+)
+async def create_types_ticket(  # type: ignore[no-untyped-def]
+    ticket_type_data: CreateTicketType,
+    service: ManagementTicketTypeProtocol = Depends(get_ticket_types_service),
+    jwt_token: str = Cookie(None),
+):
+    return await service.create_types_ticket_event(jwt_token, ticket_type_data)
 
 
 @router.patch(
@@ -62,7 +61,8 @@ async def get_types_ticket_event(  # type: ignore[no-untyped-def]
     responses=None,  # TODO: дописать
 )
 @IClearCache(
-    unique_name="ticket-types-cache",
+    unique_name="ticket-types",
+    tags_delete=["ticket-types-1"],
 )
 async def edit_types_ticket(  # type: ignore[no-untyped-def]
     ticket_type_data: EditTicketType,
@@ -82,7 +82,7 @@ async def edit_types_ticket(  # type: ignore[no-untyped-def]
     status_code=status.HTTP_204_NO_CONTENT,
     responses=None,  # TODO: дописать
 )
-# @IClearCache(unique_name="ticket-types-cache", jwt_token_path="jwt_token")
+@IClearCache(unique_name="ticket-types", tags_delete=["ticket-types-1"])
 async def delete_types_ticket(
     ticket_type_id: int = Path(
         ..., title="ID типа билета мероприятия", ge=1, le=config.MAX_ID
@@ -90,4 +90,5 @@ async def delete_types_ticket(
     service: ManagementTicketTypeProtocol = Depends(get_ticket_types_service),
     jwt_token: str = Cookie(None),
 ) -> None:
-    return  # TODO: реализовать
+    await service.delete_ticket_type(jwt_token, ticket_type_id)
+    return

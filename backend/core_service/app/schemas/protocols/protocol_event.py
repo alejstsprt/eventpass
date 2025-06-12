@@ -61,3 +61,16 @@ class ManagementEventsProtocol(Protocol):
             NoTokenError: Токен отстутствует/Неверный
         """
         ...
+
+    async def delete_event(self, jwt_token: str, event_id: int) -> None:
+        """
+        Удаление мероприятия.
+
+        Args:
+            jwt_token (str): Токен пользователя.
+            event_id (int): ID мероприятия.
+
+        Raises:
+            NoTokenError: Токен отстутствует/Неверный.
+        """
+        ...

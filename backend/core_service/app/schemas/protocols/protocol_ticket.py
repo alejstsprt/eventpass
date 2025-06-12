@@ -24,3 +24,16 @@ class ManagementTicketsProtocol(Protocol):
             NoTokenError: Токен неправильный/отсутствует.
         """
         ...
+
+    async def delete_ticket(self, ticket_id: int, jwt_token: str) -> None:
+        """
+        Метод для удаления билета.
+
+        Args:
+            ticket_id (int): ID билета.
+            jwt_token (str): JWT токен пользователя.
+
+        Raises:
+            NoTokenError: Токен неправильный/отсутствует.
+        """
+        ...

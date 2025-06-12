@@ -1,12 +1,13 @@
 from typing import TYPE_CHECKING
 
-from core.exceptions import LoginError, PasswordError
 from fastapi import Response
 from models.crud import search_user, user_registration
+from sqlalchemy.orm import Session
+
+from core.exceptions import LoginError, PasswordError
 from schemas import StrUserLogin, StrUserName, StrUserPassword
 from security.hashing import hash_password, verify_password
 from security.jwt import create_access_token, set_jwt_cookie
-from sqlalchemy.orm import Session
 
 if TYPE_CHECKING:
     from schemas import (

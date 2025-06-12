@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Protocol
 if TYPE_CHECKING:
     from models.models import TicketTypes
     from models.session import DBBaseModel
+
     from schemas import CreateTicketType, EditTicketType
 
 
@@ -60,6 +61,19 @@ class ManagementTicketTypeProtocol(Protocol):
 
         Returns:
             DBBaseModel: Результат поиска.
+
+        Raises:
+            NoTokenError (HTTPException): Отсутствует/неправильный токен.
+        """
+        ...
+
+    async def delete_ticket_type(self, jwt_token: str, ticket_type_id: int) -> None:
+        """
+        Удаление типа билета мероприятия.
+
+        Args:
+            jwt_token (str): Токен пользователя.
+            ticket_type_id (int): ID типа билета.
 
         Raises:
             NoTokenError (HTTPException): Отсутствует/неправильный токен.

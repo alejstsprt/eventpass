@@ -1,13 +1,20 @@
 from typing import TYPE_CHECKING
 
-from core.exceptions import NoTokenError, ValidationError
-from models.crud import create_type_ticket_event, edit_data, get_types_ticket_event
-from security.jwt import token_verification
+from models.crud import (
+    create_type_ticket_event,
+    del_ticket_type,
+    edit_data,
+    get_types_ticket_event,
+)
 from sqlalchemy.orm import Session
+
+from core.exceptions import NoTokenError, ValidationError
+from security.jwt import token_verification
 
 if TYPE_CHECKING:
     from models.models import TicketTypes
     from models.session import DBBaseModel
+
     from schemas import CreateTicketType, EditTicketType
 
 
@@ -104,3 +111,21 @@ class ManagementTicketTypes:
             raise NoTokenError()
 
         return await get_types_ticket_event(self.db, event_id)
+
+    async def delete_ticket_type(self, jwt_token: str, ticket_type_id: int) -> None:
+        """
+        Удаление типа билета мероприятия.
+
+        Args:
+            jwt_token (str): Токен пользователя.
+            ticket_type_id (int): ID типа билета.
+
+        Raises:
+            NoTokenError (HTTPException): Отсутствует/неправильный токен.
+        """
+        user_id = await token_verification(jwt_token)
+        if not user_id:
+            raise NoTokenError()
+
+        await del_ticket_type(self.db, ticket_type_id, user_id)
+        return
