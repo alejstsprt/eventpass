@@ -1,7 +1,8 @@
 from typing import Annotated
 
-from core.config import config
 from pydantic import BaseModel, Field
+
+from core.config import config
 from schemas.pydantics.cfg_base_model import ConfigBaseModelResponseDTO
 from schemas.pydantics.table_db import (
     AccountResponseDTO,

@@ -6,15 +6,14 @@ v: v2.0
 """
 
 import asyncio
-import hashlib
-import json
-import logging
-import threading
-import warnings
 from copy import deepcopy
 from dataclasses import dataclass, field
 from functools import lru_cache, wraps
+import hashlib
 from inspect import getmembers, iscoroutinefunction, isfunction, signature
+import json
+import logging
+import threading
 from typing import (
     Any,
     Awaitable,
@@ -35,11 +34,12 @@ from typing import (
     overload,
     runtime_checkable,
 )
+import warnings
 
 import anyio
-import redis
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
+import redis
 from redis import Redis
 
 P = ParamSpec("P")
@@ -359,7 +359,7 @@ class IParam:
             kwargs = deepcopy(self.__kwargs)
 
             if iscoroutinefunction(self.__func):
-                return self.__func(
+                return await self.__func(
                     *self.__process_args(logger, [*args], injections),
                     **self.__process_kwargs(logger, kwargs, injections),
                 )
@@ -596,10 +596,11 @@ class _RedisService:
         try:
             if tags_delete:
                 cls.delete_tags(tags_delete)
+                logger.info("Кеш удален [tags]")
 
             if cls.search_key(key_redis) is not None:
                 cls.delete_key(key_redis)
-                logger.info("Кеш удален")
+                logger.info("Кеш удален [key]")
         except redis.ConnectionError as e:
             logger.error(f"Не удалось удалить кеш/тег. Отсутствует подключение к Redis")
 
@@ -841,9 +842,13 @@ class IClearCache(_CacheCommonMixin):
             ValueError: Неверные входные данные.
         """
         self.unique_name = unique_name
-        self.tags_delete = tags_delete
         self.functions = functions
         self.data = data
+
+        for tag in tags_delete:
+            if not tag:
+                raise ValueError("Тег не может быть пустым")
+        self.tags_delete = tags_delete
 
         # устанавливаем сессию логера и редис
         self.log = self.__loger_name(unique_name)
@@ -928,9 +933,13 @@ class ICache(_CacheCommonMixin):
             ValueError: Неверные входные данные.
         """
         self.unique_name = unique_name
-        self.tags = tags
         self.functions = functions
         self.data = data
+
+        for tag in tags:
+            if not tag:
+                raise ValueError("Тег не может быть пустым")
+        self.tags = tags
 
         if LIMIT_TIME_REDIS > time_ttl >= -1:
             self.key_ttl = time_ttl

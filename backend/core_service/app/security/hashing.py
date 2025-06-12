@@ -1,5 +1,6 @@
-from core.exceptions import ValidationError
 from passlib.context import CryptContext
+
+from core.exceptions import ValidationError
 
 pwd_context = CryptContext(
     schemes=["bcrypt"],

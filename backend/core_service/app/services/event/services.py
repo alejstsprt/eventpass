@@ -1,7 +1,9 @@
 from typing import TYPE_CHECKING
 
-from core.exceptions import NoTokenError, TokenError
 from models.crud import all_info_table, create_event, edit_data, search_user
+from sqlalchemy.orm import Session
+
+from core.exceptions import NoTokenError, TokenError
 from schemas import (
     IntEventCreatorId,
     IntUserId,
@@ -10,11 +12,11 @@ from schemas import (
     StrEventTitle,
 )
 from security.jwt import token_verification
-from sqlalchemy.orm import Session
 
 if TYPE_CHECKING:
     from models.models import Events
     from models.session import DBBaseModel
+
     from schemas import CreateEvent, EditEvent
 
 

@@ -3,9 +3,9 @@ import sys
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
 
 from backend.core_service.app.api.v1 import event, ticket_types, tickets, user
 from backend.core_service.app.middleware.cors import setup_cors

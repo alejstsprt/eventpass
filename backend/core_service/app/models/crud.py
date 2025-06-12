@@ -4,6 +4,11 @@
 
 from typing import TYPE_CHECKING, Literal, Optional, TypeVar
 
+from models.models import Accounts, Events, Tickets, TicketTypes
+from models.session import DBBaseModel
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session, joinedload
+
 from core.config import config
 from core.exceptions import (
     InternalServerError,
@@ -12,13 +17,10 @@ from core.exceptions import (
     ValidationError,
 )
 from core.logger import logger_api
-from models.models import Accounts, Events, Tickets, TicketTypes
-from models.session import DBBaseModel
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session, joinedload
 
 if TYPE_CHECKING:
     from pydantic import BaseModel
+
     from schemas import (
         IntEventCreatorId,
         IntUserId,

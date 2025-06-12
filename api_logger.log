@@ -1023,3 +1023,5 @@ sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
 [parameters: ('Витя', 'user@example.com', '$2b$12$Nt4k3Bp4YPxQVu0UVv7YV.Y044pDcGY7Z73eoe/sCpHEl7GXHuC5G')]
 (Background on this error at: https://sqlalche.me/e/20/e3q8)
 [2025-06-06 16:25:39,539] [ERROR] api_logger: Данный тип билета для этого мероприяия уже существует ticket_type = 'Vip'
+[2025-06-12 16:19:40,826] [ERROR] api_logger: Данный тип билета для этого мероприяия уже существует ticket_type = 'Vip'
+[2025-06-12 16:20:41,855] [ERROR] api_logger: Данный тип билета для этого мероприяия уже существует ticket_type = 'Vip'

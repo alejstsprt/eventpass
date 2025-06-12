@@ -1,7 +1,7 @@
-import hashlib
-import json
 from dataclasses import dataclass
 from functools import wraps
+import hashlib
+import json
 from typing import (
     Any,
     Awaitable,
@@ -17,12 +17,13 @@ from typing import (
     TypeVar,
 )
 
-import redis
-from core.exceptions import NoTokenError, TokenError
 from fastapi.encoders import jsonable_encoder
 from models.crud import search_user
 from models.session import get_db
+import redis
 from redis import Redis
+
+from core.exceptions import NoTokenError, TokenError
 from schemas import IntUserId
 from security.jwt import token_verification
 
