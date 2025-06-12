@@ -41,7 +41,10 @@ async def get_types_ticket_event(  # type: ignore[no-untyped-def]
     status_code=status.HTTP_201_CREATED,
     responses=None,  # TODO: дописать
 )
-@IClearCache(unique_name="ticket-types", tags_delete=["ticket-types-1"])
+@IClearCache(
+    unique_name="ticket-types",
+    tags_delete=["ticket-types-1"],
+)
 async def create_types_ticket(  # type: ignore[no-untyped-def]
     ticket_type_data: CreateTicketType,
     service: ManagementTicketTypeProtocol = Depends(get_ticket_types_service),
@@ -57,7 +60,10 @@ async def create_types_ticket(  # type: ignore[no-untyped-def]
     status_code=status.HTTP_200_OK,
     responses=None,  # TODO: дописать
 )
-@IClearCache(unique_name="ticket-types", tags_delete=["ticket-types-1"])
+@IClearCache(
+    unique_name="ticket-types",
+    tags_delete=["ticket-types-1"],
+)
 async def edit_types_ticket(  # type: ignore[no-untyped-def]
     ticket_type_data: EditTicketType,
     ticket_type_id: int = Path(
@@ -84,4 +90,5 @@ async def delete_types_ticket(
     service: ManagementTicketTypeProtocol = Depends(get_ticket_types_service),
     jwt_token: str = Cookie(None),
 ) -> None:
-    return  # TODO: реализовать
+    await service.delete_ticket_type(jwt_token, ticket_type_id)
+    return

@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from models.crud import all_info_table, create_event, edit_data, search_user
+from models.crud import all_info_table, create_event, del_event, edit_data, search_user
 from sqlalchemy.orm import Session
 
 from core.exceptions import NoTokenError, TokenError
@@ -64,7 +64,7 @@ class ManagementEvents:
 
     async def all_events(self, jwt_token: str) -> list["DBBaseModel"]:
         """
-        Метод для вывода всех мероприятий (не оптимизирован для больших данных)
+        Метод для вывода всех мероприятий (не оптимизирован для больших данных).
 
         Args:
             jwt_token (str): Токен пользователя.
@@ -95,9 +95,28 @@ class ManagementEvents:
             (list[Dict[str, Any]]): Вся информация об измененном обьекте.
 
         Raises:
-            NoTokenError: Токен отстутствует/Неверный
+            NoTokenError: Токен отстутствует/Неверный.
         """
         if not await token_verification(jwt_token):
             raise NoTokenError()  # выбрасываем ошибку чтобы запутать, если попытка подделать токен. фронтенд поймет.
 
         return await edit_data(self.db, "Events", event_id, event)
+
+    async def delete_event(self, jwt_token: str, event_id: int) -> None:
+        """
+        Удаление мероприятия.
+
+        Args:
+            jwt_token (str): Токен пользователя.
+            event_id (int): ID мероприятия.
+
+        Raises:
+            NoTokenError: Токен отстутствует/Неверный.
+        """
+        user_id = await token_verification(jwt_token)
+        if not user_id:
+            raise NoTokenError()
+
+        await del_event(self.db, event_id, user_id)
+
+        return

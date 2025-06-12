@@ -89,4 +89,5 @@ async def delete_events(
     jwt_token: str = Cookie(None),
     service: ManagementEventsProtocol = Depends(get_event_service),
 ) -> None:
-    return  # TODO: реализовать
+    await service.delete_event(jwt_token, event_id)
+    return

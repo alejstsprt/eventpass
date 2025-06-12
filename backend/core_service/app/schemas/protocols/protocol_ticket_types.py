@@ -66,3 +66,16 @@ class ManagementTicketTypeProtocol(Protocol):
             NoTokenError (HTTPException): Отсутствует/неправильный токен.
         """
         ...
+
+    async def delete_ticket_type(self, jwt_token: str, ticket_type_id: int) -> None:
+        """
+        Удаление типа билета мероприятия.
+
+        Args:
+            jwt_token (str): Токен пользователя.
+            ticket_type_id (int): ID типа билета.
+
+        Raises:
+            NoTokenError (HTTPException): Отсутствует/неправильный токен.
+        """
+        ...

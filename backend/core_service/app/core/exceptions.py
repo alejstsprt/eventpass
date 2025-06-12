@@ -59,7 +59,7 @@ class InvalidTokenException(HTTPException):
 
 
 class ValidationError(HTTPException):
-    """[all] Ошибка неверные данные"""
+    """[origin] Ошибка неверные данные"""
 
     def __init__(self, detail: str = "Неверные данные") -> None:
         super().__init__(status_code=status.HTTP_401_UNAUTHORIZED, detail=detail)
@@ -100,3 +100,29 @@ class TicketTypeError(ValidationError):
         super().__init__(
             detail="Данный тип билета для этого мероприятия уже существует"
         )
+
+
+# HTTP_403_FORBIDDEN
+
+
+class ForbiddenError(HTTPException):
+    """[origin] Недостаточно прав для выполнения действия"""
+
+    def __init__(
+        self, detail: str = "Недостаточно прав для выполнения действия"
+    ) -> None:
+        super().__init__(status_code=status.HTTP_403_FORBIDDEN, detail=detail)
+
+
+class ForbiddenUserError(ForbiddenError):
+    """[ForbiddenError] Нет прав на удаление"""
+
+    def __init__(self) -> None:
+        super().__init__(detail="Нет прав на удаление")
+
+
+class TicketLimitError(ForbiddenError):
+    """[ForbiddenError] Нет прав на удаление"""
+
+    def __init__(self) -> None:
+        super().__init__(detail="Достигнут лимит билетов")

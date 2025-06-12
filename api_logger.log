@@ -1025,3 +1025,21 @@ sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
 [2025-06-06 16:25:39,539] [ERROR] api_logger: Данный тип билета для этого мероприяия уже существует ticket_type = 'Vip'
 [2025-06-12 16:19:40,826] [ERROR] api_logger: Данный тип билета для этого мероприяия уже существует ticket_type = 'Vip'
 [2025-06-12 16:20:41,855] [ERROR] api_logger: Данный тип билета для этого мероприяия уже существует ticket_type = 'Vip'
+[2025-06-12 22:21:06,020] [ERROR] api_logger: Данный тип билета для этого мероприяия уже существует ticket_type = 'Vip'
+[2025-06-12 22:24:10,852] [ERROR] api_logger: Данный тип билета для этого мероприяия уже существует ticket_type = 'Vip'
+[2025-06-12 22:24:11,700] [ERROR] api_logger: Данный тип билета для этого мероприяия уже существует ticket_type = 'Vip'
+[2025-06-12 22:34:31,171] [ERROR] api_logger: Данный тип билета для этого мероприяия уже существует ticket_type = 'Standard'
+[2025-06-12 23:01:30,374] [ERROR] api_logger: Данного типа билета c ticket_type_id = 3 не существует
+[2025-06-12 23:02:01,007] [ERROR] api_logger: Внутренняя ошибка сервера. Проблемы с сейвом БД: Can't call Query.update() or Query.delete() when join(), outerjoin(), select_from(), or from_self() has been called
+Traceback (most recent call last):
+  File "C:\work\eventpass\backend\core_service\app\models\crud.py", line 407, in del_event
+    ).delete(synchronize_session=False)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\sqlalchemy\orm\query.py", line 3170, in delete
+    bulk_del = BulkDelete(self)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\sqlalchemy\orm\query.py", line 3358, in __init__
+    self._validate_query_state()
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\sqlalchemy\orm\query.py", line 3382, in _validate_query_state
+    raise sa_exc.InvalidRequestError(
+sqlalchemy.exc.InvalidRequestError: Can't call Query.update() or Query.delete() when join(), outerjoin(), select_from(), or from_self() has been called

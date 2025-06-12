@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from models.crud import create_ticket_event
+from models.crud import create_ticket_event, delete_data
 from sqlalchemy.orm import Session
 
 from core.exceptions import NoTokenError
@@ -51,3 +51,21 @@ class ManagementTickets:
         )
 
         return TicketCreateResponseDTO.model_validate(result)
+
+    async def delete_ticket(self, ticket_id: int, jwt_token: str) -> None:
+        """
+        Метод для удаления билета.
+
+        Args:
+            ticket_id (int): ID билета.
+            jwt_token (str): JWT токен пользователя.
+
+        Raises:
+            NoTokenError: Токен неправильный/отсутствует.
+        """
+        user_id = await token_verification(jwt_token)
+        if not user_id:
+            raise NoTokenError()
+
+        await delete_data(self.db, "Tickets", ticket_id, user_id)
+        return

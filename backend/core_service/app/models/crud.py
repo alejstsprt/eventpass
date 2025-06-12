@@ -6,13 +6,16 @@ from typing import TYPE_CHECKING, Literal, Optional, TypeVar
 
 from models.models import Accounts, Events, Tickets, TicketTypes
 from models.session import DBBaseModel
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, joinedload
 
 from core.config import config
 from core.exceptions import (
+    ForbiddenUserError,
     InternalServerError,
     LoginAlreadyExistsException,
+    TicketLimitError,
     TicketTypeError,
     ValidationError,
 )
@@ -97,9 +100,18 @@ async def create_ticket_event(
         logger_api.error(f"Данного мероприятия c {event_id = } не существует")
         raise ValidationError()
 
-    if not (db.query(TicketTypes).filter(TicketTypes.id == ticket_type_id).first()):
+    ticket_type = db.query(TicketTypes).filter(TicketTypes.id == ticket_type_id).first()
+    if not ticket_type:
         logger_api.error(f"Данного типа билета c {ticket_type_id = } не существует")
         raise ValidationError()
+
+    count = (
+        db.query(func.count(Tickets.id))
+        .filter(Tickets.ticket_type_id == ticket_type.id)
+        .scalar()
+    )
+    if ticket_type.total_count <= count:
+        raise TicketLimitError()
 
     try:
         new_ticket = Tickets(
@@ -328,7 +340,7 @@ async def edit_data(
     Args:
         db (Session): Сессия SQLAlchemy для работы с БД.
         table_name (Literal['Accounts', 'Events', 'TicketTypes', 'Tickets']): Название таблицы.
-        id (int): Айди мероприятия.
+        id (int): Айди нужного элемента для изменения.
         data (T): Данные которые нужно изменить.
 
     Returns:
@@ -356,3 +368,126 @@ async def edit_data(
     db.commit()
     db.refresh(obj)
     return obj
+
+
+async def del_event(
+    db: Session,
+    event_id: int,
+    user_id: int,
+) -> None:
+    """
+    Удаление мероприятия вместе с типами и билетами.
+
+    Args:
+        db (Session): Сессия SQLAlchemy для работы с БД.
+        event_id (int): ID мероприятия.
+        user_id (int): ID пользователя.
+
+    Raises:
+        ValidationError: Неверные данные.
+        ForbiddenUserError: Отказано в доступе.
+        InternalServerError: Ошибка сервера.
+    """
+    event = db.query(Events).get(event_id)
+    if not event:
+        raise ValidationError()
+    if event.creator_id != user_id:
+        raise ForbiddenUserError()
+
+    try:
+        db.query(Tickets).filter(
+            Tickets.ticket_type_id.in_(
+                db.query(TicketTypes.id).filter(TicketTypes.event_id == event_id)
+            )
+        ).delete(synchronize_session=False)
+
+        db.query(TicketTypes).filter(TicketTypes.event_id == event_id).delete(
+            synchronize_session=False
+        )
+
+        db.delete(event)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        logger_api.exception(f"Внутренняя ошибка сервера. Проблемы с сейвом БД: {e}")
+        raise InternalServerError()
+
+    return
+
+
+async def del_ticket_type(
+    db: Session,
+    ticket_type_id: int,
+    user_id: int,
+) -> None:
+    """
+    Удаление типа мероприятия.
+
+    Args:
+        db (Session): Сессия SQLAlchemy для работы с БД.
+        ticket_type_id (int): ID типа билета.
+        user_id (int): ID пользователя.
+
+    Raises:
+        ValidationError: Неверные данные.
+        ForbiddenUserError: Отказано в доступе.
+        InternalServerError: Ошибка сервера.
+    """
+    ticket_type = (
+        db.query(TicketTypes)
+        .join(Events)
+        .filter(TicketTypes.id == ticket_type_id, Events.creator_id == user_id)
+        .first()
+    )
+
+    if not ticket_type:
+        exists = (
+            db.query(TicketTypes.id).filter(TicketTypes.id == ticket_type_id).first()
+        )
+        if not exists:
+            raise ValidationError()
+        raise ForbiddenUserError()
+
+    try:
+        db.query(Tickets).filter(Tickets.ticket_type_id == ticket_type_id).delete(
+            synchronize_session=False
+        )
+
+        db.delete(ticket_type)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        logger_api.exception(f"Внутренняя ошибка сервера. Проблемы с сейвом БД: {e}")
+        raise InternalServerError()
+
+    return
+
+
+async def delete_data(
+    db: Session,
+    table_name: Literal["Accounts", "Events", "TicketTypes", "Tickets"],
+    id: int,
+    user_id: int | None,
+) -> None:
+    """
+    Удаление элемента в таблице.
+
+    Args:
+        db (Session): Сессия SQLAlchemy для работы с БД.
+        table_name (Literal["Accounts", "Events", "TicketTypes", "Tickets"]): Название таблицы.
+        id (int): Айди нужного элемента для удаления.
+
+    Raises:
+        ValidationError (HTTPException): Неверные данные.
+    """
+
+    data = db.get(config.GET_TABLE[table_name], id)
+    if not data:
+        raise ValidationError()
+
+    if user_id is not None and user_id != data.user_id:
+        raise ForbiddenUserError()
+
+    db.delete(data)
+    db.commit()
+    return
