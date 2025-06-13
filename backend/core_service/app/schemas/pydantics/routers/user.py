@@ -48,4 +48,4 @@ class CreateUserResponseDTO(ConfigBaseModelResponseDTO):
 class GetUserInfoResponseDTO(ConfigBaseModelResponseDTO):
     id: int
     name: str
-    login: str
+    login: EmailStr

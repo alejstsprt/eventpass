@@ -3,6 +3,8 @@ from typing import Annotated
 
 from pydantic import BaseModel, Field
 
+from schemas.pydantics.cfg_base_model import ConfigBaseModelResponseDTO
+
 
 class TypeForm(str, Enum):
     """Типы мероприятия"""
@@ -13,7 +15,7 @@ class TypeForm(str, Enum):
 
 
 # [CreateTicketType]
-class CreateTicketType(BaseModel):
+class CreateTicketTypeDTO(BaseModel):
     """Модель данных для создания типа мероприятия"""
 
     event_id: Annotated[int, Field(description="Айди мероприятия", examples=[1], ge=1)]
@@ -51,8 +53,17 @@ class CreateTicketType(BaseModel):
     ]
 
 
+class CreateTicketTypeResponseDTO(ConfigBaseModelResponseDTO):
+    id: int
+    type: str
+    description: str
+    price: int
+    total_count: int
+    event_id: int
+
+
 # [EditTicketType]
-class EditTicketType(BaseModel):
+class EditTicketTypeDTO(BaseModel):
     """Модель данных для редактирования типа билета мероприятия"""
 
     description: Annotated[
@@ -84,3 +95,12 @@ class EditTicketType(BaseModel):
             le=1_000_000_000,
         ),
     ] = None
+
+
+class EditTicketTypeResponseDTO(CreateTicketTypeResponseDTO):
+    pass
+
+
+# [GetTicketTypes]
+class GetTicketTypesResponseDTO(CreateTicketTypeResponseDTO):
+    pass

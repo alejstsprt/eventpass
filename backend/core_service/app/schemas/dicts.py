@@ -47,3 +47,11 @@ class LoginUserResult(TypedDict):
 
     id: Column[int]
     name: Column[str]
+
+
+# [ActivateQrCodeResult]
+class ActivateQrCodeResult(TypedDict):
+    """Формат ответа"""
+
+    activate: str
+    info: str

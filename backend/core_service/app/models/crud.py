@@ -27,6 +27,7 @@ if TYPE_CHECKING:
     from pydantic import BaseModel
 
     from schemas import (
+        ActivateQrCodeResult,
         IntEventCreatorId,
         IntUserId,
         StrEventAddress,
@@ -514,7 +515,9 @@ async def delete_data(
     return
 
 
-async def db_activate_qr_code(db: Session, user_id: int, code: str):
+async def db_activate_qr_code(
+    db: Session, user_id: int, code: str
+) -> "ActivateQrCodeResult":
     ticket = db.query(Tickets).filter(Tickets.unique_code == code).first()
 
     if not ticket:

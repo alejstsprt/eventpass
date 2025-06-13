@@ -1,8 +1,15 @@
 from fastapi import APIRouter, Cookie, Depends, Path, status
 
 from core.config import config
-from infrastructure.cache_v2 import ICache, ICacheWriter, IClearCache, IParam
-from schemas import CreateEvent, EditEvent, ManagementEventsProtocol
+from infrastructure.cache_v2 import ICache, IClearCache, IParam
+from schemas import (
+    AllElementsResponseDTO,
+    CreateEventDTO,
+    CreateEventResponseDTO,
+    EditEventDTO,
+    EditEventResponseDTO,
+    ManagementEventsProtocol,
+)
 from security.jwt import token_verification
 from services import CREATE_EVENT_RESPONSES, get_event_service
 
@@ -23,10 +30,10 @@ router = APIRouter()
     tags=["event-cache-1"],
     functions=[IParam(token_verification, "jwt_token")],
 )
-async def list_events(  # type: ignore[no-untyped-def]
+async def list_events(
     service: ManagementEventsProtocol = Depends(get_event_service),
     jwt_token: str = Cookie(None),
-):
+) -> list[AllElementsResponseDTO]:
     return await service.all_events(jwt_token)
 
 
@@ -41,11 +48,11 @@ async def list_events(  # type: ignore[no-untyped-def]
     unique_name="event-cache",
     tags_delete=["event-cache-1"],
 )
-async def create_event(  # type: ignore[no-untyped-def]
-    event: CreateEvent,
+async def create_event(
+    event: CreateEventDTO,
     service: ManagementEventsProtocol = Depends(get_event_service),
     jwt_token: str = Cookie(None),
-):
+) -> CreateEventResponseDTO:
     return await service.create_events(jwt_token, event)
 
 
@@ -60,12 +67,12 @@ async def create_event(  # type: ignore[no-untyped-def]
     unique_name="event-cache",
     tags_delete=["event-cache-1"],
 )
-async def edit_events(  # type: ignore[no-untyped-def]
-    event: EditEvent,
+async def edit_events(
+    event: EditEventDTO,
     event_id: int = Path(..., title="ID мероприятия", ge=1, le=config.MAX_ID),
     jwt_token: str = Cookie(None),
     service: ManagementEventsProtocol = Depends(get_event_service),
-):
+) -> EditEventResponseDTO:
     return await service.edit_events(jwt_token, event_id, event)
 
 
