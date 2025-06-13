@@ -1,9 +1,30 @@
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Cookie, Depends, Response, status
 
-from schemas import CreateUser, LoginUser, ManagementUsersProtocol
+from schemas import (
+    CreateUserDTO,
+    CreateUserResponseDTO,
+    GetUserInfoResponseDTO,
+    LoginUserDTO,
+    LoginUserResponseDTO,
+    ManagementUsersProtocol,
+)
 from services import CREATE_USER_RESPONSES, LOGIN_USER_RESPONSES, get_user_service
 
 router = APIRouter()
+
+
+@router.get(
+    "",
+    summary="Информация о пользователе",
+    description="ИНФО: Ручка возвращает информацию о пользователе. ID user берется из токена.",
+    status_code=status.HTTP_200_OK,
+    responses=None,  # TODO: сделать
+)
+async def create_user(
+    jwt_token: str = Cookie(None),
+    service: ManagementUsersProtocol = Depends(get_user_service),
+) -> GetUserInfoResponseDTO:
+    return await service.get_info_user(jwt_token)
 
 
 @router.post(
@@ -13,7 +34,11 @@ router = APIRouter()
     status_code=status.HTTP_201_CREATED,
     responses=CREATE_USER_RESPONSES,
 )
-async def create_user(response: Response, user: CreateUser, service: ManagementUsersProtocol = Depends(get_user_service)):  # type: ignore[no-untyped-def]
+async def create_user(
+    response: Response,
+    user: CreateUserDTO,
+    service: ManagementUsersProtocol = Depends(get_user_service),
+) -> CreateUserResponseDTO:
     return await service.create_user(response, user)
 
 
@@ -24,5 +49,9 @@ async def create_user(response: Response, user: CreateUser, service: ManagementU
     status_code=status.HTTP_200_OK,
     responses=LOGIN_USER_RESPONSES,
 )
-async def login_user(response: Response, user: LoginUser, service: ManagementUsersProtocol = Depends(get_user_service)):  # type: ignore[no-untyped-def]
+async def login_user(
+    response: Response,
+    user: LoginUserDTO,
+    service: ManagementUsersProtocol = Depends(get_user_service),
+) -> LoginUserResponseDTO:
     return await service.login_user(response, user)

@@ -2,9 +2,11 @@ from typing import Annotated
 
 from pydantic import BaseModel, EmailStr, Field
 
+from schemas.pydantics.cfg_base_model import ConfigBaseModelResponseDTO
+
 
 # [LoginUser]
-class LoginUser(BaseModel):
+class LoginUserDTO(BaseModel):
     login: Annotated[
         EmailStr, Field(description="Логин пользователя", min_length=2, max_length=100)
     ]
@@ -20,8 +22,13 @@ class LoginUser(BaseModel):
     ]
 
 
+class LoginUserResponseDTO(ConfigBaseModelResponseDTO):
+    id: int
+    name: str
+
+
 # [CreateUser]
-class CreateUser(LoginUser):
+class CreateUserDTO(LoginUserDTO):
     name: Annotated[
         str,
         Field(
@@ -31,3 +38,14 @@ class CreateUser(LoginUser):
             max_length=100,
         ),
     ]
+
+
+class CreateUserResponseDTO(ConfigBaseModelResponseDTO):
+    id: int
+
+
+# [GetUserInfo]
+class GetUserInfoResponseDTO(ConfigBaseModelResponseDTO):
+    id: int
+    name: str
+    login: str
