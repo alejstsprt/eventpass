@@ -6,7 +6,13 @@ from .protocols.protocol_user import ManagementUsersProtocol
 from .pydantics.routers.event import CreateEvent, EditEvent
 from .pydantics.routers.ticket_types import CreateTicketType, EditTicketType
 from .pydantics.routers.tickets import TicketCreateDTO, TicketCreateResponseDTO
-from .pydantics.routers.user import CreateUser, LoginUser
+from .pydantics.routers.user import (
+    CreateUserDTO,
+    CreateUserResponseDTO,
+    GetUserInfoResponseDTO,
+    LoginUserDTO,
+    LoginUserResponseDTO,
+)
 from .types.types_event import (
     IntEventCreatorId,
     StrEventAddress,
@@ -19,8 +25,8 @@ __all__ = [
     "UserRegistrationResult",
     "EventCreatedResult",
     "LoginUserResult",
-    "LoginUser",
-    "CreateUser",
+    "LoginUserDTO",
+    "CreateUserDTO",
     "CreateEvent",
     "EditEvent",
     "IntUserId",
@@ -39,4 +45,7 @@ __all__ = [
     "TicketCreateDTO",
     "TicketCreateResponseDTO",
     "ManagementTicketsProtocol",
+    "GetUserInfoResponseDTO",
+    "LoginUserResponseDTO",
+    "CreateUserResponseDTO",
 ]

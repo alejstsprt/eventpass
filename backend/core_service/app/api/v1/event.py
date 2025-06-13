@@ -62,9 +62,7 @@ async def create_event(  # type: ignore[no-untyped-def]
 )
 async def edit_events(  # type: ignore[no-untyped-def]
     event: EditEvent,
-    event_id: int = Path(
-        ..., title="ID мероприятия", ge=1, le=config.MAX_ID
-    ),  # иначе будет ошибка бд
+    event_id: int = Path(..., title="ID мероприятия", ge=1, le=config.MAX_ID),
     jwt_token: str = Cookie(None),
     service: ManagementEventsProtocol = Depends(get_event_service),
 ):
@@ -83,9 +81,7 @@ async def edit_events(  # type: ignore[no-untyped-def]
     tags_delete=["event-cache-1"],
 )
 async def delete_events(
-    event_id: int = Path(
-        ..., title="ID мероприятия", ge=1, le=config.MAX_ID
-    ),  # иначе будет ошибка бд
+    event_id: int = Path(..., title="ID мероприятия", ge=1, le=config.MAX_ID),
     jwt_token: str = Cookie(None),
     service: ManagementEventsProtocol = Depends(get_event_service),
 ) -> None:

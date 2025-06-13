@@ -12,7 +12,7 @@ from fastapi import HTTPException, status
 class InternalServerError(HTTPException):
     """Ошибка для неожиданных серверных сбоев"""
 
-    def __init__(self, detail: str = "Внутренняя ошибка сервера") -> None:
+    def __init__(self, detail: str = "Ошибка. Попробуйте позже.") -> None:
         super().__init__(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail
         )

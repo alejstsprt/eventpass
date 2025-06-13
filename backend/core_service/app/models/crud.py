@@ -2,6 +2,7 @@
 Костыльный модуль взаимодействия с бд без класса. позже нужно сделать как класс и сократить количество функций
 """
 
+from collections import defaultdict
 from typing import TYPE_CHECKING, Literal, Optional, TypeVar
 
 from models.models import Accounts, Events, Tickets, TicketTypes
@@ -12,6 +13,7 @@ from sqlalchemy.orm import Session, joinedload
 
 from core.config import config
 from core.exceptions import (
+    ForbiddenError,
     ForbiddenUserError,
     InternalServerError,
     LoginAlreadyExistsException,
@@ -68,11 +70,12 @@ async def user_registration(
         db.add(new_user)
         db.commit()
         db.refresh(new_user)
-        return {"result": True, "user_id": new_user.id}
+        return new_user
     except IntegrityError:
         logger_api.error("Имя/Логин уже занят")
         raise LoginAlreadyExistsException()
     except Exception as e:
+        db.rollback()
         logger_api.exception(f"Внутренняя ошибка сервера. Проблемы с сейвом БД: {e}")
         raise InternalServerError()
 
@@ -136,6 +139,7 @@ async def create_ticket_event(
         )
         return ticket_with_details
     except Exception as e:
+        db.rollback()
         logger_api.exception(f"Внутренняя ошибка сервера. Проблемы с сейвом БД: {e}")
         raise InternalServerError()
 
@@ -173,7 +177,11 @@ async def create_type_ticket_event(
 
     existing_ticket = (
         db.query(TicketTypes)
-        .filter(TicketTypes.event_id == event_id, TicketTypes.type == ticket_type)
+        .filter(
+            TicketTypes.event_id
+            == event_id,  # находит все существующие типы этого мероприятия
+            TicketTypes.type == ticket_type,  # и смотрит есть ли такой тип уже
+        )
         .first()
     )
 
@@ -182,6 +190,17 @@ async def create_type_ticket_event(
             f"Данный тип билета для этого мероприяия уже существует {ticket_type = }"
         )
         raise TicketTypeError()
+
+    event = (
+        db.query(Events)
+        .filter(
+            Events.id == event_id,
+        )
+        .first()
+    )
+    if not event:
+        logger_api.error(f"Мероприятие под {event_id = } не существует")
+        raise ValidationError()
 
     try:
         new_type_ticket_event = TicketTypes(
@@ -197,6 +216,7 @@ async def create_type_ticket_event(
 
         return new_type_ticket_event
     except Exception as e:
+        db.rollback()
         logger_api.exception(f"Внутренняя ошибка сервера. Проблемы с сейвом БД: {e}")
         raise InternalServerError()
 
@@ -254,6 +274,7 @@ async def create_event(
 
         return new_event
     except Exception as e:
+        db.rollback()
         logger_api.exception(f"Внутренняя ошибка сервера. Проблемы с сейвом БД: {e}")
         raise InternalServerError()
 
@@ -491,3 +512,66 @@ async def delete_data(
     db.delete(data)
     db.commit()
     return
+
+
+async def db_activate_qr_code(db: Session, user_id: int, code: str):
+    ticket = db.query(Tickets).filter(Tickets.unique_code == code).first()
+
+    if not ticket:
+        raise ValidationError()
+
+    if ticket.event.creator_id != user_id:
+        raise ForbiddenError("Активировать билет может только создатель мероприятия")
+
+    if ticket.is_used:
+        return {"activate": "False", "info": "Билет уже был активирован"}
+
+    try:
+        ticket.is_used = True
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        logger_api.exception(f"Внутренняя ошибка сервера. Проблемы с сейвом БД: {e}")
+        raise InternalServerError()
+
+    return {"activate": "True", "info": "Билет успешно активирован"}
+
+
+async def db_all_active_tickets_event(
+    db: Session, event_id: int
+) -> tuple[dict[str, int], int]:
+    tickets = (
+        db.query(Tickets)
+        .options(joinedload(Tickets.ticket_type))
+        .filter(Tickets.is_used == True, Tickets.event_id == event_id)
+        .all()
+    )
+
+    result = defaultdict(int)
+    total = 0
+    for ticket in tickets:
+        result[ticket.ticket_type.type] += 1
+        total += 1
+    return result, total
+
+
+async def db_all_tickets_event(
+    db: Session, event_id: int
+) -> tuple[dict[str, int], int]:
+    tickets = (
+        db.query(Tickets)
+        .options(joinedload(Tickets.ticket_type))
+        .filter(Tickets.event_id == event_id)
+        .all()
+    )
+
+    result = defaultdict(int)
+    total = 0
+    for ticket in tickets:
+        result[ticket.ticket_type.type] += 1
+        total += 1
+    return result, total
+
+
+async def db_get_info_user(db: Session, user_id: int):
+    return db.query(Accounts).filter(Accounts.id == user_id).first()

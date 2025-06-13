@@ -1,6 +1,12 @@
 from typing import TYPE_CHECKING
 
-from models.crud import create_ticket_event, delete_data
+from models.crud import (
+    create_ticket_event,
+    db_activate_qr_code,
+    db_all_active_tickets_event,
+    db_all_tickets_event,
+    delete_data,
+)
 from sqlalchemy.orm import Session
 
 from core.exceptions import NoTokenError
@@ -69,3 +75,24 @@ class ManagementTickets:
 
         await delete_data(self.db, "Tickets", ticket_id, user_id)
         return
+
+    async def activate_qr_code(self, jwt_token: str, code: str):
+        user_id = await token_verification(jwt_token)
+        if not user_id:
+            raise NoTokenError()
+
+        return await db_activate_qr_code(self.db, user_id, code)
+
+    async def all_active_tickets_event(self, jwt_token: str, event_id: int):
+        if not await token_verification(jwt_token):
+            raise NoTokenError()
+
+        by_type, total = await db_all_active_tickets_event(self.db, event_id)
+        return {"total": total, "by_type": by_type}
+
+    async def all_tickets_event(self, jwt_token: str, event_id: int):
+        if not await token_verification(jwt_token):
+            raise NoTokenError()
+
+        by_type, total = await db_all_tickets_event(self.db, event_id)
+        return {"total": total, "by_type": by_type}

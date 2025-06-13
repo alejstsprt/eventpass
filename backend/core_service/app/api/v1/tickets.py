@@ -7,6 +7,36 @@ from services import get_tickets_service
 router = APIRouter()
 
 
+@router.get(  # type: ignore[no-untyped-def]
+    "/{event_id}",
+    summary="Количество купленных билетов мероприятия",
+    description="ИНФО: Ручка для возврата количества купленных билетов.",
+    status_code=status.HTTP_200_OK,
+    responses=None,  # TODO: дописать
+)
+async def create_ticket(
+    event_id: int = Path(..., title="ID мероприятия", ge=1, le=config.MAX_ID),
+    service: ManagementTicketsProtocol = Depends(get_tickets_service),
+    jwt_token: str = Cookie(None),
+):
+    return await service.all_tickets_event(jwt_token, event_id)
+
+
+@router.get(  # type: ignore[no-untyped-def]
+    "/{event_id}/active",
+    summary="Количество активированных билетов мероприятия",
+    description="ИНФО: Ручка для возврата количества активированных билетов.",
+    status_code=status.HTTP_200_OK,
+    responses=None,  # TODO: дописать
+)
+async def create_ticket(
+    event_id: int = Path(..., title="ID мероприятия", ge=1, le=config.MAX_ID),
+    service: ManagementTicketsProtocol = Depends(get_tickets_service),
+    jwt_token: str = Cookie(None),
+):
+    return await service.all_active_tickets_event(jwt_token, event_id)
+
+
 @router.post(
     "",
     summary="Создание билета на мероприятие",
@@ -20,6 +50,21 @@ async def create_ticket(
     jwt_token: str = Cookie(None),
 ) -> TicketCreateResponseDTO:
     return await service.create_ticket(ticket_data, jwt_token)
+
+
+@router.post(
+    "/scan/{code}",
+    summary="Сканирование билета и его активация",
+    description="ИНФО: Ручка для активации билета. Принимает уникальный код билета.",
+    status_code=status.HTTP_200_OK,
+    responses=None,  # TODO: дописать
+)
+async def create_ticket(  # type: ignore[no-untyped-def]
+    code: str = Path(..., title="Уникальный код билета", min_length=2, max_length=1000),
+    service: ManagementTicketsProtocol = Depends(get_tickets_service),
+    jwt_token: str = Cookie(None),
+):
+    return await service.activate_qr_code(jwt_token, code)
 
 
 @router.delete(

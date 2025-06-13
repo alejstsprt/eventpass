@@ -1,22 +1,23 @@
 from typing import TYPE_CHECKING
 
 from fastapi import Response
-from models.crud import search_user, user_registration
+from models.crud import db_get_info_user, search_user, user_registration
 from sqlalchemy.orm import Session
 
-from core.exceptions import LoginError, PasswordError
-from schemas import StrUserLogin, StrUserName, StrUserPassword
+from core.exceptions import LoginError, NoTokenError, PasswordError
+from schemas import (
+    CreateUserResponseDTO,
+    GetUserInfoResponseDTO,
+    LoginUserResponseDTO,
+    StrUserLogin,
+    StrUserName,
+    StrUserPassword,
+)
 from security.hashing import hash_password, verify_password
-from security.jwt import create_access_token, set_jwt_cookie
+from security.jwt import create_access_token, set_jwt_cookie, token_verification
 
 if TYPE_CHECKING:
-    from schemas import (
-        CreateUser,
-        LoginUser,
-        LoginUserResult,
-        StrUserLogin,
-        UserRegistrationResult,
-    )
+    from schemas import CreateUserDTO, LoginUserDTO, LoginUserResult, StrUserLogin
 
 
 class ManagementUsers:
@@ -28,8 +29,8 @@ class ManagementUsers:
         self.db = db
 
     async def create_user(
-        self, response: Response, user: "CreateUser"
-    ) -> "UserRegistrationResult":
+        self, response: Response, user: "CreateUserDTO"
+    ) -> CreateUserResponseDTO:
         """
         Метод для создания пользователя в базе данных.
 
@@ -38,7 +39,7 @@ class ManagementUsers:
             user (LoginUser): Имя, логин и пароль.
 
         Returns:
-            UserRegistrationResult (TypedDict): Возвращает `{'result': True, 'user_id': int}`.
+            CreateUserResponseDTO (BaseModel): Возвращает пайдемик модель ответа.
 
         Raises:
             LoginAlreadyExistsException (HTTPException): Пользователь уже существует.
@@ -53,14 +54,13 @@ class ManagementUsers:
             StrUserLogin(user.login),
             StrUserPassword(hash_pass),
         )
-
-        token = await create_access_token(result["user_id"])
+        token = await create_access_token(result.id)
         await set_jwt_cookie(response, token)
         return result
 
     async def login_user(
-        self, response: Response, user: "LoginUser"
-    ) -> "LoginUserResult":
+        self, response: Response, user: "LoginUserDTO"
+    ) -> LoginUserResponseDTO:
         """
         Метод для входа в аккаунт.
 
@@ -69,7 +69,7 @@ class ManagementUsers:
             response (Response): ответ, который сервер (FastAPI) отправляет клиенту
 
         Returns:
-            dict: Возвращает `{'result': True, 'id': ID, 'name': Name}`.
+            LoginUserResponseDTO (BaseModel): Возвращает пайдемик модель ответа.
 
         Raises:
             ValidationError (HTTPException): Неверные данные.
@@ -88,4 +88,26 @@ class ManagementUsers:
         token = await create_access_token(db_user.id)
         await set_jwt_cookie(response, token)
 
-        return {"id": db_user.id, "name": db_user.name}
+        return LoginUserResponseDTO.model_validate(db_user)
+
+    async def get_info_user(self, jwt_token: str) -> GetUserInfoResponseDTO:
+        """
+        Метод возвращает информацию о пользователе из токена.
+
+        Args:
+            jwt_token (str): JWT токен пользователя.
+
+        Raises:
+            NoTokenError: Токен отсутствует/неверный.
+
+        Returns:
+            GetUserInfoResponseDTO (BaseModel): Возвращает пайдемик модель ответа.
+        """
+        user_id = await token_verification(jwt_token)
+
+        if not user_id:
+            raise NoTokenError()
+
+        result = await db_get_info_user(self.db, user_id)
+
+        return GetUserInfoResponseDTO.model_validate(result)
