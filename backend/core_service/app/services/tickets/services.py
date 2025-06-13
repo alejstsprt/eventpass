@@ -10,12 +10,15 @@ from models.crud import (
 from sqlalchemy.orm import Session
 
 from core.exceptions import NoTokenError
-from schemas import TicketCreateResponseDTO
+from schemas import (
+    ActivateQrCodeResponseDTO,
+    AllActiveTicketsEventResponseDTO,
+    AllTicketsEventResponseDTO,
+    TicketCreateDTO,
+    TicketCreateResponseDTO,
+)
 from security.hmac import generate_code_hmac_ticket
 from security.jwt import token_verification
-
-if TYPE_CHECKING:
-    from schemas import TicketCreateDTO
 
 
 class ManagementTickets:
@@ -76,23 +79,76 @@ class ManagementTickets:
         await delete_data(self.db, "Tickets", ticket_id, user_id)
         return
 
-    async def activate_qr_code(self, jwt_token: str, code: str):
+    async def activate_qr_code(
+        self, jwt_token: str, code: str
+    ) -> ActivateQrCodeResponseDTO:
+        """
+        Метод для активации кьюаркода.
+
+        Args:
+            jwt_token (str): JWT токен пользователя.
+            code (str): Уникальный код билета
+
+        Returns:
+            ActivateQrCodeResponseDTO (BaseModel): Возвращает пайдемик модель.
+
+        Raises:
+            NoTokenError: Токен неправильный/отсутствует.
+        """
         user_id = await token_verification(jwt_token)
         if not user_id:
             raise NoTokenError()
 
-        return await db_activate_qr_code(self.db, user_id, code)
+        result = await db_activate_qr_code(self.db, user_id, code)
 
-    async def all_active_tickets_event(self, jwt_token: str, event_id: int):
+        return ActivateQrCodeResponseDTO.model_validate(result)
+
+    async def all_active_tickets_event(
+        self, jwt_token: str, event_id: int
+    ) -> AllActiveTicketsEventResponseDTO:
+        """
+        Метод для получения активированных билетов мероприятия.
+
+        Args:
+            jwt_token (str): JWT токен пользователя.
+            event_id (int): ID мероприятия.
+
+        Returns:
+            AllActiveTicketsEventResponseDTO (BaseModel): Возвращает пайдемик модель.
+
+        Raises:
+            NoTokenError: Токен неправильный/отсутствует.
+        """
         if not await token_verification(jwt_token):
             raise NoTokenError()
 
         by_type, total = await db_all_active_tickets_event(self.db, event_id)
-        return {"total": total, "by_type": by_type}
 
-    async def all_tickets_event(self, jwt_token: str, event_id: int):
+        return AllActiveTicketsEventResponseDTO.model_validate(
+            {"total": total, "by_type": by_type}
+        )
+
+    async def all_tickets_event(
+        self, jwt_token: str, event_id: int
+    ) -> AllTicketsEventResponseDTO:
+        """
+        Метод для получения всех билетов мероприятия.
+
+        Args:
+            jwt_token (str): JWT токен пользователя.
+            event_id (int): ID мероприятия.
+
+        Returns:
+            AllTicketsEventResponseDTO (BaseModel): Возвращает пайдемик модель.
+
+        Raises:
+            NoTokenError: Токен неправильный/отсутствует.
+        """
         if not await token_verification(jwt_token):
             raise NoTokenError()
 
         by_type, total = await db_all_tickets_event(self.db, event_id)
-        return {"total": total, "by_type": by_type}
+
+        return AllTicketsEventResponseDTO.model_validate(
+            {"total": total, "by_type": by_type}
+        )

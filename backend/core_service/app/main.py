@@ -4,17 +4,25 @@ import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
 import uvicorn
 
 from backend.core_service.app.api.v1 import event, ticket_types, tickets, user
+from backend.core_service.app.core.exceptions_handlers import (
+    validation_exception_handler,
+)
+from backend.core_service.app.core.lifespan import lifespan
 from backend.core_service.app.middleware.cors import setup_cors
+from backend.core_service.app.middleware.error_handler import ExceptionMiddleware
 from backend.core_service.app.models.session import DBBaseModel, engine
 
 DBBaseModel.metadata.create_all(bind=engine)
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
+
 setup_cors(app)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_middleware(ExceptionMiddleware)
 
 
 app.include_router(

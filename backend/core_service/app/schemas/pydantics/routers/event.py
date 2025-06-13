@@ -1,7 +1,10 @@
+from datetime import datetime
 from enum import Enum
 from typing import Annotated
 
 from pydantic import BaseModel, Field
+
+from schemas.pydantics.cfg_base_model import ConfigBaseModelResponseDTO
 
 
 class StatusForm(str, Enum):
@@ -25,7 +28,7 @@ class CategoriesForm(str, Enum):
 
 
 # [CreateEvent]
-class CreateEvent(BaseModel):
+class CreateEventDTO(BaseModel):
     """Модель данных для создания мероприятия"""
 
     status: Annotated[StatusForm, Field(description="Статус мероприятия")]
@@ -63,8 +66,19 @@ class CreateEvent(BaseModel):
     ]
 
 
+class CreateEventResponseDTO(ConfigBaseModelResponseDTO):
+    id: int
+    title: str
+    category: str
+    status: str
+    description: str
+    creator_id: int
+    address: str
+    datetime: datetime
+
+
 # [EditEvent]
-class EditEvent(BaseModel):
+class EditEventDTO(BaseModel):
     """Модель данных для редактирования мероприятия"""
 
     status: Annotated[StatusForm | None, Field(description="Статус мероприятия")] = None
@@ -98,3 +112,12 @@ class EditEvent(BaseModel):
             max_length=100,
         ),
     ] = None
+
+
+class EditEventResponseDTO(CreateEventResponseDTO):
+    pass
+
+
+# [AllElements]
+class AllElementsResponseDTO(CreateEventResponseDTO):
+    pass

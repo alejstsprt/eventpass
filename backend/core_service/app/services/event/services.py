@@ -5,6 +5,9 @@ from sqlalchemy.orm import Session
 
 from core.exceptions import NoTokenError, TokenError
 from schemas import (
+    AllElementsResponseDTO,
+    CreateEventResponseDTO,
+    EditEventResponseDTO,
     IntEventCreatorId,
     IntUserId,
     StrEventAddress,
@@ -14,10 +17,7 @@ from schemas import (
 from security.jwt import token_verification
 
 if TYPE_CHECKING:
-    from models.models import Events
-    from models.session import DBBaseModel
-
-    from schemas import CreateEvent, EditEvent
+    from schemas import CreateEventDTO, EditEventDTO
 
 
 class ManagementEvents:
@@ -28,16 +28,18 @@ class ManagementEvents:
     def __init__(self, db: Session):
         self.db = db
 
-    async def create_events(self, jwt_token: str, event: "CreateEvent") -> "Events":
+    async def create_events(
+        self, jwt_token: str, event: "CreateEventDTO"
+    ) -> CreateEventResponseDTO:
         """
         Метод для создания мероприятия.
 
         Args:
             jwt_token (str): Токен пользователя.
-            event (CreateEvent): Название, описание и адрес мероприятия.
+            event (CreateEventDTO): Название, описание и адрес мероприятия.
 
         Returns:
-            Events (DBBaseModel): Возвращает всю информацию о мероприятии, используя `create_event()`.
+            CreateEventResponseDTO (BaseModel): Возвращает всю информацию о мероприятии, используя `create_event()`.
 
         Raises:
             NoTokenError (HTTPException): Токен отсутствует.
@@ -52,7 +54,7 @@ class ManagementEvents:
         if is_user["id"] is None:
             raise TokenError()
 
-        return await create_event(
+        event = await create_event(
             self.db,
             IntEventCreatorId(user_id),
             event.status.value,
@@ -62,7 +64,9 @@ class ManagementEvents:
             StrEventAddress(event.address),
         )
 
-    async def all_events(self, jwt_token: str) -> list["DBBaseModel"]:
+        return CreateEventResponseDTO.model_validate(event)
+
+    async def all_events(self, jwt_token: str) -> list[AllElementsResponseDTO]:
         """
         Метод для вывода всех мероприятий (не оптимизирован для больших данных).
 
@@ -70,37 +74,41 @@ class ManagementEvents:
             jwt_token (str): Токен пользователя.
 
         Returns:
-            list[object]: Все мероприятия.
+           AllElementsResponseDTO (list[BaseModel]): Все мероприятия.
 
         Raises:
             NoTokenError (HTTPException): Токен отсутствует.
         """
         if not await token_verification(jwt_token):
-            raise NoTokenError()  # выбрасываем ошибку чтобы запутать, если попытка подделать токен. фронтенд поймет.
+            raise NoTokenError()
 
-        return await all_info_table(self.db, "Events")
+        events = await all_info_table(self.db, "Events")
+
+        return [AllElementsResponseDTO.model_validate(event) for event in events]
 
     async def edit_events(
-        self, jwt_token: str, event_id: int, event: "EditEvent"
-    ) -> "DBBaseModel":
+        self, jwt_token: str, event_id: int, event: "EditEventDTO"
+    ) -> EditEventResponseDTO:
         """
         Редактирование данных мероприятия.
 
         Args:
             jwt_token (str): Токен пользователя.
             event_id (int): ID мероприятия.
-            event (EditEvent): Данные которые нужно изменить.
+            event (EditEventDTO): Данные которые нужно изменить.
 
         Returns:
-            (list[Dict[str, Any]]): Вся информация об измененном обьекте.
+            EditEventResponseDTO (BaseModel): Вся информация об измененном обьекте.
 
         Raises:
             NoTokenError: Токен отстутствует/Неверный.
         """
         if not await token_verification(jwt_token):
-            raise NoTokenError()  # выбрасываем ошибку чтобы запутать, если попытка подделать токен. фронтенд поймет.
+            raise NoTokenError()
 
-        return await edit_data(self.db, "Events", event_id, event)
+        event = await edit_data(self.db, "Events", event_id, event)
+
+        return EditEventResponseDTO.model_validate(event)
 
     async def delete_event(self, jwt_token: str, event_id: int) -> None:
         """

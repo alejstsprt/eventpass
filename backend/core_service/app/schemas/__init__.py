@@ -1,11 +1,39 @@
-from .dicts import EventCreatedResult, LoginUserResult, UserRegistrationResult
+# === TypedDict ===
+from .dicts import (
+    ActivateQrCodeResult,
+    EventCreatedResult,
+    LoginUserResult,
+    UserRegistrationResult,
+)
+
+# === Protocol ===
 from .protocols.protocol_event import ManagementEventsProtocol
 from .protocols.protocol_ticket import ManagementTicketsProtocol
 from .protocols.protocol_ticket_types import ManagementTicketTypeProtocol
 from .protocols.protocol_user import ManagementUsersProtocol
-from .pydantics.routers.event import CreateEvent, EditEvent
-from .pydantics.routers.ticket_types import CreateTicketType, EditTicketType
-from .pydantics.routers.tickets import TicketCreateDTO, TicketCreateResponseDTO
+
+# === Pydantic ===
+from .pydantics.routers.event import (
+    AllElementsResponseDTO,
+    CreateEventDTO,
+    CreateEventResponseDTO,
+    EditEventDTO,
+    EditEventResponseDTO,
+)
+from .pydantics.routers.ticket_types import (
+    CreateTicketTypeDTO,
+    CreateTicketTypeResponseDTO,
+    EditTicketTypeDTO,
+    EditTicketTypeResponseDTO,
+    GetTicketTypesResponseDTO,
+)
+from .pydantics.routers.tickets import (
+    ActivateQrCodeResponseDTO,
+    AllActiveTicketsEventResponseDTO,
+    AllTicketsEventResponseDTO,
+    TicketCreateDTO,
+    TicketCreateResponseDTO,
+)
 from .pydantics.routers.user import (
     CreateUserDTO,
     CreateUserResponseDTO,
@@ -13,6 +41,8 @@ from .pydantics.routers.user import (
     LoginUserDTO,
     LoginUserResponseDTO,
 )
+
+# === NewType ===
 from .types.types_event import (
     IntEventCreatorId,
     StrEventAddress,
@@ -27,8 +57,8 @@ __all__ = [
     "LoginUserResult",
     "LoginUserDTO",
     "CreateUserDTO",
-    "CreateEvent",
-    "EditEvent",
+    "CreateEventDTO",
+    "EditEventDTO",
     "IntUserId",
     "StrUserName",
     "StrUserLogin",
@@ -40,12 +70,22 @@ __all__ = [
     "ManagementEventsProtocol",
     "ManagementUsersProtocol",
     "ManagementTicketTypeProtocol",
-    "CreateTicketType",
-    "EditTicketType",
+    "CreateTicketTypeDTO",
+    "EditTicketTypeDTO",
+    "CreateTicketTypeResponseDTO",
+    "EditTicketTypeResponseDTO",
     "TicketCreateDTO",
     "TicketCreateResponseDTO",
     "ManagementTicketsProtocol",
     "GetUserInfoResponseDTO",
     "LoginUserResponseDTO",
     "CreateUserResponseDTO",
+    "AllElementsResponseDTO",
+    "CreateEventResponseDTO",
+    "EditEventResponseDTO",
+    "GetTicketTypesResponseDTO",
+    "AllTicketsEventResponseDTO",
+    "AllActiveTicketsEventResponseDTO",
+    "ActivateQrCodeResult",
+    "ActivateQrCodeResponseDTO",
 ]

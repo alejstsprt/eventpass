@@ -11,6 +11,7 @@ from schemas.pydantics.table_db import (
 )
 
 
+# [TicketCreate]
 class TicketCreateDTO(BaseModel):
     """Модель для входных данных пользователя"""
 
@@ -24,8 +25,6 @@ class TicketCreateDTO(BaseModel):
 
 
 class TicketCreateResponseDTO(ConfigBaseModelResponseDTO):
-    """Модель для возврата данных при создании билета"""
-
     id: int
     event_id: int
     user_id: int
@@ -35,3 +34,20 @@ class TicketCreateResponseDTO(ConfigBaseModelResponseDTO):
     user: AccountResponseDTO
     ticket_type: TicketTypeResponseDTO
     event: EventResponseDTO
+
+
+# [AllTicketsEvent]
+class AllTicketsEventResponseDTO(ConfigBaseModelResponseDTO):
+    total: int
+    by_type: dict[str, int]
+
+
+# [AllActiveTicketsEvent]
+class AllActiveTicketsEventResponseDTO(AllTicketsEventResponseDTO):
+    pass
+
+
+# [ActivateQrCode]
+class ActivateQrCodeResponseDTO(ConfigBaseModelResponseDTO):
+    activate: str
+    info: str
