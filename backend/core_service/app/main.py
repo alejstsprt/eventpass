@@ -14,6 +14,10 @@ from backend.core_service.app.core.exceptions_handlers import (
 from backend.core_service.app.core.lifespan import lifespan
 from backend.core_service.app.middleware.cors import setup_cors
 from backend.core_service.app.middleware.error_handler import ExceptionMiddleware
+from backend.core_service.app.middleware.logger_handler import AccessLogMiddleware
+from backend.core_service.app.middleware.rollback_handler import (
+    SQLAlchemySessionMiddleware,
+)
 from backend.core_service.app.models.session import DBBaseModel, engine
 
 DBBaseModel.metadata.create_all(bind=engine)
@@ -22,7 +26,9 @@ app = FastAPI(lifespan=lifespan)
 
 setup_cors(app)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_middleware(SQLAlchemySessionMiddleware)
 app.add_middleware(ExceptionMiddleware)
+app.add_middleware(AccessLogMiddleware)
 
 
 app.include_router(
