@@ -1,82 +1,18 @@
-[2025-06-13 23:53:38,533] [ERROR] api_logger: Ошибка сервера. NameError: name 'е' is not defined
-Traceback (most recent call last):
-  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\anyio\streams\memory.py", line 97, in receive
-    return self.receive_nowait()
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\anyio\streams\memory.py", line 92, in receive_nowait
-    raise WouldBlock
-anyio.WouldBlock
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\base.py", line 147, in call_next
-    message = await recv_stream.receive()
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\anyio\streams\memory.py", line 112, in receive
-    raise EndOfStream
-anyio.EndOfStream
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "C:\work\eventpass\backend\core_service\app\middleware\error_handler.py", line 11, in dispatch
-    response = await call_next(request)
-               ^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\base.py", line 153, in call_next
-    raise app_exc
-  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\base.py", line 140, in coro
-    await self.app(scope, receive_or_disconnect, send_no_error)
-  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\cors.py", line 85, in __call__
-    await self.app(scope, receive, send)
-  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
-    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
-  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
-    raise exc
-  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
-    await app(scope, receive, sender)
-  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\routing.py", line 714, in __call__
-    await self.middleware_stack(scope, receive, send)
-  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\routing.py", line 734, in app
-    await route.handle(scope, receive, send)
-  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\routing.py", line 288, in handle
-    await self.app(scope, receive, send)
-  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\routing.py", line 76, in app
-    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
-  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
-    raise exc
-  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
-    await app(scope, receive, sender)
-  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\routing.py", line 73, in app
-    response = await f(request)
-               ^^^^^^^^^^^^^^^^
-  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\fastapi\routing.py", line 301, in app
-    raw_response = await run_endpoint_function(
-                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
-    return await dependant.call(**values)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\work\eventpass\backend\core_service\app\api\v1\tickets.py", line 29, in create_ticket
-    е
-NameError: name 'е' is not defined
-[2025-06-14 00:08:50,621] [INFO] api_logger: Приложение запущено
-[2025-06-14 00:08:54,482] [INFO] api_logger: Приложение завершило свою работу
-[2025-06-14 00:09:11,084] [INFO] api_logger: Приложение запущено
-[2025-06-14 00:14:14,927] [INFO] api_logger: Приложение завершило свою работу
-[2025-06-14 00:14:18,007] [INFO] api_logger: Приложение запущено
-[2025-06-14 00:14:21,464] [INFO] api_logger: Приложение запущено
-[2025-06-14 00:14:24,661] [INFO] api_logger: Приложение запущено
-[2025-06-14 00:14:29,592] [INFO] api_logger: Приложение запущено
-[2025-06-14 00:14:39,651] [INFO] api_logger: Приложение завершило свою работу
-[2025-06-14 00:15:05,683] [INFO] api_logger: Приложение запущено
-[2025-06-14 00:15:15,176] [INFO] api_logger: Приложение завершило свою работу
-[2025-06-14 00:15:18,167] [INFO] api_logger: Приложение запущено
-[2025-06-14 00:15:28,124] [INFO] api_logger: Приложение завершило свою работу
-[2025-06-14 00:15:30,907] [INFO] api_logger: Приложение запущено
-[2025-06-14 00:28:56,025] [INFO] api_logger: Приложение завершило свою работу
-[2025-06-14 00:29:35,302] [INFO] api_logger: Приложение запущено
-[2025-06-14 00:29:38,313] [INFO] api_logger: Приложение запущено
-[2025-06-14 00:30:04,269] [INFO] api_logger: Приложение завершило свою работу
-[2025-06-14 00:30:09,455] [INFO] api_logger: Приложение запущено
-[2025-06-14 00:30:11,977] [INFO] api_logger: Приложение запущено
-[2025-06-14 00:31:48,091] [INFO] api_logger: Приложение запущено
+[2025-06-14 16:22:10,657] [INFO] api_logger: Приложение завершило свою работу
+[2025-06-14 16:22:13,166] [INFO] api_logger: Приложение запущено
+[2025-06-14 16:22:13,213] [INFO] api_logger: GET /api/v1/ticket/17 -> 200 [0.0386s]
+[2025-06-14 16:22:13,741] [INFO] api_logger: GET /api/v1/ticket/17 -> 200 [0.00414s]
+[2025-06-14 16:22:13,911] [INFO] api_logger: GET /api/v1/ticket/17 -> 200 [0.00365s]
+[2025-06-14 16:22:14,072] [INFO] api_logger: GET /api/v1/ticket/17 -> 200 [0.0059s]
+[2025-06-14 16:22:14,237] [INFO] api_logger: GET /api/v1/ticket/17 -> 200 [0.00381s]
+[2025-06-14 16:22:14,404] [INFO] api_logger: GET /api/v1/ticket/17 -> 200 [0.00448s]
+[2025-06-14 16:22:14,554] [INFO] api_logger: GET /api/v1/ticket/17 -> 200 [0.00363s]
+[2025-06-14 16:22:14,707] [INFO] api_logger: GET /api/v1/ticket/17 -> 200 [0.00389s]
+[2025-06-14 16:22:14,865] [INFO] api_logger: GET /api/v1/ticket/17 -> 200 [0.00413s]
+[2025-06-14 16:22:28,067] [INFO] api_logger: Приложение завершило свою работу
+[2025-06-14 16:22:30,692] [INFO] api_logger: Приложение запущено
+[2025-06-14 16:25:30,077] [INFO] api_logger: Приложение завершило свою работу
+[2025-06-14 16:25:32,885] [INFO] api_logger: Приложение запущено
+[2025-06-14 16:25:35,387] [INFO] api_logger: Приложение запущено
+[2025-06-14 16:30:56,427] [INFO] api_logger: Приложение завершило свою работу
+[2025-06-14 16:30:58,985] [INFO] api_logger: Приложение запущено

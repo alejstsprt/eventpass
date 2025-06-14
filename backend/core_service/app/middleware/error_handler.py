@@ -15,5 +15,5 @@ class ExceptionMiddleware(BaseHTTPMiddleware):
         except Exception as e:
             logger_api.exception(f"Ошибка сервера. {type(e).__name__}: {e}")
             return JSONResponse(
-                {"message": "Ошибка, попробуйте позже"}, status_code=500
+                {"message": "Ошибка. попробуйте позже."}, status_code=500
             )

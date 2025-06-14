@@ -9,4 +9,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     for err in exc.errors():
         errors.append(err.get("msg"))
 
-    return JSONResponse(status_code=422, content={"errors": errors})
+    return JSONResponse(
+        content={"errors": errors},
+        status_code=422,
+    )

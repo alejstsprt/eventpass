@@ -26,7 +26,6 @@ async def create_ticket(
     service: ManagementTicketsProtocol = Depends(get_tickets_service),
     jwt_token: str = Cookie(None),
 ) -> AllTicketsEventResponseDTO:
-    е
     return await service.all_tickets_event(jwt_token, event_id)
 
 
