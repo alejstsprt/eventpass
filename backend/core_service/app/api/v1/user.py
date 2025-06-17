@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Cookie, Depends, Request, Response, status
+from fastapi_limiter.depends import RateLimiter
 
 from dependencies.injection_app import get_rabbit_producer
 from infrastructure.messaging.producer import RabbitProducer
@@ -17,6 +18,7 @@ router = APIRouter()
 
 @router.get(
     "",
+    dependencies=[Depends(RateLimiter(times=10, seconds=60))],
     summary="Информация о пользователе",
     description="ИНФО: Ручка возвращает информацию о пользователе. ID user берется из токена.",
     status_code=status.HTTP_200_OK,
@@ -31,6 +33,7 @@ async def create_user(
 
 @router.post(
     "/register",
+    dependencies=[Depends(RateLimiter(times=8, seconds=60))],
     summary="Создание аккаунта",
     description="ИНФО: Ручка для создания аккаунта. Принимает в себя name, login, password.",
     status_code=status.HTTP_201_CREATED,
@@ -47,6 +50,7 @@ async def create_user(
 
 @router.post(
     "/login",
+    dependencies=[Depends(RateLimiter(times=10, seconds=60))],
     summary="Вход в аккаунт",
     description="ИНФО: Ручка для входа в аккаунт. Принимает в себя login, password.",
     status_code=status.HTTP_200_OK,

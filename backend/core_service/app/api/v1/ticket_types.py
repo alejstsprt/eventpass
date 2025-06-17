@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Cookie, Depends, Path, status
+from fastapi_limiter.depends import RateLimiter
 
 from core.config import config
 from dependencies.injection_app import get_rabbit_producer
@@ -20,6 +21,7 @@ router = APIRouter()
 
 @router.get(
     "/{event_id}",
+    dependencies=[Depends(RateLimiter(times=10, seconds=60))],
     summary="Список типов билета мероприятия",
     description="ИНФО: Список типов билета мероприятия. Принимает только токен.",
     status_code=status.HTTP_200_OK,
@@ -43,6 +45,7 @@ async def get_types_ticket_event(
 
 @router.post(
     "",
+    dependencies=[Depends(RateLimiter(times=10, seconds=60))],
     summary="Создание типа билета для мероприятия",
     description="ИНФО: Ручка для создания типа билета для мероприятия. Принимает в себя event_id, ticket_type, description, price, total_count.",
     status_code=status.HTTP_201_CREATED,
@@ -65,6 +68,7 @@ async def create_types_ticket(
 
 @router.patch(
     "/{ticket_type_id}",
+    dependencies=[Depends(RateLimiter(times=10, seconds=60))],
     summary="Изменение деталей типа билета мероприятия",
     description="ИНФО: Ручка для создания типа билета для мероприятия. Принимает в себя event_id | None, description | None, price | None, total_count | None.",
     status_code=status.HTTP_200_OK,
@@ -87,6 +91,7 @@ async def edit_types_ticket(
 
 @router.delete(
     "/{ticket_type_id}",
+    dependencies=[Depends(RateLimiter(times=10, seconds=60))],
     summary="Удаление типа билета мероприятия",
     description="ИНФО: Ручка для удаления типа билета мероприятия.",
     status_code=status.HTTP_204_NO_CONTENT,

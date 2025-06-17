@@ -67,7 +67,7 @@ class ManagementUsers:
             {
                 "type": "email",
                 "payload": {
-                    "to": "alexeyisaev2@mail.ru",  # TODO: сделать
+                    "to": f"{result.login}",
                     "title": "Спасибо за регистрацию",
                     "text": f"{result.name}, благодарим вас за регистрацию на нашем сайте!",
                 },

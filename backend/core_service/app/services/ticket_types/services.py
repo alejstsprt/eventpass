@@ -66,7 +66,7 @@ class ManagementTicketTypes:
             {
                 "type": "email",
                 "payload": {
-                    "to": "alexeyisaev2@mail.ru",  # TODO: сделать
+                    "to": f"{ticket_type.event.creator.login}",
                     "title": "Новый тип мероприятия",
                     "text": f"Вы создали новый тип билета '{ticket_type.type}' для мероприятия '{ticket_type.event.title}'. Цена: {ticket_type.price} рублей.",
                 },

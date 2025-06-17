@@ -3,12 +3,13 @@ import sys
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from fastapi import FastAPI
+from fastapi import FastAPI, status
 from fastapi.exceptions import RequestValidationError
 import uvicorn
 
 from backend.core_service.app.api.v1 import event, ticket_types, tickets, user
 from backend.core_service.app.core.exceptions_handlers import (
+    rate_limit,
     validation_exception_handler,
 )
 from backend.core_service.app.core.lifespan import lifespan
@@ -24,8 +25,11 @@ DBBaseModel.metadata.create_all(bind=engine)
 
 app = FastAPI(lifespan=lifespan)
 
-setup_cors(app)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(status.HTTP_429_TOO_MANY_REQUESTS, rate_limit)
+
+
+setup_cors(app)
 app.add_middleware(SQLAlchemySessionMiddleware)
 app.add_middleware(ExceptionMiddleware)
 app.add_middleware(AccessLogMiddleware)

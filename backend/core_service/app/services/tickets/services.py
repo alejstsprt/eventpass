@@ -9,11 +9,13 @@ from models.crud import (
     db_all_active_tickets_event,
     db_all_tickets_event,
     delete_data,
+    search_user,
 )
 from schemas import (
     ActivateQrCodeResponseDTO,
     AllActiveTicketsEventResponseDTO,
     AllTicketsEventResponseDTO,
+    IntUserId,
     TicketCreateDTO,
     TicketCreateResponseDTO,
 )
@@ -67,7 +69,7 @@ class ManagementTickets:
             {
                 "type": "email",
                 "payload": {
-                    "to": "alexeyisaev2@mail.ru",  # TODO: сделать
+                    "to": f"{result.user.login}",
                     "title": "Покупка билета",
                     "text": f"{result.user.name}, спасибо за покупку билета на мероприятие '{result.event.title}'. Вы купили '{result.ticket_type.type}' билет за {result.ticket_type.price} рублей",
                 },
@@ -114,6 +116,8 @@ class ManagementTickets:
         if not user_id:
             raise NoTokenError()
 
+        user = await search_user(self.db, user_id=IntUserId(user_id))
+
         result = await db_activate_qr_code(self.db, user_id, code)
 
         if result["activate"]:
@@ -122,9 +126,9 @@ class ManagementTickets:
                 {
                     "type": "email",
                     "payload": {
-                        "to": "alexeyisaev2@mail.ru",  # TODO: сделать
+                        "to": f"{user['id'].login}",
                         "title": "Активация билета",
-                        "text": "Ваш билет был успешно активирован. Хорошего дня!",
+                        "text": f"{user['id'].name}, ваш билет был успешно активирован. Хорошего дня!",
                     },
                 },
             )
