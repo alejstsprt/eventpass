@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Any, Dict, Protocol
 
 if TYPE_CHECKING:
+    from infrastructure.messaging.producer import RabbitProducer
     from schemas import (
         AllElementsResponseDTO,
         CreateEventDTO,
@@ -14,7 +15,10 @@ class ManagementEventsProtocol(Protocol):
     """Протокол ManagementEvents"""
 
     async def create_events(
-        self, jwt_token: str, event: "CreateEventDTO"
+        self,
+        jwt_token: str,
+        event: "CreateEventDTO",
+        rabbit_producer: "RabbitProducer",
     ) -> "CreateEventResponseDTO":
         """
         Метод для создания мероприятия.

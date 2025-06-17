@@ -1,14 +1,14 @@
-from typing import TYPE_CHECKING
+from sqlalchemy.orm import Session
 
+from core.config import config
+from core.exceptions import NoTokenError
+from infrastructure.messaging.producer import RabbitProducer
 from models.crud import (
     create_type_ticket_event,
     del_ticket_type,
     edit_data,
     get_types_ticket_event,
 )
-from sqlalchemy.orm import Session
-
-from core.exceptions import NoTokenError
 from schemas import (
     CreateTicketTypeDTO,
     CreateTicketTypeResponseDTO,
@@ -28,7 +28,10 @@ class ManagementTicketTypes:
         self.db = db
 
     async def create_types_ticket_event(
-        self, jwt_token: str, ticket_type_data: CreateTicketTypeDTO
+        self,
+        jwt_token: str,
+        ticket_type_data: CreateTicketTypeDTO,
+        rabbit_producer: RabbitProducer,
     ) -> CreateTicketTypeResponseDTO:
         """
         Метод для создания типа билета для мероприятия.
@@ -56,6 +59,18 @@ class ManagementTicketTypes:
             ticket_type_data.description,
             ticket_type_data.price,
             ticket_type_data.total_count,
+        )
+
+        await rabbit_producer.add_to_queue(
+            config.QUEUE_NAME,
+            {
+                "type": "email",
+                "payload": {
+                    "to": "alexeyisaev2@mail.ru",  # TODO: сделать
+                    "title": "Новый тип мероприятия",
+                    "text": f"Вы создали новый тип билета '{ticket_type.type}' для мероприятия '{ticket_type.event.title}'. Цена: {ticket_type.price} рублей.",
+                },
+            },
         )
 
         return CreateTicketTypeResponseDTO.model_validate(ticket_type)

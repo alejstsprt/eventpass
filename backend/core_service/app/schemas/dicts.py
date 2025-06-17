@@ -53,5 +53,5 @@ class LoginUserResult(TypedDict):
 class ActivateQrCodeResult(TypedDict):
     """Формат ответа"""
 
-    activate: str
+    activate: bool
     info: str

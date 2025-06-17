@@ -14,7 +14,7 @@ line-length = 88
 [tool.isort]
 profile = "black"
 line_length = 88
-known_first_party = ["core", "infrastructure", "schemas", "services", "security", "dependencies"]
+known_first_party = ["core", "infrastructure", "schemas", "services", "security", "dependencies", "models"]
 sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
 combine_as_imports = true
 include_trailing_comma = true

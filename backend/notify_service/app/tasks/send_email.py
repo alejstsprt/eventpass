@@ -47,4 +47,4 @@ async def send_email(to: str, title: str, text: str):
         password=config.PASSWORD_KEY,
         start_tls=True,
     )
-    print("[✔] Сообщение отправилось")
+    print(f"[✔] Сообщение отправилось на почту {to}. Заголовок: {title}")

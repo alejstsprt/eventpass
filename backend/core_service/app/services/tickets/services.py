@@ -1,5 +1,8 @@
-from typing import TYPE_CHECKING
+from sqlalchemy.orm import Session
 
+from core.config import config
+from core.exceptions import NoTokenError
+from infrastructure.messaging.producer import RabbitProducer
 from models.crud import (
     create_ticket_event,
     db_activate_qr_code,
@@ -7,9 +10,6 @@ from models.crud import (
     db_all_tickets_event,
     delete_data,
 )
-from sqlalchemy.orm import Session
-
-from core.exceptions import NoTokenError
 from schemas import (
     ActivateQrCodeResponseDTO,
     AllActiveTicketsEventResponseDTO,
@@ -30,7 +30,10 @@ class ManagementTickets:
         self.db = db
 
     async def create_ticket(
-        self, data: "TicketCreateDTO", jwt_token: str
+        self,
+        data: "TicketCreateDTO",
+        jwt_token: str,
+        rabbit_producer: RabbitProducer,
     ) -> TicketCreateResponseDTO:
         """
         Метод для создания билета на мероприятие.
@@ -59,6 +62,18 @@ class ManagementTickets:
             self.db, data.event_id, user_id, data.ticket_type_id, unique_code
         )
 
+        await rabbit_producer.add_to_queue(
+            config.QUEUE_NAME,
+            {
+                "type": "email",
+                "payload": {
+                    "to": "alexeyisaev2@mail.ru",  # TODO: сделать
+                    "title": "Покупка билета",
+                    "text": f"{result.user.name}, спасибо за покупку билета на мероприятие '{result.event.title}'. Вы купили '{result.ticket_type.type}' билет за {result.ticket_type.price} рублей",
+                },
+            },
+        )
+
         return TicketCreateResponseDTO.model_validate(result)
 
     async def delete_ticket(self, ticket_id: int, jwt_token: str) -> None:
@@ -80,7 +95,7 @@ class ManagementTickets:
         return
 
     async def activate_qr_code(
-        self, jwt_token: str, code: str
+        self, jwt_token: str, code: str, rabbit_producer: RabbitProducer
     ) -> ActivateQrCodeResponseDTO:
         """
         Метод для активации кьюаркода.
@@ -100,6 +115,19 @@ class ManagementTickets:
             raise NoTokenError()
 
         result = await db_activate_qr_code(self.db, user_id, code)
+
+        if result["activate"]:
+            await rabbit_producer.add_to_queue(
+                config.QUEUE_NAME,
+                {
+                    "type": "email",
+                    "payload": {
+                        "to": "alexeyisaev2@mail.ru",  # TODO: сделать
+                        "title": "Активация билета",
+                        "text": "Ваш билет был успешно активирован. Хорошего дня!",
+                    },
+                },
+            )
 
         return ActivateQrCodeResponseDTO.model_validate(result)
 

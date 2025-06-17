@@ -1,11 +1,11 @@
 from typing import TYPE_CHECKING
 
 from fastapi import Response
-from models.crud import db_get_info_user, search_user, user_registration
 from sqlalchemy.orm import Session
 
 from core.config import config
 from core.exceptions import LoginError, NoTokenError, PasswordError
+from models.crud import db_get_info_user, search_user, user_registration
 from schemas import (
     CreateUserResponseDTO,
     GetUserInfoResponseDTO,
@@ -67,13 +67,13 @@ class ManagementUsers:
             {
                 "type": "email",
                 "payload": {
-                    "to": "alexeyisaev2@mail.ru",
+                    "to": "alexeyisaev2@mail.ru",  # TODO: сделать
                     "title": "Спасибо за регистрацию",
-                    "text": "Вы зарегестрировались",
+                    "text": f"{result.name}, благодарим вас за регистрацию на нашем сайте!",
                 },
             },
         )
-        return result
+        return CreateUserResponseDTO.model_validate(result)
 
     async def login_user(
         self, response: Response, user: "LoginUserDTO"

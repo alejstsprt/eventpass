@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Cookie, Depends, Path, status
 
 from core.config import config
+from dependencies.injection_app import get_rabbit_producer
 from infrastructure.cache.cache_v2 import ICache, IClearCache, IParam
+from infrastructure.messaging.producer import RabbitProducer
 from schemas import (
     AllElementsResponseDTO,
     CreateEventDTO,
@@ -50,10 +52,11 @@ async def list_events(
 )
 async def create_event(
     event: CreateEventDTO,
+    rabbit_producer: RabbitProducer = Depends(get_rabbit_producer),
     service: ManagementEventsProtocol = Depends(get_event_service),
     jwt_token: str = Cookie(None),
 ) -> CreateEventResponseDTO:
-    return await service.create_events(jwt_token, event)
+    return await service.create_events(jwt_token, event, rabbit_producer)
 
 
 @router.patch(
