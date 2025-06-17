@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Protocol
 from fastapi import Response
 
 if TYPE_CHECKING:
+    from infrastructure.messaging.producer import RabbitProducer
     from schemas import (
         CreateUserDTO,
         CreateUserResponseDTO,
@@ -16,7 +17,10 @@ class ManagementUsersProtocol(Protocol):
     """Протокол ManagementUsers"""
 
     async def create_user(
-        self, response: Response, user: "CreateUserDTO"
+        self,
+        response: Response,
+        user: "CreateUserDTO",
+        rabbit_producer: "RabbitProducer",
     ) -> "CreateUserResponseDTO":
         """
         Метод для создания пользователя в базе данных.

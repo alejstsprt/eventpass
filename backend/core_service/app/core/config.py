@@ -41,5 +41,9 @@ class Settings:
         "SECRET_KEY_HMAC", "ewgewgwgew22222222fee"
     ).encode()
 
+    # для раббита
+    RABBIT_USER: str = os.getenv("RABBIT_USER", "eventpass")
+    RABBIT_PASSWORD: str = os.getenv("RABBIT_PASSWORD", "eventpass12345")
+
 
 config = Settings()

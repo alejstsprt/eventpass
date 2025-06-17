@@ -1,3 +1,4 @@
+from fastapi.exceptions import HTTPException
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
@@ -12,6 +13,10 @@ class ExceptionMiddleware(BaseHTTPMiddleware):
         try:
             response = await call_next(request)
             return response
+
+        except HTTPException:
+            raise
+
         except Exception as e:
             logger_api.exception(f"Ошибка сервера. {type(e).__name__}: {e}")
             return JSONResponse(

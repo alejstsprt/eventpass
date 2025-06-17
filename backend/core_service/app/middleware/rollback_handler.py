@@ -1,3 +1,4 @@
+from fastapi.exceptions import HTTPException
 from sqlalchemy.exc import SQLAlchemyError
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
@@ -15,11 +16,17 @@ class SQLAlchemySessionMiddleware(BaseHTTPMiddleware):
             response = await call_next(request)
             request.state.db.commit()
             return response
+
+        except HTTPException:
+            raise
+
         except SQLAlchemyError:
             request.state.db.rollback()
             raise
+
         except Exception:
             request.state.db.rollback()
             raise
+
         finally:
             request.state.db.close()

@@ -1,5 +1,7 @@
-from fastapi import APIRouter, Cookie, Depends, Response, status
+from dependencies.injection_app import get_rabbit_producer
+from fastapi import APIRouter, Cookie, Depends, Request, Response, status
 
+from infrastructure.messaging.producer import RabbitProducer
 from schemas import (
     CreateUserDTO,
     CreateUserResponseDTO,
@@ -37,9 +39,10 @@ async def create_user(
 async def create_user(
     response: Response,
     user: CreateUserDTO,
+    rabbit_producer: RabbitProducer = Depends(get_rabbit_producer),
     service: ManagementUsersProtocol = Depends(get_user_service),
 ) -> CreateUserResponseDTO:
-    return await service.create_user(response, user)
+    return await service.create_user(response, user, rabbit_producer)
 
 
 @router.post(

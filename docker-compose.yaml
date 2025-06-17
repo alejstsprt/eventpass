@@ -1,7 +1,18 @@
 services:
   redis:
     image: redis:latest
-    container_name: servis_redis2
+    container_name: servis_redis3
     ports:
       - "6379:6379"
     restart: always
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq3
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBIT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBIT_PASSWORD}
+    restart: unless-stopped

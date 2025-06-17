@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, unique
 from typing import Annotated
 
 from pydantic import BaseModel, Field
@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 from schemas.pydantics.cfg_base_model import ConfigBaseModelResponseDTO
 
 
+@unique
 class TypeForm(str, Enum):
     """Типы мероприятия"""
 

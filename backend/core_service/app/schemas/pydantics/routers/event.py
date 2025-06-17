@@ -1,5 +1,5 @@
 from datetime import datetime
-from enum import Enum
+from enum import Enum, unique
 from typing import Annotated
 
 from pydantic import BaseModel, Field
@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 from schemas.pydantics.cfg_base_model import ConfigBaseModelResponseDTO
 
 
+@unique
 class StatusForm(str, Enum):
     """Статусы мероприятия"""
 
@@ -15,6 +16,7 @@ class StatusForm(str, Enum):
     DRAFT = "черновик"
 
 
+@unique
 class CategoriesForm(str, Enum):
     """Категории мероприятия"""
 

@@ -17,6 +17,7 @@ from security.hashing import hash_password, verify_password
 from security.jwt import create_access_token, set_jwt_cookie, token_verification
 
 if TYPE_CHECKING:
+    from infrastructure.messaging.producer import RabbitProducer
     from schemas import CreateUserDTO, LoginUserDTO, LoginUserResult, StrUserLogin
 
 
@@ -29,7 +30,10 @@ class ManagementUsers:
         self.db = db
 
     async def create_user(
-        self, response: Response, user: "CreateUserDTO"
+        self,
+        response: Response,
+        user: "CreateUserDTO",
+        rabbit_producer: "RabbitProducer",
     ) -> CreateUserResponseDTO:
         """
         Метод для создания пользователя в базе данных.
@@ -56,6 +60,15 @@ class ManagementUsers:
         )
         token = await create_access_token(result.id)
         await set_jwt_cookie(response, token)
+
+        await rabbit_producer.add_to_queue(
+            "email",
+            {
+                "email": "fire.pl12345@mail.ru",
+                "title": "Спасибо за регистрацию",
+                "text": "Вы зарегестрировались",
+            },
+        )
         return result
 
     async def login_user(

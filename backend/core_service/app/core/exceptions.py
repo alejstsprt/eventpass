@@ -29,7 +29,14 @@ class RegistrationFailedException(HTTPException):
 class LoginAlreadyExistsException(HTTPException):
     def __init__(self) -> None:
         super().__init__(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Имя/Логин уже занят"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Логин уже занят"
+        )
+
+
+class NameAlreadyExistsException(HTTPException):
+    def __init__(self) -> None:
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Имя уже занято"
         )
 
 

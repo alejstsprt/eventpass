@@ -17,6 +17,7 @@ from core.exceptions import (
     ForbiddenUserError,
     InternalServerError,
     LoginAlreadyExistsException,
+    NameAlreadyExistsException,
     TicketLimitError,
     TicketTypeError,
     ValidationError,
@@ -59,7 +60,8 @@ async def user_registration(
 
     Raises:
         ValidationError (HTTPException): Неверные входные данные.
-        LoginAlreadyExistsException (HTTPException): Имя/Логин уже занят.
+        LoginAlreadyExistsException (HTTPException): Логин уже занят.
+        NameAlreadyExistsException (HTTPException): Имя уже занято.
         InternalServerError (HTTPException): Ошибка сервера.
     """
     try:
@@ -72,13 +74,14 @@ async def user_registration(
         db.commit()
         db.refresh(new_user)
         return new_user
-    except IntegrityError:
-        logger_api.error("Имя/Логин уже занят")
-        raise LoginAlreadyExistsException()
-    except Exception as e:
+    except IntegrityError as e:
         db.rollback()
-        logger_api.exception(f"Внутренняя ошибка сервера. Проблемы с сейвом БД: {e}")
-        raise InternalServerError()
+        if "users.login" in str(e).split():  # HACK: костыль
+            logger_api.error("Логин уже занят")
+            raise LoginAlreadyExistsException()
+        else:
+            logger_api.error("Имя уже занято")
+            raise NameAlreadyExistsException()
 
 
 async def create_ticket_event(

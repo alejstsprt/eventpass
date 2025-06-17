@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Cookie, Depends, Path, status
 
 from core.config import config
-from infrastructure.cache_v2 import ICache, IClearCache, IParam
+from infrastructure.cache.cache_v2 import ICache, IClearCache, IParam
 from schemas import (
     AllElementsResponseDTO,
     CreateEventDTO,
