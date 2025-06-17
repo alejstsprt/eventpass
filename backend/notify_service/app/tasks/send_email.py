@@ -39,12 +39,15 @@ async def send_email(to: str, title: str, text: str):
         subtype="html",
     )
 
-    await aiosmtplib.send(
-        message,
-        hostname="smtp.mail.ru",
-        port=587,
-        username=config.EMAIL,
-        password=config.PASSWORD_KEY,
-        start_tls=True,
-    )
-    print(f"[✔] Сообщение отправилось на почту {to}. Заголовок: {title}")
+    try:
+        await aiosmtplib.send(
+            message,
+            hostname="smtp.mail.ru",
+            port=587,
+            username=config.EMAIL,
+            password=config.PASSWORD_KEY,
+            start_tls=True,
+        )
+        print(f"[✔] Сообщение отправилось на почту {to}. Заголовок: {title}")
+    except aiosmtplib.errors.SMTPDataError:
+        print(f"[X] Сообщение не отправилось. Почты {to} не существует.")

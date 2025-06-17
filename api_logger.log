@@ -2081,3 +2081,287 @@ activate
 [2025-06-17 17:32:03,143] [INFO] api_logger: POST /api/v1/ticket/scan/TKT.ad6267a12cea86d8.bd0bc624fcb271c9 -> 200 [0.03056s]
 [2025-06-17 17:32:26,701] [INFO] api_logger: POST /api/v1/ticket -> 201 [0.03991s]
 [2025-06-17 17:32:33,701] [INFO] api_logger: POST /api/v1/ticket/scan/TKT.d5832d31b784525e.9a6c3c990408b03c -> 200 [0.02947s]
+[2025-06-17 17:34:23,568] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 17:35:18,072] [INFO] api_logger: POST /api/v1/ticket -> 201 [0.16005s]
+[2025-06-17 17:42:45,990] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 17:42:55,389] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 17:43:01,998] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 17:43:06,177] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 17:53:59,593] [INFO] api_logger: GET /api/v1/auth -> 200 [0.09878s]
+[2025-06-17 17:54:51,058] [INFO] api_logger: POST /api/v1/auth/register -> 201 [0.54761s]
+[2025-06-17 17:54:54,082] [INFO] api_logger: GET /api/v1/auth -> 200 [0.00383s]
+[2025-06-17 17:55:49,731] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 17:55:53,731] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 17:55:56,899] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 17:55:58,778] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 17:56:01,860] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 17:56:18,326] [INFO] api_logger: POST /api/v1/auth/register -> 201 [0.79479s]
+[2025-06-17 17:57:03,630] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 17:57:06,864] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 17:57:10,165] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 17:57:13,794] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 17:57:14,227] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 17:57:17,073] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 17:57:19,814] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 17:57:22,745] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 17:57:28,904] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 17:57:32,016] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 17:57:40,278] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 17:57:43,112] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 17:57:43,890] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 17:57:46,733] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 17:57:47,501] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 17:57:50,642] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 17:57:53,500] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 17:58:04,468] [INFO] api_logger: POST /api/v1/events -> 201 [0.09653s]
+[2025-06-17 17:58:18,535] [INFO] api_logger: POST /api/v1/auth/register -> 201 [0.49545s]
+[2025-06-17 17:58:35,828] [INFO] api_logger: POST /api/v1/auth/login -> 200 [0.40915s]
+[2025-06-17 17:59:26,433] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 17:59:30,285] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 17:59:33,723] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 17:59:34,161] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 17:59:37,544] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 17:59:41,124] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 17:59:43,554] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 17:59:46,564] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 17:59:52,180] [INFO] api_logger: POST /api/v1/events -> 201 [0.09309s]
+[2025-06-17 18:00:42,994] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:00:45,939] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:00:51,423] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:00:54,419] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:00:58,318] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:00:58,547] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:01:01,649] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:01:28,031] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:01:31,355] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:01:46,182] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:01:49,336] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:01:56,822] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:01:59,814] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:02:10,502] [INFO] api_logger: POST /api/v1/events -> 201 [0.16006s]
+[2025-06-17 18:02:25,013] [ERROR] api_logger: Данный тип билета для этого мероприяия уже существует ticket_type = 'Vip'
+[2025-06-17 18:02:25,016] [INFO] api_logger: POST /api/v1/ticket-types -> 401 [0.01944s]
+[2025-06-17 18:02:29,864] [INFO] api_logger: POST /api/v1/ticket-types -> 201 [0.09624s]
+[2025-06-17 18:03:17,069] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:03:21,906] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:03:25,398] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:03:28,617] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:03:31,618] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:03:59,532] [INFO] api_logger: POST /api/v1/ticket -> 201 [0.11411s]
+[2025-06-17 18:04:55,296] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:04:58,521] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:05:09,730] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:05:13,029] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:05:16,329] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:05:16,881] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:05:19,817] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:05:22,649] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:05:27,715] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:05:31,038] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:05:34,698] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:05:37,806] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:05:45,485] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:05:48,555] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:06:00,325] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:06:03,855] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:06:04,843] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:06:07,815] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:06:11,175] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:06:12,935] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:06:16,616] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:06:19,493] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:06:20,264] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:06:23,523] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:06:26,893] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:06:29,884] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:06:33,504] [INFO] api_logger: POST /api/v1/ticket -> 201 [0.08438s]
+[2025-06-17 18:06:41,176] [ERROR] api_logger: Ошибка сервера. TypeError: search_user() takes 1 positional argument but 2 were given
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\anyio\streams\memory.py", line 97, in receive
+    return self.receive_nowait()
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\anyio\streams\memory.py", line 92, in receive_nowait
+    raise WouldBlock
+anyio.WouldBlock
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\base.py", line 147, in call_next
+    message = await recv_stream.receive()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\anyio\streams\memory.py", line 112, in receive
+    raise EndOfStream
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\work\eventpass\backend\core_service\app\middleware\error_handler.py", line 14, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\base.py", line 153, in call_next
+    raise app_exc
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\base.py", line 140, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\base.py", line 173, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\_utils.py", line 82, in collapse_excgroups
+    raise exc
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\base.py", line 175, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\work\eventpass\backend\core_service\app\middleware\rollback_handler.py", line 16, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\base.py", line 153, in call_next
+    raise app_exc
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\base.py", line 140, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\work\eventpass\backend\core_service\app\api\v1\tickets.py", line 78, in create_ticket
+    return await service.activate_qr_code(jwt_token, code, rabbit_producer)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\work\eventpass\backend\core_service\app\services\tickets\services.py", line 119, in activate_qr_code
+    user = await search_user(self.db, IntUserId(user_id))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: search_user() takes 1 positional argument but 2 were given
+[2025-06-17 18:06:41,207] [INFO] api_logger: POST /api/v1/ticket/scan/TKT.d5832d31b784525e.9a6c3c990408b03c -> 500 [0.03394s]
+[2025-06-17 18:07:55,157] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:07:58,147] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:08:02,823] [ERROR] api_logger: Ошибка сервера. ResponseValidationError: 1 validation errors:
+  {'type': 'model_attributes_type', 'loc': ('response',), 'msg': 'Input should be a valid dictionary or object to extract fields from', 'input': None}
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\anyio\streams\memory.py", line 97, in receive
+    return self.receive_nowait()
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\anyio\streams\memory.py", line 92, in receive_nowait
+    raise WouldBlock
+anyio.WouldBlock
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\base.py", line 147, in call_next
+    message = await recv_stream.receive()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\anyio\streams\memory.py", line 112, in receive
+    raise EndOfStream
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\work\eventpass\backend\core_service\app\middleware\error_handler.py", line 14, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\base.py", line 153, in call_next
+    raise app_exc
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\base.py", line 140, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\base.py", line 173, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\_utils.py", line 82, in collapse_excgroups
+    raise exc
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\base.py", line 175, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\work\eventpass\backend\core_service\app\middleware\rollback_handler.py", line 16, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\base.py", line 153, in call_next
+    raise app_exc
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\base.py", line 140, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\fastapi\routing.py", line 327, in app
+    content = await serialize_response(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\fastapi\routing.py", line 176, in serialize_response
+    raise ResponseValidationError(
+fastapi.exceptions.ResponseValidationError: 1 validation errors:
+  {'type': 'model_attributes_type', 'loc': ('response',), 'msg': 'Input should be a valid dictionary or object to extract fields from', 'input': None}
+
+[2025-06-17 18:08:02,847] [INFO] api_logger: POST /api/v1/ticket/scan/TKT.d5832d31b784525e.9a6c3c990408b03c -> 500 [0.08876s]
+[2025-06-17 18:08:27,382] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:08:30,974] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:08:31,301] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:08:34,065] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:08:37,105] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:08:40,621] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:08:43,912] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:08:45,550] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:08:49,213] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:08:52,393] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:08:54,968] [INFO] api_logger: POST /api/v1/ticket/scan/TKT.d5832d31b784525e.9a6c3c990408b03c -> 403 [0.04426s]
+[2025-06-17 18:09:07,142] [INFO] api_logger: POST /api/v1/ticket/scan/TKT.7166581484ba4e6f.c4b4b5c0bc4ada22 -> 200 [0.07732s]
+[2025-06-17 18:09:28,343] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:09:41,689] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:09:44,778] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:09:46,977] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:09:50,158] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:10:04,725] [INFO] api_logger: POST /api/v1/ticket -> 201 [0.18969s]
+[2025-06-17 18:10:15,390] [INFO] api_logger: POST /api/v1/ticket/scan/TKT.d0967cf71ffc630a.a03000c7dec887c7 -> 200 [0.04503s]
+[2025-06-17 18:10:23,464] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:10:26,688] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:10:51,744] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:10:54,974] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:10:57,873] [INFO] api_logger: Продюсер Rabbit запущен

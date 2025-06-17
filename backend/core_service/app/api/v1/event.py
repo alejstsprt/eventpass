@@ -34,7 +34,7 @@ router = APIRouter()
 )
 async def list_events(
     service: ManagementEventsProtocol = Depends(get_event_service),
-    jwt_token: str = Cookie(None),
+    jwt_token: str = Cookie(None),  # TODO: сделать DI
 ) -> list[AllElementsResponseDTO]:
     return await service.all_events(jwt_token)
 

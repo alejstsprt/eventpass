@@ -74,7 +74,7 @@ class ManagementEvents:
             {
                 "type": "email",
                 "payload": {
-                    "to": "alexeyisaev2@mail.ru",  # TODO: сделать
+                    "to": f"{event.creator.login}",
                     "title": "Новое мероприятие",
                     "text": f"Вы создали новое мероприятие '{event.title}'. Статус: {event.status}.",
                 },
