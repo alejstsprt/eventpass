@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Cookie, Depends, Path, status
+from fastapi_limiter.depends import RateLimiter
 
 from core.config import config
 from dependencies.injection_app import get_rabbit_producer
@@ -22,6 +23,7 @@ router = APIRouter()
 
 @router.get(
     "",
+    dependencies=[Depends(RateLimiter(times=10, seconds=60))],
     summary="Список всех мероприятий",
     description="ИНФО: Ручка для получения списка всех мероприятий.",
     status_code=status.HTTP_200_OK,
@@ -41,6 +43,7 @@ async def list_events(
 
 @router.post(
     "",
+    dependencies=[Depends(RateLimiter(times=10, seconds=60))],
     summary="Создание мероприятия",
     description="ИНФО: Ручка для создания мероприятия. Принимает в себя status, title, description, address.",
     status_code=status.HTTP_201_CREATED,
@@ -61,6 +64,7 @@ async def create_event(
 
 @router.patch(
     "/{event_id}",
+    dependencies=[Depends(RateLimiter(times=10, seconds=60))],
     summary="Изменение мероприятия",
     description="ИНФО: Ручка для изменения мероприятия. Принимает в себя status | None, title | None, description | None, address | None.",
     status_code=status.HTTP_200_OK,
@@ -81,6 +85,7 @@ async def edit_events(
 
 @router.delete(
     "/{event_id}",
+    dependencies=[Depends(RateLimiter(times=10, seconds=60))],
     summary="Удаление мероприятия",
     description="ИНФО: Ручка для удаления мероприятия по ID.",
     status_code=status.HTTP_204_NO_CONTENT,

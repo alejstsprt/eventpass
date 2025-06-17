@@ -2365,3 +2365,375 @@ fastapi.exceptions.ResponseValidationError: 1 validation errors:
 [2025-06-17 18:10:51,744] [INFO] api_logger: Продюсер Rabbit завершил свою работу
 [2025-06-17 18:10:54,974] [INFO] api_logger: Продюсер Rabbit запущен
 [2025-06-17 18:10:57,873] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:16:46,688] [INFO] api_logger: GET /api/v1/events -> 200 [0.10564s]
+[2025-06-17 18:16:49,741] [INFO] api_logger: GET /api/v1/events -> 200 [0.01151s]
+[2025-06-17 18:19:28,946] [INFO] api_logger: POST /api/v1/auth/register -> 201 [0.51043s]
+[2025-06-17 18:20:08,161] [INFO] api_logger: POST /api/v1/events -> 422 [0.0083s]
+[2025-06-17 18:20:33,504] [INFO] api_logger: POST /api/v1/events -> 201 [0.10422s]
+[2025-06-17 18:21:43,996] [INFO] api_logger: POST /api/v1/ticket-types -> 201 [0.07035s]
+[2025-06-17 18:22:24,886] [INFO] api_logger: POST /api/v1/ticket -> 201 [0.10753s]
+[2025-06-17 18:22:59,960] [INFO] api_logger: POST /api/v1/ticket/scan/TKT.fa4f872149ad2df8.a3666ede625452ee -> 200 [0.03078s]
+[2025-06-17 18:23:11,257] [INFO] api_logger: POST /api/v1/ticket/scan/TKT.fa4f872149ad2df8.a3666ede625452ee -> 200 [0.00674s]
+[2025-06-17 18:23:15,593] [INFO] api_logger: POST /api/v1/ticket/scan/TKT.fa4f872149ad2df8.a3666ede625452ee -> 200 [0.00716s]
+[2025-06-17 18:23:15,760] [INFO] api_logger: POST /api/v1/ticket/scan/TKT.fa4f872149ad2df8.a3666ede625452ee -> 200 [0.00522s]
+[2025-06-17 18:23:15,952] [INFO] api_logger: POST /api/v1/ticket/scan/TKT.fa4f872149ad2df8.a3666ede625452ee -> 200 [0.0055s]
+[2025-06-17 18:23:17,069] [INFO] api_logger: POST /api/v1/ticket/scan/TKT.fa4f872149ad2df8.a3666ede625452ee -> 200 [0.00627s]
+[2025-06-17 18:23:17,208] [INFO] api_logger: POST /api/v1/ticket/scan/TKT.fa4f872149ad2df8.a3666ede625452ee -> 200 [0.00552s]
+[2025-06-17 18:23:18,626] [INFO] api_logger: POST /api/v1/ticket/scan/TKT.fa4f872149ad2df8.a3666ede625452ee -> 200 [0.00501s]
+[2025-06-17 18:38:58,131] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:39:01,347] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:39:05,538] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:39:27,526] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:39:27,863] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:39:39,225] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:39:44,264] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:39:47,515] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:39:50,254] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:39:52,016] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:40:29,902] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:40:33,011] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:40:36,770] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:40:44,732] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:40:48,730] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:40:55,098] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:41:02,538] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:42:07,598] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:47:28,843] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:48:14,359] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:48:17,919] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:48:29,488] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:48:33,250] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:49:03,686] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:49:09,095] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:49:12,182] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:49:18,725] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:49:25,121] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:50:35,529] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:51:32,999] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:55:06,052] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:56:02,298] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:56:05,267] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:56:11,209] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:56:39,304] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:56:46,017] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:56:50,215] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:56:50,433] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:56:53,805] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:56:57,585] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:57:01,213] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:57:04,793] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:57:08,015] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:57:11,982] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:57:15,372] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:57:18,662] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:57:22,553] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:57:25,653] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:57:29,991] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:58:03,888] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:58:17,696] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:58:22,600] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:58:25,651] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:58:29,149] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:58:36,206] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:59:04,104] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:59:09,015] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:59:12,235] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:59:15,974] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:59:19,055] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:59:31,013] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:59:31,347] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:59:34,554] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:59:36,219] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:59:39,443] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:59:42,075] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:59:50,212] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:59:53,511] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 18:59:55,708] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 18:59:59,291] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:00:00,172] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:00:17,953] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:00:21,929] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:00:25,579] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:00:29,730] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:00:32,870] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:00:41,679] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:00:45,118] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:03:35,368] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:03:43,666] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:03:51,262] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:03:54,807] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:03:58,575] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:04:01,907] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:04:29,998] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:06:17,798] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:06:20,716] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:06:34,152] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:06:37,725] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:06:37,737] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:06:41,148] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:06:44,743] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:06:44,749] [INFO] api_logger: Redis для 
+[2025-06-17 19:06:47,180] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:06:50,824] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:06:50,830] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:09:24,246] [ERROR] api_logger: Ошибка сервера. ResponseError: invalid expire time in 'set' command script: a3f9e982197e9e887f6b5dcb7ec273863bb83aad, on @user_script:14.
+Traceback (most recent call last):
+  File "C:\work\eventpass\backend\core_service\app\middleware\error_handler.py", line 14, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\base.py", line 153, in call_next
+    raise app_exc
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\base.py", line 140, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\base.py", line 173, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\_utils.py", line 82, in collapse_excgroups
+    raise exc
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\base.py", line 175, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\work\eventpass\backend\core_service\app\middleware\rollback_handler.py", line 16, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\base.py", line 153, in call_next
+    raise app_exc
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\base.py", line 140, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\starlette\routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\fastapi\routing.py", line 291, in app
+    solved_result = await solve_dependencies(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\fastapi\dependencies\utils.py", line 638, in solve_dependencies
+    solved = await call(**solved_result.values)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\fastapi_limiter\depends.py", line 54, in __call__
+    pexpire = await self._check(key)
+              ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\fastapi_limiter\depends.py", line 30, in _check
+    pexpire = await redis.evalsha(
+              ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\redis\asyncio\client.py", line 678, in execute_command
+    return await conn.retry.call_with_retry(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\redis\asyncio\retry.py", line 71, in call_with_retry
+    return await do()
+           ^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\redis\asyncio\client.py", line 653, in _send_command_parse_response
+    return await self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\redis\asyncio\client.py", line 699, in parse_response
+    response = await connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\redis\asyncio\connection.py", line 626, in read_response
+    raise response from None
+redis.exceptions.ResponseError: invalid expire time in 'set' command script: a3f9e982197e9e887f6b5dcb7ec273863bb83aad, on @user_script:14.
+[2025-06-17 19:09:24,274] [INFO] api_logger: GET /api/v1/auth -> 500 [0.03967s]
+[2025-06-17 19:10:11,035] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:10:14,629] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:10:14,635] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:10:17,660] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:10:17,667] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:10:20,095] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:10:23,401] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:10:23,410] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:10:26,640] [INFO] api_logger: GET /api/v1/auth -> 200 [0.0608s]
+[2025-06-17 19:10:27,460] [INFO] api_logger: GET /api/v1/auth -> 200 [0.00903s]
+[2025-06-17 19:10:27,910] [INFO] api_logger: GET /api/v1/auth -> 200 [0.0075s]
+[2025-06-17 19:10:28,313] [INFO] api_logger: GET /api/v1/auth -> 429 [0.01404s]
+[2025-06-17 19:10:29,024] [INFO] api_logger: GET /api/v1/auth -> 429 [0.00224s]
+[2025-06-17 19:10:49,259] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:10:53,487] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:10:53,512] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:10:56,466] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:10:56,474] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:10:57,695] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:11:00,866] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:11:00,875] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:11:38,258] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:11:41,234] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:11:41,245] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:14:09,161] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:14:43,990] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:14:43,996] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:14:46,320] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:14:50,067] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:14:50,074] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:14:53,329] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:14:53,338] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:17:02,089] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:17:02,099] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:17:05,247] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:17:05,257] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:18:11,710] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:18:14,772] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:18:14,779] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:18:17,420] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:18:20,531] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:18:20,537] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:18:23,723] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:18:30,593] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:18:30,599] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:18:46,010] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:18:49,868] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:18:49,882] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:18:56,050] [INFO] api_logger: GET /api/v1/auth -> 200 [0.04929s]
+[2025-06-17 19:18:56,767] [INFO] api_logger: GET /api/v1/auth -> 200 [0.0053s]
+[2025-06-17 19:18:57,194] [INFO] api_logger: GET /api/v1/auth -> 200 [0.00526s]
+[2025-06-17 19:18:57,717] [INFO] api_logger: GET /api/v1/auth -> 429 [0.00239s]
+[2025-06-17 19:18:58,191] [INFO] api_logger: GET /api/v1/auth -> 429 [0.02042s]
+[2025-06-17 19:19:04,403] [INFO] api_logger: GET /api/v1/auth -> 429 [0.00352s]
+[2025-06-17 19:19:04,862] [INFO] api_logger: GET /api/v1/auth -> 429 [0.00244s]
+[2025-06-17 19:20:02,739] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:20:05,824] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:20:05,830] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:20:13,845] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:20:17,552] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:20:17,563] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:20:21,244] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:20:21,251] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:20:31,169] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:20:34,182] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:20:34,188] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:20:50,811] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:20:54,200] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:20:54,209] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:20:54,648] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:21:11,810] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:21:11,817] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:21:27,981] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:21:31,986] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:21:31,995] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:21:35,136] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:21:35,145] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:22:21,798] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:22:28,998] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:22:29,009] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:22:32,852] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:22:32,864] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:24:52,548] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:25:06,002] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:25:06,010] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:29:55,607] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:29:58,601] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:29:58,611] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:30:11,348] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:30:14,348] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:30:14,356] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:30:17,148] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:30:17,153] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:30:27,061] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:30:30,976] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:30:30,983] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:30:34,156] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:30:34,164] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:30:37,176] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:30:37,182] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:30:41,251] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:30:44,166] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:30:44,172] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:30:49,459] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:30:52,754] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:30:52,761] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:30:55,535] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:30:55,540] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:30:59,736] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:31:02,823] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:31:02,830] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:31:05,835] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:31:05,882] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:31:07,102] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:31:10,354] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:31:10,360] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:31:15,344] [INFO] api_logger: POST /api/v1/auth/login -> 200 [0.45841s]
+[2025-06-17 19:31:19,809] [INFO] api_logger: POST /api/v1/auth/login -> 401 [0.54174s]
+[2025-06-17 19:31:20,904] [INFO] api_logger: POST /api/v1/auth/login -> 401 [0.38345s]
+[2025-06-17 19:31:21,794] [INFO] api_logger: POST /api/v1/auth/login -> 401 [0.41479s]
+[2025-06-17 19:31:22,652] [INFO] api_logger: POST /api/v1/auth/login -> 401 [0.42109s]
+[2025-06-17 19:31:23,523] [INFO] api_logger: POST /api/v1/auth/login -> 401 [0.39446s]
+[2025-06-17 19:31:24,339] [INFO] api_logger: POST /api/v1/auth/login -> 401 [0.3759s]
+[2025-06-17 19:31:25,127] [INFO] api_logger: POST /api/v1/auth/login -> 401 [0.37102s]
+[2025-06-17 19:31:25,882] [INFO] api_logger: POST /api/v1/auth/login -> 401 [0.37322s]
+[2025-06-17 19:31:26,619] [INFO] api_logger: POST /api/v1/auth/login -> 401 [0.38106s]
+[2025-06-17 19:31:26,958] [INFO] api_logger: POST /api/v1/auth/login -> 429 [0.00341s]
+[2025-06-17 19:31:27,678] [INFO] api_logger: POST /api/v1/auth/login -> 429 [0.00358s]
+[2025-06-17 19:31:28,080] [INFO] api_logger: POST /api/v1/auth/login -> 429 [0.00398s]
+[2025-06-17 19:31:28,303] [INFO] api_logger: POST /api/v1/auth/login -> 429 [0.00334s]
+[2025-06-17 19:31:28,521] [INFO] api_logger: POST /api/v1/auth/login -> 429 [0.00357s]
+[2025-06-17 19:31:28,779] [INFO] api_logger: POST /api/v1/auth/login -> 429 [0.00404s]
+[2025-06-17 19:31:28,916] [INFO] api_logger: POST /api/v1/auth/login -> 429 [0.00357s]
+[2025-06-17 19:31:47,839] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:31:52,232] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:31:52,239] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:31:53,459] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:31:57,239] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:31:57,246] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:32:01,802] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:32:01,808] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:32:04,669] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:32:04,680] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:32:13,841] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:32:16,579] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:32:16,587] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:32:22,850] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:32:25,688] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:32:25,694] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:32:40,413] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:32:43,507] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:32:43,514] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:32:46,207] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:32:46,215] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:32:49,968] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:32:53,486] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:32:53,492] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:32:56,636] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:32:56,646] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:33:01,417] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:33:01,423] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:33:03,067] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:33:06,896] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:33:06,908] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:33:08,123] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:33:12,375] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:33:12,383] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:33:16,894] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:33:16,901] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:33:17,121] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:33:20,258] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:33:20,282] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:33:23,501] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:33:27,073] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:33:27,080] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:33:29,176] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:33:47,843] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:33:47,851] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:33:51,502] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:33:51,513] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:47:38,507] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-17 19:47:42,513] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:47:42,520] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:47:45,205] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:47:45,212] [INFO] api_logger: Redis для FastAPILimiter подключен
