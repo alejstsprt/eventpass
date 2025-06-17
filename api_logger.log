@@ -2737,3 +2737,5 @@ redis.exceptions.ResponseError: invalid expire time in 'set' command script: a3f
 [2025-06-17 19:47:42,520] [INFO] api_logger: Redis для FastAPILimiter подключен
 [2025-06-17 19:47:45,205] [INFO] api_logger: Продюсер Rabbit запущен
 [2025-06-17 19:47:45,212] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-17 19:48:59,399] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-17 19:48:59,417] [INFO] api_logger: Redis для FastAPILimiter подключен
