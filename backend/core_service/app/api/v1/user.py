@@ -1,6 +1,6 @@
-from dependencies.injection_app import get_rabbit_producer
 from fastapi import APIRouter, Cookie, Depends, Request, Response, status
 
+from dependencies.injection_app import get_rabbit_producer
 from infrastructure.messaging.producer import RabbitProducer
 from schemas import (
     CreateUserDTO,
