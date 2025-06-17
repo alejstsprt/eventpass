@@ -49,5 +49,5 @@ class AllActiveTicketsEventResponseDTO(AllTicketsEventResponseDTO):
 
 # [ActivateQrCode]
 class ActivateQrCodeResponseDTO(ConfigBaseModelResponseDTO):
-    activate: str
+    activate: bool
     info: str

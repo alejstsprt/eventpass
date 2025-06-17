@@ -1,10 +1,11 @@
 from typing import TYPE_CHECKING
 
 from fastapi import Response
-from models.crud import db_get_info_user, search_user, user_registration
 from sqlalchemy.orm import Session
 
+from core.config import config
 from core.exceptions import LoginError, NoTokenError, PasswordError
+from models.crud import db_get_info_user, search_user, user_registration
 from schemas import (
     CreateUserResponseDTO,
     GetUserInfoResponseDTO,
@@ -62,14 +63,17 @@ class ManagementUsers:
         await set_jwt_cookie(response, token)
 
         await rabbit_producer.add_to_queue(
-            "email",
+            config.QUEUE_NAME,
             {
-                "email": "fire.pl12345@mail.ru",
-                "title": "Спасибо за регистрацию",
-                "text": "Вы зарегестрировались",
+                "type": "email",
+                "payload": {
+                    "to": "alexeyisaev2@mail.ru",  # TODO: сделать
+                    "title": "Спасибо за регистрацию",
+                    "text": f"{result.name}, благодарим вас за регистрацию на нашем сайте!",
+                },
             },
         )
-        return result
+        return CreateUserResponseDTO.model_validate(result)
 
     async def login_user(
         self, response: Response, user: "LoginUserDTO"

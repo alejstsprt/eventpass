@@ -1,28 +1,42 @@
+import asyncio
 import json
 
 from aio_pika import IncomingMessage
-from app.broker.connection import get_connection
-from app.handlers import email, telegram
-from app.utils.parse_payload import parse_payload
+
+from backend.notify_service.app.broker.connection import get_connection
+from backend.notify_service.app.handlers import email, telegram
+from backend.notify_service.app.utils.parse_body import (
+    parse_email_body,
+    parse_telegram_body,
+)
+from backend.notify_service.config import config
 
 
 async def handle_message(message: IncomingMessage):
     async with message.process():
-        payload = json.loads(message.body)
-        data = parse_payload(payload)
+        body = json.loads(message.body)
 
-        match data.type:
+        match body["type"]:
             case "email":
-                await email.handle(data)
+                await email.handle(parse_email_body(body["payload"]))
             case "telegram":
-                await telegram.handle(data)
+                await telegram.handle(parse_telegram_body(body["payload"]))
             case _:
-                raise ValueError(f"Ошибка типа: {data.type} не существует")
+                raise ValueError(f"Ошибка типа: {body['type']} не существует")
 
 
 async def start_consuming():
     connection = await get_connection()
-    channel = await connection.channel()
-    queue = await channel.declare_queue("notifications", durable=True)
+    async with connection:
+        channel = await connection.channel()
 
-    await queue.consume(handle_message)
+        queue = await channel.declare_queue(config.QUEUE_NAME, durable=True)
+
+        await queue.consume(handle_message)
+
+        print("[✔] Консьюмер запущен. Ожидание сообщений...")
+        await asyncio.Future()
+
+
+if __name__ == "__main__":
+    asyncio.run(start_consuming())

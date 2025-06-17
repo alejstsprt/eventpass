@@ -2,6 +2,7 @@ import os
 from typing import Final, Type
 
 from dotenv import load_dotenv
+
 from models.models import Accounts, Events, Tickets, TicketTypes
 from models.session import DBBaseModel
 
@@ -44,6 +45,7 @@ class Settings:
     # для раббита
     RABBIT_USER: str = os.getenv("RABBIT_USER", "eventpass")
     RABBIT_PASSWORD: str = os.getenv("RABBIT_PASSWORD", "eventpass12345")
+    QUEUE_NAME: str = os.getenv("QUEUE_NAME", "notifications")
 
 
 config = Settings()

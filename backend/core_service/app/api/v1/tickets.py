@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Cookie, Depends, Path, status
 
 from core.config import config
+from dependencies.injection_app import get_rabbit_producer
+from infrastructure.messaging.producer import RabbitProducer
 from schemas import (
     ActivateQrCodeResponseDTO,
     AllActiveTicketsEventResponseDTO,
@@ -21,7 +23,7 @@ router = APIRouter()
     status_code=status.HTTP_200_OK,
     responses=None,  # TODO: дописать
 )
-async def create_ticket(
+async def get_ticket_all(
     event_id: int = Path(..., title="ID мероприятия", ge=1, le=config.MAX_ID),
     service: ManagementTicketsProtocol = Depends(get_tickets_service),
     jwt_token: str = Cookie(None),
@@ -36,7 +38,7 @@ async def create_ticket(
     status_code=status.HTTP_200_OK,
     responses=None,  # TODO: дописать
 )
-async def create_ticket(
+async def get_ticket_active(
     event_id: int = Path(..., title="ID мероприятия", ge=1, le=config.MAX_ID),
     service: ManagementTicketsProtocol = Depends(get_tickets_service),
     jwt_token: str = Cookie(None),
@@ -53,10 +55,11 @@ async def create_ticket(
 )
 async def create_ticket(
     ticket_data: TicketCreateDTO,
+    rabbit_producer: RabbitProducer = Depends(get_rabbit_producer),
     service: ManagementTicketsProtocol = Depends(get_tickets_service),
     jwt_token: str = Cookie(None),
 ) -> TicketCreateResponseDTO:
-    return await service.create_ticket(ticket_data, jwt_token)
+    return await service.create_ticket(ticket_data, jwt_token, rabbit_producer)
 
 
 @router.post(
@@ -68,10 +71,11 @@ async def create_ticket(
 )
 async def create_ticket(
     code: str = Path(..., title="Уникальный код билета", min_length=2, max_length=1000),
+    rabbit_producer: RabbitProducer = Depends(get_rabbit_producer),
     service: ManagementTicketsProtocol = Depends(get_tickets_service),
     jwt_token: str = Cookie(None),
 ) -> ActivateQrCodeResponseDTO:
-    return await service.activate_qr_code(jwt_token, code)
+    return await service.activate_qr_code(jwt_token, code, rabbit_producer)
 
 
 @router.delete(

@@ -5,8 +5,6 @@
 from collections import defaultdict
 from typing import TYPE_CHECKING, Literal, Optional, TypeVar
 
-from models.models import Accounts, Events, Tickets, TicketTypes
-from models.session import DBBaseModel
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, joinedload
@@ -23,6 +21,8 @@ from core.exceptions import (
     ValidationError,
 )
 from core.logger import logger_api
+from models.models import Accounts, Events, Tickets, TicketTypes
+from models.session import DBBaseModel
 
 if TYPE_CHECKING:
     from pydantic import BaseModel
@@ -45,7 +45,7 @@ T = TypeVar("T", bound=DBBaseModel)
 
 async def user_registration(
     db: Session, name: "StrUserName", login: "StrUserLogin", password: "StrUserPassword"
-) -> "UserRegistrationResult":
+) -> "Accounts":
     """
     Функция для регистрации аккаунта.
 
@@ -56,7 +56,7 @@ async def user_registration(
         password (StrUserPassword): Пароль пользователя (хеш).
 
     Returns:
-        UserRegistrationResult (TypedDict): `{'result': True, 'user_id': int}`
+        Accounts (DBBaseModel): Всю информацию о пользователе.
 
     Raises:
         ValidationError (HTTPException): Неверные входные данные.
@@ -521,6 +521,22 @@ async def delete_data(
 async def db_activate_qr_code(
     db: Session, user_id: int, code: str
 ) -> "ActivateQrCodeResult":
+    """
+    Активация билета на мероприятие.
+
+    Args:
+        db (Session): Сессия SQLAlchemy для работы с БД.
+        user_id (int): ID пользователя.
+        code (str): Код билета.
+
+    Raises:
+        ValidationError (HTTPException): Неверные данные.
+        ForbiddenError: Недостаточно прав для выполнения.
+        InternalServerError: Ошибка сервера.
+
+    Returns:
+        ActivateQrCodeResult (TypedDict): Тело ответа.
+    """
     ticket = db.query(Tickets).filter(Tickets.unique_code == code).first()
 
     if not ticket:
@@ -530,17 +546,12 @@ async def db_activate_qr_code(
         raise ForbiddenError("Активировать билет может только создатель мероприятия")
 
     if ticket.is_used:
-        return {"activate": "False", "info": "Билет уже был активирован"}
+        return {"activate": False, "info": "Билет уже был активирован"}
 
-    try:
-        ticket.is_used = True
-        db.commit()
-    except Exception as e:
-        db.rollback()
-        logger_api.exception(f"Внутренняя ошибка сервера. Проблемы с сейвом БД: {e}")
-        raise InternalServerError()
+    ticket.is_used = True
+    db.commit()
 
-    return {"activate": "True", "info": "Билет успешно активирован"}
+    return {"activate": True, "info": "Билет успешно активирован"}
 
 
 async def db_all_active_tickets_event(

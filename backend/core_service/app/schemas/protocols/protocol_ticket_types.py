@@ -1,27 +1,30 @@
 from typing import TYPE_CHECKING, Protocol
 
 if TYPE_CHECKING:
+    from infrastructure.messaging.producer import RabbitProducer
     from models.models import TicketTypes
     from models.session import DBBaseModel
-
-    from schemas import CreateTicketType, EditTicketType
+    from schemas import CreateTicketTypeDTO, EditTicketTypeDTO
 
 
 class ManagementTicketTypeProtocol(Protocol):
     """Протокол ManagementTicketType"""
 
     async def create_types_ticket_event(
-        self, jwt_token: str, ticket_type_data: "CreateTicketType"
+        self,
+        jwt_token: str,
+        ticket_type_data: "CreateTicketTypeDTO",
+        rabbit_producer: "RabbitProducer",
     ) -> "TicketTypes":
         """
         Метод для создания типа билета для мероприятия.
 
         Args:
             jwt_token (str): Токен пользователя.
-            ticket_type_data (CreateTicketType): Пайдемик модель.
+            ticket_type_data (CreateTicketTypeDTO): Пайдемик модель.
 
         Returns:
-            CreateTicketType: None
+            TicketTypes
 
         Raises:
             NoTokenError (Exception): Токен отстуствует/неправильный.
@@ -30,7 +33,10 @@ class ManagementTicketTypeProtocol(Protocol):
         ...
 
     async def edit_types_ticket(
-        self, jwt_token: str, types_ticket_id: int, ticket_type_data: "EditTicketType"
+        self,
+        jwt_token: str,
+        types_ticket_id: int,
+        ticket_type_data: "EditTicketTypeDTO",
     ) -> "DBBaseModel":
         """
         Обновляет тип билета для мероприятия.
@@ -38,7 +44,7 @@ class ManagementTicketTypeProtocol(Protocol):
         Args:
             jwt_token (str): Токен пользователя.
             types_ticket_id (int): ID редактируемого типа билета.
-            ticket_type_data (EditTicketType): Данные для обновления.
+            ticket_type_data (EditTicketTypeDTO): Данные для обновления.
 
         Returns:
             BaseModel: Обновленный обьект типа билета.

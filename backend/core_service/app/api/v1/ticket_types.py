@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Cookie, Depends, Path, status
 
 from core.config import config
+from dependencies.injection_app import get_rabbit_producer
 from infrastructure.cache.cache_v2 import ICache, ICacheWriter, IClearCache, IParam
+from infrastructure.messaging.producer import RabbitProducer
 from schemas import (
     CreateTicketTypeDTO,
     CreateTicketTypeResponseDTO,
@@ -52,10 +54,13 @@ async def get_types_ticket_event(
 )
 async def create_types_ticket(
     ticket_type_data: CreateTicketTypeDTO,
+    rabbit_producer: RabbitProducer = Depends(get_rabbit_producer),
     service: ManagementTicketTypeProtocol = Depends(get_ticket_types_service),
     jwt_token: str = Cookie(None),
 ) -> CreateTicketTypeResponseDTO:
-    return await service.create_types_ticket_event(jwt_token, ticket_type_data)
+    return await service.create_types_ticket_event(
+        jwt_token, ticket_type_data, rabbit_producer
+    )
 
 
 @router.patch(

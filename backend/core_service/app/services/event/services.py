@@ -1,9 +1,11 @@
 from typing import TYPE_CHECKING
 
-from models.crud import all_info_table, create_event, del_event, edit_data, search_user
 from sqlalchemy.orm import Session
 
+from core.config import config
 from core.exceptions import NoTokenError, TokenError
+from infrastructure.messaging.producer import RabbitProducer
+from models.crud import all_info_table, create_event, del_event, edit_data, search_user
 from schemas import (
     AllElementsResponseDTO,
     CreateEventResponseDTO,
@@ -29,7 +31,10 @@ class ManagementEvents:
         self.db = db
 
     async def create_events(
-        self, jwt_token: str, event: "CreateEventDTO"
+        self,
+        jwt_token: str,
+        event: "CreateEventDTO",
+        rabbit_producer: RabbitProducer,
     ) -> CreateEventResponseDTO:
         """
         Метод для создания мероприятия.
@@ -62,6 +67,18 @@ class ManagementEvents:
             event.category.value,
             StrEventDescription(event.description),
             StrEventAddress(event.address),
+        )
+
+        await rabbit_producer.add_to_queue(
+            config.QUEUE_NAME,
+            {
+                "type": "email",
+                "payload": {
+                    "to": "alexeyisaev2@mail.ru",  # TODO: сделать
+                    "title": "Новое мероприятие",
+                    "text": f"Вы создали новое мероприятие '{event.title}'. Статус: {event.status}.",
+                },
+            },
         )
 
         return CreateEventResponseDTO.model_validate(event)
