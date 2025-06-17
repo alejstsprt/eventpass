@@ -4,6 +4,7 @@ from fastapi import Response
 from models.crud import db_get_info_user, search_user, user_registration
 from sqlalchemy.orm import Session
 
+from core.config import config
 from core.exceptions import LoginError, NoTokenError, PasswordError
 from schemas import (
     CreateUserResponseDTO,
@@ -62,11 +63,14 @@ class ManagementUsers:
         await set_jwt_cookie(response, token)
 
         await rabbit_producer.add_to_queue(
-            "email",
+            config.QUEUE_NAME,
             {
-                "email": "fire.pl12345@mail.ru",
-                "title": "Спасибо за регистрацию",
-                "text": "Вы зарегестрировались",
+                "type": "email",
+                "payload": {
+                    "to": "alexeyisaev2@mail.ru",
+                    "title": "Спасибо за регистрацию",
+                    "text": "Вы зарегестрировались",
+                },
             },
         )
         return result

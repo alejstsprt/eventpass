@@ -1,6 +1,6 @@
-from app.tasks.send_telegram import send_telegram
-from app.utils.parse_payload import Payload
+from backend.notify_service.app.tasks.send_telegram import send_telegram
+from backend.notify_service.app.utils.parse_body import TelegramBody
 
 
-async def handle(payload: Payload) -> None:
-    await send_telegram(to=payload.to, message=payload.message)
+async def handle(payload: TelegramBody) -> None:
+    await send_telegram(user_id=payload.user_id, text=payload.text)

@@ -1,12 +1,17 @@
-from pydantic import BaseSettings
+import os
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
-class Settings(BaseSettings):
-    rabbitmq_url: str = "amqp://guest:guest@localhost:5672/"
-    queue_name: str = "notifications"
+class Settings:
+    RABBIT_USER: str = os.getenv("RABBIT_USER", "eventpass")
+    RABBIT_PASSWORD: str = os.getenv("RABBIT_PASSWORD", "eventpass12345")
+    QUEUE_NAME: str = os.getenv("QUEUE_NAME", "notifications")
 
-    class Config:
-        env_file = ".env"
+    EMAIL: str = os.getenv("EMAIL", "None")
+    PASSWORD_KEY: str = os.getenv("PASSWORD_KEY", "None")
 
 
-settings = Settings()
+config = Settings()
