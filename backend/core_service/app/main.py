@@ -9,6 +9,7 @@ import uvicorn
 
 from backend.core_service.app.api.v1 import event, ticket_types, tickets, user
 from backend.core_service.app.core.exceptions_handlers import (
+    not_found,
     rate_limit,
     validation_exception_handler,
 )
@@ -27,6 +28,7 @@ app = FastAPI(lifespan=lifespan)
 
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(status.HTTP_429_TOO_MANY_REQUESTS, rate_limit)
+app.add_exception_handler(status.HTTP_404_NOT_FOUND, not_found)
 
 
 setup_cors(app)

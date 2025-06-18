@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Cookie, Depends, Request, Response, status
+from typing import Annotated
+
+from fastapi import APIRouter, Body, Cookie, Depends, Response, status
 from fastapi_limiter.depends import RateLimiter
 
 from dependencies.injection_app import get_rabbit_producer
@@ -24,9 +26,11 @@ router = APIRouter()
     status_code=status.HTTP_200_OK,
     responses=None,  # TODO: сделать
 )
-async def create_user(
-    jwt_token: str = Cookie(None),
-    service: ManagementUsersProtocol = Depends(get_user_service),
+async def get_user(
+    jwt_token: Annotated[
+        str, Cookie(..., description="JWT токен пользователя", max_length=1_000)
+    ],
+    service: Annotated[ManagementUsersProtocol, Depends(get_user_service)],
 ) -> GetUserInfoResponseDTO:
     return await service.get_info_user(jwt_token)
 
@@ -41,9 +45,11 @@ async def create_user(
 )
 async def create_user(
     response: Response,
-    user: CreateUserDTO,
-    rabbit_producer: RabbitProducer = Depends(get_rabbit_producer),
-    service: ManagementUsersProtocol = Depends(get_user_service),
+    user: Annotated[
+        CreateUserDTO, Body(..., description="Данные пользователя для регистрации")
+    ],
+    service: Annotated[ManagementUsersProtocol, Depends(get_user_service)],
+    rabbit_producer: Annotated[RabbitProducer, Depends(get_rabbit_producer)],
 ) -> CreateUserResponseDTO:
     return await service.create_user(response, user, rabbit_producer)
 
@@ -58,7 +64,7 @@ async def create_user(
 )
 async def login_user(
     response: Response,
-    user: LoginUserDTO,
-    service: ManagementUsersProtocol = Depends(get_user_service),
+    user: Annotated[LoginUserDTO, Body(..., description="Данные для входа")],
+    service: Annotated[ManagementUsersProtocol, Depends(get_user_service)],
 ) -> LoginUserResponseDTO:
     return await service.login_user(response, user)
