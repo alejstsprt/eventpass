@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Cookie, Depends, Path, status
+from typing import Annotated
+
+from fastapi import APIRouter, Body, Cookie, Depends, Path, status
 from fastapi_limiter.depends import RateLimiter
 
 from core.config import config
@@ -26,9 +28,13 @@ router = APIRouter()
     responses=None,  # TODO: дописать
 )
 async def get_ticket_all(
-    event_id: int = Path(..., title="ID мероприятия", ge=1, le=config.MAX_ID),
-    service: ManagementTicketsProtocol = Depends(get_tickets_service),
-    jwt_token: str = Cookie(None),
+    event_id: Annotated[
+        int, Path(..., description="ID мероприятия", ge=1, le=config.MAX_ID)
+    ],
+    jwt_token: Annotated[
+        str, Cookie(..., description="JWT токен пользователя", max_length=1_000)
+    ],
+    service: Annotated[ManagementTicketsProtocol, Depends(get_tickets_service)],
 ) -> AllTicketsEventResponseDTO:
     return await service.all_tickets_event(jwt_token, event_id)
 
@@ -42,9 +48,13 @@ async def get_ticket_all(
     responses=None,  # TODO: дописать
 )
 async def get_ticket_active(
-    event_id: int = Path(..., title="ID мероприятия", ge=1, le=config.MAX_ID),
-    service: ManagementTicketsProtocol = Depends(get_tickets_service),
-    jwt_token: str = Cookie(None),
+    event_id: Annotated[
+        int, Path(..., description="ID мероприятия", ge=1, le=config.MAX_ID)
+    ],
+    jwt_token: Annotated[
+        str, Cookie(..., description="JWT токен пользователя", max_length=1_000)
+    ],
+    service: Annotated[ManagementTicketsProtocol, Depends(get_tickets_service)],
 ) -> AllActiveTicketsEventResponseDTO:
     return await service.all_active_tickets_event(jwt_token, event_id)
 
@@ -58,10 +68,14 @@ async def get_ticket_active(
     responses=None,  # TODO: дописать
 )
 async def create_ticket(
-    ticket_data: TicketCreateDTO,
-    rabbit_producer: RabbitProducer = Depends(get_rabbit_producer),
-    service: ManagementTicketsProtocol = Depends(get_tickets_service),
-    jwt_token: str = Cookie(None),
+    ticket_data: Annotated[
+        TicketCreateDTO, Body(..., description="Данные для создания билета")
+    ],
+    jwt_token: Annotated[
+        str, Cookie(..., description="JWT токен пользователя", max_length=1_000)
+    ],
+    rabbit_producer: Annotated[RabbitProducer, Depends(get_rabbit_producer)],
+    service: Annotated[ManagementTicketsProtocol, Depends(get_tickets_service)],
 ) -> TicketCreateResponseDTO:
     return await service.create_ticket(ticket_data, jwt_token, rabbit_producer)
 
@@ -74,11 +88,16 @@ async def create_ticket(
     status_code=status.HTTP_200_OK,
     responses=None,  # TODO: дописать
 )
-async def create_ticket(
-    code: str = Path(..., title="Уникальный код билета", min_length=2, max_length=1000),
-    rabbit_producer: RabbitProducer = Depends(get_rabbit_producer),
-    service: ManagementTicketsProtocol = Depends(get_tickets_service),
-    jwt_token: str = Cookie(None),
+async def scan_ticket(
+    code: Annotated[
+        str,
+        Path(..., description="Уникальный код билета", min_length=2, max_length=1000),
+    ],
+    jwt_token: Annotated[
+        str, Cookie(..., description="JWT токен пользователя", max_length=1_000)
+    ],
+    rabbit_producer: Annotated[RabbitProducer, Depends(get_rabbit_producer)],
+    service: Annotated[ManagementTicketsProtocol, Depends(get_tickets_service)],
 ) -> ActivateQrCodeResponseDTO:
     return await service.activate_qr_code(jwt_token, code, rabbit_producer)
 
@@ -92,9 +111,13 @@ async def create_ticket(
     responses={status.HTTP_204_NO_CONTENT: {"description": "Успешное удаление"}},
 )
 async def delete_ticket(
-    ticket_id: int = Path(..., title="ID билета", ge=1, le=config.MAX_ID),
-    service: ManagementTicketsProtocol = Depends(get_tickets_service),
-    jwt_token: str = Cookie(None),
+    ticket_id: Annotated[
+        int, Path(..., description="ID билета", ge=1, le=config.MAX_ID)
+    ],
+    jwt_token: Annotated[
+        str, Cookie(..., description="JWT токен пользователя", max_length=1_000)
+    ],
+    service: Annotated[ManagementTicketsProtocol, Depends(get_tickets_service)],
 ) -> None:
     await service.delete_ticket(ticket_id, jwt_token)
     return
