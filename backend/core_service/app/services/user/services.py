@@ -19,7 +19,7 @@ from security.jwt import create_access_token, set_jwt_cookie, token_verification
 
 if TYPE_CHECKING:
     from infrastructure.messaging.producer import RabbitProducer
-    from schemas import CreateUserDTO, LoginUserDTO, LoginUserResult, StrUserLogin
+    from schemas import CreateUserDTO, LoginUserDTO, StrUserLogin
 
 
 class ManagementUsers:

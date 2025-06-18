@@ -13,7 +13,7 @@ from schemas import (
     LoginUserResponseDTO,
     ManagementUsersProtocol,
 )
-from services import CREATE_USER_RESPONSES, LOGIN_USER_RESPONSES, get_user_service
+from services import get_user_service
 
 router = APIRouter()
 
@@ -24,7 +24,6 @@ router = APIRouter()
     summary="Информация о пользователе",
     description="ИНФО: Ручка возвращает информацию о пользователе. ID user берется из токена.",
     status_code=status.HTTP_200_OK,
-    responses=None,  # TODO: сделать
 )
 async def get_user(
     jwt_token: Annotated[
@@ -41,7 +40,6 @@ async def get_user(
     summary="Создание аккаунта",
     description="ИНФО: Ручка для создания аккаунта. Принимает в себя name, login, password.",
     status_code=status.HTTP_201_CREATED,
-    responses=CREATE_USER_RESPONSES,
 )
 async def create_user(
     response: Response,
@@ -60,7 +58,6 @@ async def create_user(
     summary="Вход в аккаунт",
     description="ИНФО: Ручка для входа в аккаунт. Принимает в себя login, password.",
     status_code=status.HTTP_200_OK,
-    responses=LOGIN_USER_RESPONSES,
 )
 async def login_user(
     response: Response,

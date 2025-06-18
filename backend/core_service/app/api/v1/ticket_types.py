@@ -27,7 +27,6 @@ router = APIRouter()
     summary="Список типов билета мероприятия",
     description="ИНФО: Список типов билета мероприятия. Принимает только токен.",
     status_code=status.HTTP_200_OK,
-    responses=None,  # TODO: дописать
 )
 @ICache(
     unique_name="ticket-types",
@@ -55,7 +54,6 @@ async def get_types_ticket_event(
     summary="Создание типа билета для мероприятия",
     description="ИНФО: Ручка для создания типа билета для мероприятия. Принимает в себя event_id, ticket_type, description, price, total_count.",
     status_code=status.HTTP_201_CREATED,
-    responses=None,  # TODO: дописать
 )
 @IClearCache(
     unique_name="ticket-types",
@@ -82,7 +80,6 @@ async def create_types_ticket(
     summary="Изменение деталей типа билета мероприятия",
     description="ИНФО: Ручка для создания типа билета для мероприятия. Принимает в себя event_id | None, description | None, price | None, total_count | None.",
     status_code=status.HTTP_200_OK,
-    responses=None,  # TODO: дописать
 )
 @IClearCache(
     unique_name="ticket-types",
@@ -109,7 +106,6 @@ async def edit_types_ticket(
     summary="Удаление типа билета мероприятия",
     description="ИНФО: Ручка для удаления типа билета мероприятия.",
     status_code=status.HTTP_204_NO_CONTENT,
-    responses=None,  # TODO: дописать
 )
 @IClearCache(
     unique_name="ticket-types",
