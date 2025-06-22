@@ -16,7 +16,7 @@ from schemas import (
     ManagementEventsProtocol,
 )
 from security.jwt import token_verification
-from services import CREATE_EVENT_RESPONSES, get_event_service
+from services import get_event_service
 
 # from fastapi_cache.decorator import cache # имеет маленький функционал. я создал свой
 
@@ -29,7 +29,6 @@ router = APIRouter()
     summary="Список всех мероприятий",
     description="ИНФО: Ручка для получения списка всех мероприятий.",
     status_code=status.HTTP_200_OK,
-    responses=None,  # TODO: дописать
 )
 @ICache(
     unique_name="event-cache",
@@ -51,7 +50,6 @@ async def list_events(
     summary="Создание мероприятия",
     description="ИНФО: Ручка для создания мероприятия. Принимает в себя status, title, description, address.",
     status_code=status.HTTP_201_CREATED,
-    responses=CREATE_EVENT_RESPONSES,
 )
 @IClearCache(
     unique_name="event-cache",
@@ -69,8 +67,7 @@ async def create_event(
     rabbit_producer: Annotated[RabbitProducer, Depends(get_rabbit_producer)],
     service: Annotated[ManagementEventsProtocol, Depends(get_event_service)],
 ) -> CreateEventResponseDTO:
-    print(file)
-    return await service.create_events(jwt_token, event, rabbit_producer)
+    return await service.create_events(jwt_token, event, rabbit_producer, file)
 
 
 @router.patch(
@@ -79,7 +76,6 @@ async def create_event(
     summary="Изменение мероприятия",
     description="ИНФО: Ручка для изменения мероприятия. Принимает в себя status | None, title | None, description | None, address | None.",
     status_code=status.HTTP_200_OK,
-    responses=None,  # TODO: дописать
 )
 @IClearCache(
     unique_name="event-cache",
@@ -104,7 +100,6 @@ async def edit_events(
     summary="Удаление мероприятия",
     description="ИНФО: Ручка для удаления мероприятия по ID.",
     status_code=status.HTTP_204_NO_CONTENT,
-    responses=None,  # TODO: дописать
 )
 @IClearCache(
     unique_name="event-cache",

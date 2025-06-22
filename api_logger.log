@@ -5643,3 +5643,52 @@ TypeError: Unable to apply constraint 'max_length' to supplied value login='user
 >>>>>>> div
 [2025-06-18 19:04:58,776] [INFO] api_logger: Продюсер Rabbit запущен
 [2025-06-18 19:04:58,782] [INFO] api_logger: Redis для FastAPILimiter подключен
+<<<<<<< HEAD
+=======
+[2025-06-18 19:06:01,186] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-18 19:06:04,401] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-18 19:06:04,407] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-18 20:01:46,221] [INFO] api_logger: POST /api/v1/auth/login -> 401 [0.5378s]
+[2025-06-18 21:16:08,442] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-18 21:16:13,032] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-18 21:16:13,048] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-18 21:16:14,352] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-18 21:16:17,274] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-18 21:16:17,307] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-18 21:16:21,762] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-18 21:16:25,265] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-18 21:16:25,275] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-18 21:16:25,586] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-18 21:16:30,354] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-18 21:16:30,360] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-18 21:16:36,013] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-18 21:16:39,675] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-18 21:16:39,681] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-18 21:16:43,333] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-18 21:16:43,346] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-18 21:16:46,893] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-18 21:16:46,899] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-18 21:16:47,343] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-18 21:16:51,126] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-18 21:16:51,142] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-18 21:16:54,374] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-18 21:16:54,381] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-18 21:16:57,671] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-18 21:16:57,679] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-18 21:16:58,873] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-18 21:17:02,802] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-18 21:17:02,811] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-18 21:17:03,791] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-18 21:17:07,853] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-18 21:17:07,863] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-18 21:17:11,685] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-18 21:17:11,698] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-18 21:17:17,848] [INFO] api_logger: GET /docs -> 200 [0.00162s]
+[2025-06-18 21:17:18,354] [INFO] api_logger: GET /openapi.json -> 200 [0.05281s]
+[2025-06-18 22:42:20,038] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+[2025-06-19 02:19:04,244] [INFO] api_logger: Продюсер Rabbit запущен
+[2025-06-19 02:19:04,256] [INFO] api_logger: Redis для FastAPILimiter подключен
+[2025-06-19 02:19:04,495] [INFO] api_logger: GET /docs -> 200 [0.00152s]
+[2025-06-19 02:19:05,019] [INFO] api_logger: GET /openapi.json -> 200 [0.06256s]
+[2025-06-19 02:23:02,190] [INFO] api_logger: Продюсер Rabbit завершил свою работу
+>>>>>>> div

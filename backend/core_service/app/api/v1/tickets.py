@@ -25,7 +25,6 @@ router = APIRouter()
     summary="Количество купленных билетов мероприятия",
     description="ИНФО: Ручка для возврата количества купленных билетов.",
     status_code=status.HTTP_200_OK,
-    responses=None,  # TODO: дописать
 )
 async def get_ticket_all(
     event_id: Annotated[
@@ -45,7 +44,6 @@ async def get_ticket_all(
     summary="Количество активированных билетов мероприятия",
     description="ИНФО: Ручка для возврата количества активированных билетов.",
     status_code=status.HTTP_200_OK,
-    responses=None,  # TODO: дописать
 )
 async def get_ticket_active(
     event_id: Annotated[
@@ -65,7 +63,6 @@ async def get_ticket_active(
     summary="Создание билета на мероприятие",
     description="ИНФО: Ручка для создания билета на мероприятие. Принимает в себя event_id, ticket_type_id",
     status_code=status.HTTP_201_CREATED,
-    responses=None,  # TODO: дописать
 )
 async def create_ticket(
     ticket_data: Annotated[
@@ -86,7 +83,6 @@ async def create_ticket(
     summary="Сканирование билета и его активация",
     description="ИНФО: Ручка для активации билета. Принимает уникальный код билета.",
     status_code=status.HTTP_200_OK,
-    responses=None,  # TODO: дописать
 )
 async def scan_ticket(
     code: Annotated[
@@ -108,7 +104,6 @@ async def scan_ticket(
     summary="Удаление билета мероприятия",
     description="ИНФО: Удаляет билет по указанному ID. Принимает в себя айди билета.",
     status_code=status.HTTP_204_NO_CONTENT,
-    responses={status.HTTP_204_NO_CONTENT: {"description": "Успешное удаление"}},
 )
 async def delete_ticket(
     ticket_id: Annotated[

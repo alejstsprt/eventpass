@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, Dict, Protocol
+from typing import TYPE_CHECKING, Protocol
 
 if TYPE_CHECKING:
     from infrastructure.messaging.producer import RabbitProducer
