@@ -35,6 +35,7 @@ class ManagementEvents:
         jwt_token: str,
         event: "CreateEventDTO",
         rabbit_producer: RabbitProducer,
+        file: bytes,
     ) -> CreateEventResponseDTO:
         """
         Метод для создания мероприятия.
@@ -58,6 +59,8 @@ class ManagementEvents:
         is_user = await search_user(self.db, user_id=IntUserId(user_id))
         if is_user["id"] is None:
             raise TokenError()
+
+        print(file)
 
         event = await create_event(
             self.db,

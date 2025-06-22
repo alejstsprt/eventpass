@@ -67,8 +67,7 @@ async def create_event(
     rabbit_producer: Annotated[RabbitProducer, Depends(get_rabbit_producer)],
     service: Annotated[ManagementEventsProtocol, Depends(get_event_service)],
 ) -> CreateEventResponseDTO:
-    print(file)
-    return await service.create_events(jwt_token, event, rabbit_producer)
+    return await service.create_events(jwt_token, event, rabbit_producer, file)
 
 
 @router.patch(
