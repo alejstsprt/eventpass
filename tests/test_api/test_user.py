@@ -1,79 +1,42 @@
 from pathlib import Path
 import sys
+from unittest.mock import MagicMock
 
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
-# import pytest
-# from httpx import AsyncClient, ASGITransport
-# from backend.core_service.app.api.v1.user import router
+from unittest.mock import AsyncMock
+
+from fastapi import status
+from httpx import AsyncClient
+import pytest
+
+from backend.core_service.app.api.v1 import user
+from backend.core_service.app.schemas import GetUserInfoResponseDTO
+from backend.core_service.app.services.user import get_service
 
 
-# @pytest.mark.asyncio
-# async def test_create_user():
-#     test_data = {
-#         "login": "user@example.com",
-#         "password": "mypassword123"
-#     }
-
-#     async with AsyncClient(transport=ASGITransport(app=router), base_url="http://test") as ac:
-#         response = await ac.post("/login", json=test_data)
-
-#         # Проверки
-#         assert response.status_code == 200  # или 201 для создания
-#         print(response.json())
+@pytest.fixture
+def mocked_user_service():
+    mock = AsyncMock()
+    mock.get_info_user.return_value = GetUserInfoResponseDTO(
+        id=1, name="Test", email="test@example.com"
+    )
+    return mock
 
 
-# import pytest
-# from fastapi.testclient import TestClient
-# from sqlalchemy import create_engine
-# from sqlalchemy.orm import sessionmaker
+@pytest.mark.asyncio
+async def test_get_user_info(mocked_user_service):
+    user.router.dependency_overrides[get_service] = lambda: mocked_user_service
 
-# # Импортируем ВСЕ модели перед созданием таблиц
-# from backend.core_service.app.models.models import Accounts, Events, TicketTypes, Tickets  # noqa: F401
-# from backend.core_service.app.models.session import DBBaseModel, get_db
+    async with AsyncClient(app=user.router, base_url="http://test") as ac:
+        response = await ac.get(
+            "/api/v1/auth",  # путь до твоей ручки
+            cookies={"jwt_token": "mocked.jwt.token"},
+        )
 
-# # Создаём in-memory SQLite для тестов
-# SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
-# engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
-# TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json() == {"id": 1, "name": "Test", "email": "test@example.com"}
 
-# # Подключаем приложение
-# from backend.core_service.app.main import app
+    mocked_user_service.get_info_user.assert_awaited_once_with("mocked.jwt.token")
 
-# # Фикстура для БД
-# @pytest.fixture()
-# def test_db():
-#     # Создаём все таблицы
-#     DBBaseModel.metadata.create_all(bind=engine)
-#     db = TestingSessionLocal()
-#     try:
-#         yield db
-#     finally:
-#         db.close()
-#         DBBaseModel.metadata.drop_all(bind=engine)
-
-# # Переопределяем зависимость
-# def override_get_db():
-#     db = TestingSessionLocal()
-#     try:
-#         yield db
-#     finally:
-#         db.close()
-
-# app.dependency_overrides[get_db] = override_get_db
-
-# client = TestClient(app)
-
-# def test_create_event(test_db):
-#     response = client.post(
-#         "/api/v1/auth/register",
-#         json={
-#             "login": "user@example.com",
-#             "password": "mypassword123",
-#             "name": "Витя"
-#         }
-#     )
-#     assert response.status_code == 201
-#     data = response.json()
-#     assert data["login"] == "user@example.com"
-#     assert "id" in data
+    user.router.dependency_overrides = {}  # очищаем переопределения
